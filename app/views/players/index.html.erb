@@ -1,0 +1,21 @@
+<h1>Listing players</h1>
+:>>>
+<table>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Email</th>
+    <th>Num Wins</th>
+  </tr>
+
+<% @players.each do |player| %>
+  <tr>
+    <td><%= player.id %></td>
+    <td><%= player.last_name %></td>
+	<td><%= player.email %></td>
+	<td><%= player.num_wins %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />

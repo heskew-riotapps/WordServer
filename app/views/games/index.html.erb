@@ -1,0 +1,19 @@
+<h1>Listing games</h1>
+
+<table>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Email</th>
+    <th>Num Wins</th>
+  </tr>
+
+<% @games.each do |game| %>
+  <tr>
+    <td><%= game.test  %></td>
+	    <td>c<%= game.letters.to_s  %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
