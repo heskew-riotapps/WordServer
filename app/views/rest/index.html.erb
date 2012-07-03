@@ -39,7 +39,24 @@ $(document).ready(function() {
 		});
 		break;
 	case "DELETE":
-
+		var json = $("#tPost").val();
+		$.ajax({
+			url: $("#tUrl").val(),
+			type: 'POST',
+			dataType: 'json',
+			data: json,
+			contentType: 'application/json; charset=utf-8',
+			beforeSend: function(xhr){
+				xhr.setRequestHeader("X-Http-Method-Override","delete");
+			},
+			success: function (data, textStatus, xhr) {
+				$('#tReturn').text(JSON.stringify(data, null, "\t"));
+				$("#sRC").text(xhr.status);
+			},
+			error:function (xhr, ajaxOptions, thrownError){
+				$("#sRC").text(xhr.status); 
+			} 
+		});
 		break;
 	case "POST":
 		//$.post($("#tUrl").val(),$("#tPost").val(), function(data) {
@@ -49,18 +66,39 @@ $(document).ready(function() {
 		//var json = JSON.stringify($("#tPost").val());
 		var json = $("#tPost").val();
 		$.ajax({
-			url: $("#tUrl").val().replace(/"/g, ''),
+			url: $("#tUrl").val(),
 			type: 'POST',
 			dataType: 'json',
 			data: json,
 			contentType: 'application/json; charset=utf-8',
-			success: function (data) {
+			success: function (data, textStatus, xhr) {
 				$('#tReturn').text(JSON.stringify(data, null, "\t"));
+				$("#sRC").text(xhr.status);
+			},
+			error:function (xhr, ajaxOptions, thrownError){
+				$("#sRC").text(xhr.status); 
 			}
 		});
 		break;
 	case "PUT":
-
+		var json = $("#tPost").val();
+		$.ajax({
+			url: $("#tUrl").val(),
+			type: 'POST',
+			dataType: 'json',
+			data: json,
+			contentType: 'application/json; charset=utf-8',
+			beforeSend: function(xhr){
+				xhr.setRequestHeader("X-Http-Method-Override","put");
+			},
+			success: function (data, textStatus, xhr) {
+				$('#tReturn').text(JSON.stringify(data, null, "\t"));
+				$("#sRC").text(xhr.status);
+			},
+			error:function (xhr, ajaxOptions, thrownError){
+				$("#sRC").text(xhr.status); 
+			}
+		});
 		break;
 	}
   //  $.post($("#tUrl").val(), { _method: 'delete' }, null, "script");
