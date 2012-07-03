@@ -13,7 +13,7 @@ Word::Application.routes.draw do
   # This route can be invoked with purchase_url(:id => product.id)
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
-    resources :players, :games, :home
+    resources :players, :games, :home, :rest
 #    resources :games
 #	resources :home
 #	resources :home, :member => { :login => :get }

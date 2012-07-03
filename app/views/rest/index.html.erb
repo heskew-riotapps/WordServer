@@ -1,0 +1,70 @@
+<h1>Rest Test Harness</h1>
+
+Rest Url:<br />
+<input type="input" style="width:400px;" id="tUrl" />
+
+&nbsp;
+<select id="ddVerb">
+	<option value="GET">GET</option>
+	<option value="POST">CREATE</option>
+	<option value="PUT">UPDATE</option>
+	<option value="DELETE">DELETE</option>
+</select>
+&nbsp;<button id="bGo">GO</button>
+<br />
+<br />
+
+Post Data:<br />
+<textarea style="width:600px;height:275px;" id="tPost" >
+</textarea>
+<br />
+<br />
+
+Return Status Code:&nbsp;<span id="sRC"></span>
+<br />
+Return Data:<br />
+<textarea style="width:600px;height:275px;" id="tReturn" />
+</textarea>
+ 
+
+<script>
+$(document).ready(function() {
+  $('#bGo').click(function() {
+	$('#tReturn').text(""); 
+	switch ($("#ddVerb").val())
+	{
+	case "GET":
+		$.get($("#tUrl").val(), function(data) {
+			$('#tReturn').text(JSON.stringify(data, null, "\t"));
+		});
+		break;
+	case "DELETE":
+
+		break;
+	case "POST":
+		//$.post($("#tUrl").val(),$("#tPost").val(), function(data) {
+	//		$('#tReturn').text(JSON.stringify(data, null, "\t"));
+		//});
+		//debugger;
+		//var json = JSON.stringify($("#tPost").val());
+		var json = $("#tPost").val();
+		$.ajax({
+			url: $("#tUrl").val().replace(/"/g, ''),
+			type: 'POST',
+			dataType: 'json',
+			data: json,
+			contentType: 'application/json; charset=utf-8',
+			success: function (data) {
+				$('#tReturn').text(JSON.stringify(data, null, "\t"));
+			}
+		});
+		break;
+	case "PUT":
+
+		break;
+	}
+  //  $.post($("#tUrl").val(), { _method: 'delete' }, null, "script");
+    return false;
+  });
+});
+</script>

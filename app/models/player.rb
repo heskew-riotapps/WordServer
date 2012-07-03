@@ -1,5 +1,6 @@
 class Player
   include MongoMapper::Document
+  include ActiveModel::Serialization
 
  # short field names!!!!!!!
   
