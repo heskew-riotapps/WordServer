@@ -7,7 +7,24 @@ class PlayersController < ApplicationController
 			format.json { render json: @player }	
 		end
 	end
+  
+  # GET /players/1
+  # GET /players/1.json
+  def show
+    @player = Player.find(params[:id])
 
+    respond_to do |format|
+		if @player.nil?
+			format.html { render action: "edit" } #wrong
+			format.json { render json: "not found", status: :not_found }
+		else
+			format.html # show.html.erb
+			format.json { render json: @player }
+		end
+    end
+  end
+  
+  
   def index
     @players = Player.all#({:last_name => 'Medical'})
 
@@ -19,8 +36,8 @@ class PlayersController < ApplicationController
   
   def create
 		#create default nickname if they dont fill it in
-		@existing = Player.find_by_email(params[:player][:email])
-		if @existing.nil?
+		@player = Player.find_by_email(params[:player][:email])
+		if @player.nil?
 		
 			@player = Player.create({
 			  :nickname => params[:player][:nickname],
@@ -28,6 +45,22 @@ class PlayersController < ApplicationController
 			})
 
 			@ok = @player.save
+		else
+			#call update here....check password here, create hash in mongo via rails
+			@player = Player.find_by_nickname(params[:player][:nickname])
+			if @player.nil?
+				@player = Player.create({
+					:nickname => params[:player][:nickname],
+					:email => params[:player][:email]
+				})
+				
+				@ok = @player.save
+			else
+				#player has been found...check password now.
+				#if password fails, send login failed error to client
+				#error codes via http or just error strings??
+				@ok = @player.update_attributes(params[:player])
+			end	
 		end
 		respond_to do |format|
 		  if @ok

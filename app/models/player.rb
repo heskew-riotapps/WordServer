@@ -1,6 +1,10 @@
 class Player
   include MongoMapper::Document
-  include ActiveModel::Serialization
+  include ActiveModel::SecurePassword 
+  #include ActiveModel::Serialization
+  has_secure_password
+
+   validates_presence_of :password, :on => :create, :if => :password_required
 
  # short field names!!!!!!!
   
@@ -9,6 +13,7 @@ class Player
   key :email,      String
   key :nickname,       String
   key :num_wins,     Integer, :default => 0
+  key :password_digest, String
   key :num_losses, Integer, :default => 0
   key :num_draws, Integer, :default => 0
   key :num_active_games, Integer, :default => 0
@@ -37,6 +42,11 @@ class Player
  
   def api_is_enabled?
     !self.api_key.empty?
+  end
+ 
+ def password_required
+    return true # if @called_omniauth == true
+    #(authentications.empty? || !password.blank?)
   end
  
   protected

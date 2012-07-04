@@ -31,17 +31,30 @@ Return Data:<br />
 $(document).ready(function() {
   $('#bGo').click(function() {
 	$('#tReturn').text(""); 
+	var url = $("#tUrl").val() + ".json"
 	switch ($("#ddVerb").val())
 	{
 	case "GET":
-		$.get($("#tUrl").val(), function(data) {
-			$('#tReturn').text(JSON.stringify(data, null, "\t"));
+		//$.get(url, function(data) {
+		//	$('#tReturn').text(JSON.stringify(data, null, "\t"));
+		//});
+		$.ajax({
+			url: url,
+			type: 'GET',
+			contentType: 'application/json; charset=utf-8',
+			success: function (data, textStatus, xhr) {
+				$('#tReturn').text(JSON.stringify(data, null, "\t"));
+				$("#sRC").text(xhr.status);
+			},
+			error:function (xhr, ajaxOptions, thrownError){
+				$("#sRC").text(xhr.status); 
+			}
 		});
 		break;
 	case "DELETE":
 		var json = $("#tPost").val();
 		$.ajax({
-			url: $("#tUrl").val(),
+			url: url,
 			type: 'POST',
 			dataType: 'json',
 			data: json,
@@ -66,7 +79,7 @@ $(document).ready(function() {
 		//var json = JSON.stringify($("#tPost").val());
 		var json = $("#tPost").val();
 		$.ajax({
-			url: $("#tUrl").val(),
+			url: url,
 			type: 'POST',
 			dataType: 'json',
 			data: json,
@@ -83,7 +96,7 @@ $(document).ready(function() {
 	case "PUT":
 		var json = $("#tPost").val();
 		$.ajax({
-			url: $("#tUrl").val(),
+			url: url,
 			type: 'POST',
 			dataType: 'json',
 			data: json,
