@@ -38,39 +38,47 @@ class PlayersController < ApplicationController
 		#create default nickname if they dont fill it in
 		@player = Player.find_by_email(params[:player][:email])
 		if @player.nil?
-		
-			@player = Player.create({
-			  :nickname => params[:player][:nickname],
-			  :email => params[:player][:email]
-			})
-
-			@ok = @player.save
-		else
-			#call update here....check password here, create hash in mongo via rails
 			@player = Player.find_by_nickname(params[:player][:nickname])
 			if @player.nil?
 				@player = Player.create({
 					:nickname => params[:player][:nickname],
-					:email => params[:player][:email]
+					:email => params[:player][:email],
+					:password => params[:player][:password]
 				})
-				
+
 				@ok = @player.save
 			else
-				#player has been found...check password now.
-				#if password fails, send login failed error to client
-				#error codes via http or just error strings??
+				#validate password here
+				if @player.authenticate(params[:password])
+					@ok = @player.update_attributes(params[:player])
+				else
+					@unauthorized = true
+				end
+			end
+			
+		else
+			#player has been found...check password now.
+			#if password fails, send login failed error to client
+			#error codes via http or just error strings??
+			if @player.authenticate(params[:password])
 				@ok = @player.update_attributes(params[:player])
+			else
+				@unauthorized = true
 			end	
 		end
 		respond_to do |format|
-		  if @ok
-			format.html { redirect_to @player, notice: 'Post was successfully created.' }
-			format.json { render json: @player, status: :created, location: @player }
-		  else
-			format.html { render action: "new" }
-			#json error handling
-			format.json { render json: @player.errors, status: :unprocessable_entity }
-		  end
+			if @unauthorized #account for FB
+				format.json { render json: "unauthorized", status: :unauthorized }
+			else 
+				if @ok
+					format.html { redirect_to @player, notice: 'Post was successfully created.' }
+					format.json { render json: @player, status: :created, location: @player }
+				else
+					format.html { render action: "new" }
+					#json error handling
+					format.json { render json: @player.errors, status: :unprocessable_entity }
+				end
+			end
 		end
 	end
 	

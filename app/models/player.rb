@@ -6,6 +6,8 @@ class Player
 
    validates_presence_of :password, :on => :create, :if => :password_required
 
+   attr_accessible :email, :nickname, :first_name, :last_name, :password
+   
  # short field names!!!!!!!
   
   key :first_name,     String
