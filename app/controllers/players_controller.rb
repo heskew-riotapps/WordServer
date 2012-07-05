@@ -86,9 +86,9 @@ class PlayersController < ApplicationController
 		@player = Player.find(params[:id])
 
 		respond_to do |format|
-			if @person.update_attributes(params[:person])
+			if @player.update_attributes(params[:player])
 				format.html { redirect_to @player, notice: 'Person was successfully updated.' }
-				format.json { head :no_content }
+				format.json { render json: @player, status: :created, location: @player }
 			else
 				format.html { render action: "edit" }
 				format.json { render json: @player.errors, status: :unprocessable_entity }
