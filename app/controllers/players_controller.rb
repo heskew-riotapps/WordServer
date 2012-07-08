@@ -45,11 +45,12 @@ class PlayersController < ApplicationController
 					:email => params[:player][:email],
 					:password => params[:player][:password]
 				})
-
+				@player.generate_token(:password)
 				@ok = @player.save
 			else
 				#validate password here
-				if @player.authenticate(params[:password])
+				if @player.authenticate_with_new_token(params[:password])
+					#@player.generate_session_token
 					@ok = @player.update_attributes(params[:player])
 				else
 					@unauthorized = true
@@ -60,7 +61,8 @@ class PlayersController < ApplicationController
 			#player has been found...check password now.
 			#if password fails, send login failed error to client
 			#error codes via http or just error strings??
-			if @player.authenticate(params[:password])
+			if @player.authenticate_with_new_token(params[:password])
+				#@player.generate_session_token
 				@ok = @player.update_attributes(params[:player])
 			else
 				@unauthorized = true
