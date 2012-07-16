@@ -45,7 +45,7 @@ class PlayersController < ApplicationController
 					:email => params[:player][:email],
 					:password => params[:player][:password]
 				})
-				@player.generate_token(:password)
+				@player.generate_token(:auth_token)
 				@ok = @player.save
 			else
 				#validate password here
