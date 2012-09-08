@@ -13,6 +13,9 @@ class Player
   key :auth_token, String
   key :fb,  String
   key :email,      String
+  key :f_name,       String, :format => /\A[\w\.\-\+]+\z/
+  key :l_name,       String, :format => /\A[\w\.\-\+]+\z/
+
   key :nickname,       String, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins
   key :password_digest, String 

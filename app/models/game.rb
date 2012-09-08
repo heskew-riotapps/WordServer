@@ -5,6 +5,7 @@ class Game
   many :played_words
 #many :letters remaining vs played?#, :length => { :maximum => 2 }  
   many :played_tiles
+  
   many :chatters
   key :remaining_letters, String
   key :played_letters, String

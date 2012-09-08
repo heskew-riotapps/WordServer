@@ -27,4 +27,11 @@ class GamesController < ApplicationController
       format.html # index.html.erb
     end
   end
+  
+  def create
+	#create the letters from the hopper...create the 
+  
+  
+  end
+  
 end

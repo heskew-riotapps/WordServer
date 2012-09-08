@@ -1,7 +1,7 @@
 class Letter
 	include MongoMapper::Document
  	
-	key :value, String, :length => 1, :format => /[A-Z]/
+	key :value, String #, :length => 1, :format => /[A-Z]/
     
 	before_validation :make_upper 
 

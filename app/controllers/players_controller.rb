@@ -43,6 +43,8 @@ class PlayersController < ApplicationController
 				@player = Player.create({
 					:nickname => params[:player][:nickname],
 					:email => params[:player][:email],
+					:f_name => params[:player][:f_name],
+					:l_name => params[:player][:l_name],
 					:password => params[:player][:password]
 				})
 				@player.generate_token(:auth_token)

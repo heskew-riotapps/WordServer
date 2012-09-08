@@ -13,5 +13,6 @@ class PlayerGame
   key :is_turn, Boolean, :default => false 
   key :is_winner, Boolean, :default => false 
   key :has_been_alerted_to_end_of_game, Boolean, :default => false 
-  
+  key :player_order,    Integer, :default => 0
+  many :tray_tiles
 end
