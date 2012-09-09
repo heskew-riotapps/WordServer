@@ -7,10 +7,13 @@ class Game
   many :played_tiles
   
   many :chatters
+  key :dup_check, String #just in case same post is sent more than once
   key :remaining_letters, String
   key :played_letters, String
-  key :random_vowels, String #, format => /[AEIOU]/
-  key :random_consonants, String #, format => /[BCDFGHJKLMNPQRSTVWXYZ]/
+  key :random_vowels, String #, format => /[A,E,I,O,U]/
+  key :random_consonants, String #, format => /[B,C,D,F,G,H,J,K,L,M,N,P,Q,R,S,T,V,W,X,Y,Z]/
+ 
+  
   key :num_consecutive_skips, Integer, :default => 0
   key :num_words_played, Integer, :default => 0
   key :completion_date, Time
@@ -18,6 +21,18 @@ class Game
   key :last_action_popup_text, String
   key :last_action_alert_text, String
   key :status, Integer
+  
+  def generate_hopper_letters(culture_code)
+		if self.authenticate(password)
+			self.generate_token(:auth_token)
+			true
+		else 
+			false
+		end	
+	end
+  
+  
+  
   
   # Validations.
 #  validates_presence_of :first_name, :last_name, :email 
