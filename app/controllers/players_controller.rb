@@ -43,9 +43,8 @@ class PlayersController < ApplicationController
 			else 
 				if @player.errors.empty?
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
-					format.json { render json: @player, status: :created, location: @player }
-					
-#		 format.json  { render :json => @things.to_json(:include => { :photos => { :only => [:id, :url] } }) }
+				#format.json { render json: @player, status: :created, location: @player }
+				format.json  { render :json => @player.to_json( :only => [:id, :f_name, :l_name, :nickname, :auth_token])}
 					
 				else
 					format.html { render action: "new" }
@@ -56,57 +55,6 @@ class PlayersController < ApplicationController
 		end
   end
   
-  def create_123
-		#create default nickname if they dont fill it in
-		@player = Player.find_by_email(params[:player][:email])
-		if @player.nil?
-			@player = Player.find_by_nickname(params[:player][:nickname])
-			if @player.nil?
-				@player = Player.create({
-					:nickname => params[:player][:nickname],
-					:email => params[:player][:email],
-					:f_name => params[:player][:f_name],
-					:l_name => params[:player][:l_name],
-					:password => params[:player][:password]
-				})
-				@player.generate_token(:auth_token)
-				@ok = @player.save
-			else
-				#validate password here
-				if @player.authenticate_with_new_token(params[:password])
-					#@player.generate_session_token
-					@ok = @player.update_attributes(params[:player])
-				else
-					@unauthorized = true
-				end
-			end
-			
-		else
-			#player has been found...check password now.
-			#if password fails, send login failed error to client
-			#error codes via http or just error strings??
-			if @player.authenticate_with_new_token(params[:password])
-				#@player.generate_session_token
-				@ok = @player.update_attributes(params[:player])
-			else
-				@unauthorized = true
-			end	
-		end
-		respond_to do |format|
-			if @unauthorized #account for FB
-				format.json { render json: "unauthorized", status: :unauthorized }
-			else 
-				if @ok
-					format.html { redirect_to @player, notice: 'Post was successfully created.' }
-					format.json { render json: @player, status: :created, location: @player }
-				else
-					format.html { render action: "new" }
-					#json error handling
-					format.json { render json: @player.errors, status: :unprocessable_entity }
-				end
-			end
-		end
-	end
 	
 	def update
 		@player = Player.find(params[:id])

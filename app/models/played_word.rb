@@ -1,5 +1,5 @@
 class PlayedWord
-  include MongoMapper::Document
+  include MongoMapper::EmbeddedDocument
 
   key :word,     String
   key :player_id , ObjectId

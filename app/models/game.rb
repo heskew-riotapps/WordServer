@@ -8,11 +8,11 @@ class Game
   
   many :chatters
   key :dup_check, String #just in case same post is sent more than once
-  key :remaining_letters, String
-  key :played_letters, String
-  key :random_vowels, String #, format => /[A,E,I,O,U]/
-  key :random_consonants, String #, format => /[B,C,D,F,G,H,J,K,L,M,N,P,Q,R,S,T,V,W,X,Y,Z]/
- 
+  key :remaining_letters, Array
+  key :played_letters, Array
+  key :random_vowels, Array #, format => /[A,E,I,O,U]/
+  key :random_consonants, Array #, format => /[B,C,D,F,G,H,J,K,L,M,N,P,Q,R,S,T,V,W,X,Y,Z]/
+  key :turn_num,    Integer, :default => 0
   
   key :num_consecutive_skips, Integer, :default => 0
   key :num_words_played, Integer, :default => 0

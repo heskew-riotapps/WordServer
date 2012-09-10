@@ -15,7 +15,7 @@ class Player
   key :email,      String
   key :f_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
   key :l_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
-  key :password_confirmation, String
+   
 
   key :nickname,       String#, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins

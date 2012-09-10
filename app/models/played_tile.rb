@@ -1,5 +1,5 @@
   class PlayedTile
-  include MongoMapper::Document
+  include MongoMapper::EmbeddedDocument
  
 	key :player_id , ObjectId
 	key :board_position,     Integer, :default => 0

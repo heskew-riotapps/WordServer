@@ -24,6 +24,7 @@ group  :development, :test do
   gem "rspec-rails",      ">= 2.0.0"
   gem "autotest"
   gem "autotest-rails"
+  #gem "ruby-debug"
 end
 
 # Gems used only for assets and not required

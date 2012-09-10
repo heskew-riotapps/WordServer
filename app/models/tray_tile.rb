@@ -1,5 +1,5 @@
   class TrayTile
-  include MongoMapper::Document
+  include MongoMapper::EmbeddedDocument
  
 	key :tray_position,     Integer, :default => 0
 	key :letter, String
