@@ -5,7 +5,7 @@ class Player
   has_secure_password
 
    validates_presence_of :password, :on => :create, :if => :password_required
-
+	validates_presence_of :password_digest, :on => :create, :if => :password_required
    #attr_accessible :email, :nickname, :password
 
    
@@ -13,10 +13,11 @@ class Player
   key :auth_token, String
   key :fb,  String
   key :email,      String
-  key :f_name,       String, :format => /\A[\w\.\-\+]+\z/
-  key :l_name,       String, :format => /\A[\w\.\-\+]+\z/
+  key :f_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
+  key :l_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
+  key :password_confirmation, String
 
-  key :nickname,       String, :format => /\A[\w\.\-\+]+\z/
+  key :nickname,       String#, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins
   key :password_digest, String 
   key :n_l, Integer, :default => 0 #num_losses
@@ -38,7 +39,8 @@ class Player
   key :largest_win_margin_game_id , ObjectId
 
    def password_required
-    !self.fb || !self.fb.empty?
+    self.fb.blank? || self.fb.empty?
+	#!self.fb || !self.fb.empty?
   end
 
 	def generate_token(column)

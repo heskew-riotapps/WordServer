@@ -35,6 +35,28 @@ class PlayersController < ApplicationController
   end
   
   def create
+	@player = PlayerService.create params[:player]
+    #@player.valid?
+	respond_to do |format|
+			if @unauthorized #account for FB
+				format.json { render json: "unauthorized", status: :unauthorized }
+			else 
+				if @player.errors.empty?
+					format.html { redirect_to @player, notice: 'Post was successfully created.' }
+					format.json { render json: @player, status: :created, location: @player }
+					
+#		 format.json  { render :json => @things.to_json(:include => { :photos => { :only => [:id, :url] } }) }
+					
+				else
+					format.html { render action: "new" }
+					#json error handling
+					format.json { render json: @player.errors, status: :unprocessable_entity }
+				end
+			end
+		end
+  end
+  
+  def create_123
 		#create default nickname if they dont fill it in
 		@player = Player.find_by_email(params[:player][:email])
 		if @player.nil?
