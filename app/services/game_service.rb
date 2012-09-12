@@ -1,5 +1,5 @@
 class GameService 
-	def self.create(params) 
+	def self.create(current_player, params) 
 	#from 2 to 4 players will be sent in.
 	#validate that the player sending in the request
 	#is one of the players and has the first play order
@@ -15,12 +15,22 @@ class GameService
 		
 		Rails.logger.debug "params[:player_games]: #{params[:player_games].inspect}"
 		
+		@game.turn_num = 1
+		@game.random_vowels = AlphabetService.get_random_vowels
+		@game.random_consonants = AlphabetService.get_random_consonants
+		@game.remaining_letters = AlphabetService.get_letter_distribution + @game.random_vowels + @game.random_consonants 
+		@game.remaining_letters.shuffle! 
+		@game.create_date = Time.now.utc
+		
 		#if this count > 4, log an error and return
 		if params[:player_games].count > 4
 			Rails.logger.info("error: #{params[:player_games].count} players being requested for a game")
 			#@game.errors.add(@, "invalid user being requested" + value['player_id'])
 			return @game
 		end
+		
+		Rails.logger.info("I18n.locale: #{I18n.locale}")
+		Rails.logger.info("#myapp-#{Rails.env}")
 		
 		#if this count < 2, log an error and return
 		if params[:player_games].count < 2
@@ -29,8 +39,9 @@ class GameService
 			return @game
 		end
 		Rails.logger.debug "params playerGames.count: #{params[:player_games].count}"
- 
- 
+	
+		currentPlayerIsInGame = false
+		
 		params[:player_games].each  do |value|
 			#if index > 3 throw error
 			#Rails.logger.debug("value inspect #{value.inspect}")
@@ -42,16 +53,33 @@ class GameService
 				@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
 				return @game	
 		 	else
-		  #if params[:player_order] = 1
-		  #validate that user owns this session somehow params[:player][:auth_token]
-		  #@game.errors.add(:player_id, "unauthenticated user is starting the game")
-		  #return @game
-			#@game.add playerGame
-			
+				#if params[:player_order] = 1
+				#validate that user owns this session, starting user should always have first turn
+				#let's relax this rule.  not sure there need to be a check here
+				#if value['player_order'] = 1
+				#	if player.auth_token != params[:auth_token]
+				#		@game.errors.add(value['player_id'],  "unauthenticated user is starting the game")
+				#		return @game
+				#	end	
+				#end
+				
+				
+				#make sure that all players are unique and sort order is unique
 				#create playerGame object
 				pg = PlayerGame.new
 				pg.player_order = value['player_order']
 				pg.player_id = value['player_id']
+				pg.tray_letters = @game.remaining_letters.slice!(0,7)
+				
+				#make sure that at least one player is the curent user (auth_token)
+				if current_player.id == player.id
+					currentPlayerIsInGame = true
+					#"hello, %s.  Where is %s?" % ["John", "Mary"]
+					pg.last_action_text =  I18n.t(:game_started_by_you) 
+				else
+					#this might not work for random games where name should not be shown
+					pg.last_action_text =  I18n.t(:game_started_by_player) % current_player.get_abbreviated_name
+				end
 				
 				Rails.logger.debug("pg inspect #{pg.inspect}")
 				
@@ -61,9 +89,14 @@ class GameService
 
 			end
 		end
-		@game.turn_num = 1
+
+		#if  currentPlayerIsInGame is false, throw error
+		if  !currentPlayerIsInGame
+			@game.errors.add(value['player_id'], I18n.t(:error_authorized_user_not_in_game))
+		end
 		#@game.save
-		Rails.logger.debug("random vowels #{AlphabetENService.get_random_vowels.inspect}")
+		Rails.logger.debug("random vowels #{@game.random_vowels.inspect}")
+		Rails.logger.debug("random rconsonants #{@game.random_consonants.inspect}")
 		Rails.logger.debug("game inspect #{@game.inspect}")
 		
 		#@game.save

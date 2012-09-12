@@ -14,7 +14,10 @@ class PlayerGame
   key :is_winner, Boolean, :default => false 
   key :has_been_alerted_to_end_of_game, Boolean, :default => false 
   key :player_order,    Integer, :default => 0
-  many :tray_tiles
+  key :tray_letters, Array
+  key :last_action_text, String
+  key :last_action_short_text, String
+  #many :tray_tiles
   
   
 end

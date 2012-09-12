@@ -17,26 +17,25 @@ class Player
   key :l_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
    
 
-  key :nickname,       String#, :format => /\A[\w\.\-\+]+\z/
+  key :n_name,       String#, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins
   key :password_digest, String 
   key :n_l, Integer, :default => 0 #num_losses
   key :n_d, Integer, :default => 0 #num_draws
-  key :num_active_games, Integer, :default => 0
-  key :num_visits, Integer, :default => 0
+  key :n_a_g, Integer, :default => 0 #num_active_games
+  key :n_v, Integer, :default => 0  #num_visits
 
-  key :highest_single_turn_score, Integer, :default => 0
-  key :highest_single_turn_score_player_id , ObjectId
-  key :highest_single_turn_score_game_id , ObjectId
+  #this should record the words (turn number)
+  key :h_s_t_s, Integer, :default => 0 #highest_single_turn_score
+  key :h_s_t_s_turn_num, Integer, :default => 0 #highest_single_turn_score_turn_num
+  key :h_s_t_s_game_id , ObjectId   #highest_single_turn_score_game_id
 
   
-  key :highest_single_game_score, Integer, :default => 0 
-  key :highest_single_turn_score_player_id , ObjectId  
-  key :highest_single_turn_score_game_id , ObjectId
+  key :h_s_g_s, Integer, :default => 0  #highest_single_game_score
+  key :h_s_g_s_game_id , ObjectId 	#highest_single_game_score_game_id
   
-  key :largest_win_margin, Integer, :default => 0
-  key :largest_win_margin_player_id , ObjectId
-  key :largest_win_margin_game_id , ObjectId
+  key :l_w_m, Integer, :default => 0 # largest_win_margin
+  key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
 
    def password_required
     self.fb.blank? || self.fb.empty?
@@ -57,6 +56,14 @@ class Player
 			false
 		end	
 
+	end
+	
+	def get_abbreviated_name
+		if !self.f_name.blank?
+			return self.f_name + " " + self.l_name.first(1) + "."
+		else 
+			return self.nickname
+		end
 	end
  
   # Validations.

@@ -30,8 +30,24 @@ class GamesController < ApplicationController
   end
   
   def create
-	#create the letters from the hopper...create the 
-    @game = GameService.create params[:game]
+	#authenticate requesting player
+	player = Player.find_by_auth_token(params[:auth_token])
+	
+	@game = Game.new
+	
+	if player.nil?
+		Rails.logger.info("unauthorized request to start game")	
+		@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])		
+	else
+		@game = GameService.create( player, params[:game])
+	
+		#reset user's token
+		player.generate_token(:auth_token)
+		#player.save  temp, add this back
+		
+		@game.auth_token = player.auth_token
+	end
+	
     #@player.valid?
 	respond_to do |format|
 			if @unauthorized #account for FB

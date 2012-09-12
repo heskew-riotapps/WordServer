@@ -1,9 +1,8 @@
 # Sample localization file for English. Add more files in this directory for other locales.
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
-en:
+es:
   hello: "Hello world"
-  game_started_by_player: "%s started the game."
-  game_started_by_you: "You started the game."
+  game_started_by_player: "%s started the game.-es"
+  game_started_by_you: "You started the game.-es"
   error_authorized_user_not_in_game: "Authorized user not in game."
-  

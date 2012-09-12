@@ -31,11 +31,11 @@ class PlayerService
 		else		
 			@player = Player.find_by_email(params[:email])
 			if @player.nil?
-				@player = Player.find_by_nickname(params[:nickname])
+				@player = Player.find_by_nickname(params[:n_name])
 				if @player.nil?
 					@player = Player.new
 					@player.password = params[:password]
-					@player.nickname = params[:nickname]
+					@player.n_name = params[:n_name]
 					@player.email = params[:email]
 				#@player = Player.create({
 				#		:nickname => params[:nickname],
@@ -65,7 +65,7 @@ class PlayerService
 				#error codes via http or just error strings??
 				if @player.authenticate_with_new_token(params[:password])
 					#@player.generate_session_token
-					@player.nickname = params[:nickname]
+					@player.n_name = params[:n_name]
 					#@player.email = params[:email]
 					@ok = @player.save
 					#@ok = @player.update_attributes(params)

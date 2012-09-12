@@ -1,5 +1,5 @@
 Word::Application.routes.draw do
-  resources :people
+  #resources :people
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -13,7 +13,12 @@ Word::Application.routes.draw do
   # This route can be invoked with purchase_url(:id => product.id)
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
-    resources :players, :games, :home, :rest
+  
+  # config/routes.rb
+	scope "(:locale)", :locale => /en|es/ do
+		resources :players, :games, :home, :rest
+	end
+   # resources :players, :games, :home, :rest
 #    resources :games
 #	resources :home
 #	resources :home, :member => { :login => :get }
