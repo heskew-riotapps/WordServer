@@ -10,6 +10,7 @@
     <th>Last Name</th>
     <th>Email</th>
     <th>Num Wins</th>
+	<th>digest</th>
   </tr>
 
 <% @players.each do |player| %>
@@ -17,11 +18,12 @@
     <td><%= player.id %></td>
     <td><%= player.fb %></td>
 	<td><%= player.auth_token %></td>
-    <td><%= player.nickname %></td>
+    <td><%= player.n_name %></td>
 	<td><%= player.f_name %></td>
 	<td><%= player.l_name %></td>
 	<td><%= player.email %></td>
-	<td><%= player.num_wins %></td>
+	<td><%= player.n_w %></td>
+	<td><%= player.password_digest %></td>
   </tr>
 <% end %>
 </table>

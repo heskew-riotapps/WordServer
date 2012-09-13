@@ -35,6 +35,7 @@ class PlayersController < ApplicationController
   end
   
   def create
+  #####Player.delete_all 
 	@player = PlayerService.create params[:player]
     #@player.valid?
 	respond_to do |format|
@@ -95,6 +96,10 @@ class PlayersController < ApplicationController
 			format.json { render json: @player.errors, status: :unprocessable_entity }
 		  end
 		end
+	end
+	
+	def destroy_all
+		Player.delete_all #this is temp
 	end
 	
 end

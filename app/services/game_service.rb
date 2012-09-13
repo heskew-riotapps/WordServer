@@ -15,12 +15,12 @@ class GameService
 		
 		Rails.logger.debug "params[:player_games]: #{params[:player_games].inspect}"
 		
-		@game.turn_num = 1
-		@game.random_vowels = AlphabetService.get_random_vowels
-		@game.random_consonants = AlphabetService.get_random_consonants
-		@game.remaining_letters = AlphabetService.get_letter_distribution + @game.random_vowels + @game.random_consonants 
-		@game.remaining_letters.shuffle! 
-		@game.create_date = Time.now.utc
+		@game.t = 1 #turn_num
+		@game.r_v = AlphabetService.get_random_vowels #random_vowels
+		@game.r_c = AlphabetService.get_random_consonants #random_consonants
+		@game.r_l = AlphabetService.get_letter_distribution + @game.random_vowels + @game.random_consonants 
+		@game.r_l.shuffle! #remaining_letters
+		@game.cr_d = Time.now.utc  #create_date
 		
 		#if this count > 4, log an error and return
 		if params[:player_games].count > 4
@@ -47,7 +47,7 @@ class GameService
 			#Rails.logger.debug("value inspect #{value.inspect}")
 		 	player = Player.find_by_id(value['player_id'])
 		#  v['contact_ids']
-		  		Rails.logger.debug "player nickname: #{player.nickname}"
+		  		Rails.logger.debug "player nickname: #{player.n_name}"
 			if player.nil?
 				Rails.logger.info("invalid user being requested " + value['player_id'])
 				@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])

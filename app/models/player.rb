@@ -3,22 +3,26 @@ class Player
   include ActiveModel::SecurePassword 
   #include ActiveModel::Serialization
   has_secure_password
-
-   validates_presence_of :password, :on => :create, :if => :password_required
-	validates_presence_of :password_digest, :on => :create, :if => :password_required
+ 
+ validates :password, :presence => true,
+                     :on => :create
+					# :if => :password_required
+  # validates_presence_of :password, :on => :create, :if => :password_required
+	#validates_presence_of :password_digest, :on => :create, :if => :password_required
    #attr_accessible :email, :nickname, :password
 
    
  # short field names!!!!!!!
-  key :auth_token, String
+  key :a_t, String #auth_token
   key :fb,  String
-  key :email,      String
-  key :f_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
-  key :l_name,       String#, :format => /\A[\w\.\_\-\+]+\z/
+  key :e_m,      String #email
+  key :f_n,       String# first_name, :format => /\A[\w\.\_\-\+]+\z/
+  key :l_n,       String# last_name, :format => /\A[\w\.\_\-\+]+\z/
    
 
-  key :n_name,       String#, :format => /\A[\w\.\-\+]+\z/
+  key :n_n,       String# nickname, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins
+  key :password, String
   key :password_digest, String 
   key :n_l, Integer, :default => 0 #num_losses
   key :n_d, Integer, :default => 0 #num_draws
@@ -38,7 +42,8 @@ class Player
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
 
    def password_required
-    self.fb.blank? || self.fb.empty?
+    return false
+    #self.fb.blank? || self.fb.empty?
 	#!self.fb || !self.fb.empty?
   end
 

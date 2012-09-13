@@ -7,53 +7,35 @@ class PlayerService
 			@player = Player.find_by_fb(params[:fb])
 			if @player.nil?
 				@player = Player.new
-				@player.fb = params[:fb]
-				@player.password = "useless"
-				@player.email = params[:email]
-				@player.f_name = params[:f_name]
-				@player.l_name = params[:l_name]
-				@player.email = params[:email]
-
-#			@player = Player.create({
-#					:password => "useless", #won't be used for fb users.  cannot figure out optional has_secure_password at the moment
-#					:fb => params[:fb],
-#					:email => params[:email],
-#					:f_name => params[:f_name],
-#					:l_name => params[:l_name]})
-			else
-				@player.f_name = params[:f_name]
-				@player.l_name = params[:l_name]
-				@player.email = params[:email]
+				@player.fb = params[:fb] #facebook_id
+				#@player.password = ""
 			end
+			@player.f_n = params[:f_n] #first_name
+			@player.l_n = params[:l_n] #last_name
+			@player.e_m = params[:e_m] #email
+			@player.generate_token(:a_t) #auth_token
 			
-			@player.generate_token(:auth_token)
-			@ok = @player.save
+			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
+			@ok = @player.save(:validate => false)  
 		else		
-			@player = Player.find_by_email(params[:email])
+			@player = Player.find_by_email(params[:e_m])
 			if @player.nil?
-				@player = Player.find_by_nickname(params[:n_name])
+				@player = Player.find_by_nickname(params[:n_n])
 				if @player.nil?
 					@player = Player.new
 					@player.password = params[:password]
-					@player.n_name = params[:n_name]
-					@player.email = params[:email]
-				#@player = Player.create({
-				#		:nickname => params[:nickname],
-				#		:email => params[:email],
-				#		:f_name => params[:f_name],
-				#		:l_name => params[:l_name],
-				#		:password => params[:password]
-				#	})
-					@player.generate_token(:auth_token)
+					@player.n_n = params[:n_n] #nickname
+					@player.e_m = params[:e_m] #email
+		
+					@player.generate_token(:a_t) #auth_token
 					@ok = @player.save
 				else
 					#validate password here
 					if @player.authenticate_with_new_token(params[:password])
 						#@player.generate_session_token
 						#@player.nickname = params[:nickname]
-						@player.email = params[:email]
+						@player.e_m = params[:e_m] #email
 						@ok = @player.save
-						#@ok = @player.update_attributes(params)
 					else
 						@unauthorized = true
 					end
@@ -65,7 +47,7 @@ class PlayerService
 				#error codes via http or just error strings??
 				if @player.authenticate_with_new_token(params[:password])
 					#@player.generate_session_token
-					@player.n_name = params[:n_name]
+					@player.n_n = params[:n_n]
 					#@player.email = params[:email]
 					@ok = @player.save
 					#@ok = @player.update_attributes(params)

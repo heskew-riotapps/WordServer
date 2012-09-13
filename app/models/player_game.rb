@@ -3,21 +3,18 @@ class PlayerGame
  
  #player_id
   key :player_id , ObjectId
-  key :score,     Integer, :default => 0
-  key :last_turn_date, Time
-  key :last_alert_date, Time
-  key :last_reminder_date, Time
-  key :last_chatter_received_date, Time
-  key :last_viewed_date, Time
-  key :win_num,    Integer, :default => 0
-  key :is_turn, Boolean, :default => false 
-  key :is_winner, Boolean, :default => false 
-  key :has_been_alerted_to_end_of_game, Boolean, :default => false 
-  key :player_order,    Integer, :default => 0
-  key :tray_letters, Array
-  key :last_action_text, String
-  key :last_action_short_text, String
-  #many :tray_tiles
-  
+  key :sc,     Integer, :default => 0 #score
+  key :l_t_d, Time #last_turn_date
+  key :l_a_d, Time #last_alert_date
+  key :l_r_d, Time #last_reminder_date
+  key :l_c_r_d, Time #last_chatter_received_date
+  key :l_v_d, Time #last_viewed_date
+  key :w_n,    Integer, :default => 0 #win_num
+  key :i_t, Boolean, :default => false #is_turn 
+  key :i_w, Boolean, :default => false #is_winner
+  key :a_e_g, Boolean, :default => false #alerted_to_end_of_game
+  key :o,    Integer, :default => 0 #order
+  key :t_l, Array #tray_letters
+
   
 end

@@ -55,6 +55,8 @@ class GamesController < ApplicationController
 			else 
 				if @game.errors.empty?
 					format.html { redirect_to @game, notice: 'Post was successfully created.' }
+					
+					#http://apidock.com/rails/ActiveRecord/Serialization/to_json
 				format.json { render json: @game, status: :created, location: @game }
 				#format.json  { render :json => @game.to_json( :only => [:id, :f_name, :l_name, :nickname, :auth_token])}
 					
