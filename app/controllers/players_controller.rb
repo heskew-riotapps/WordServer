@@ -45,7 +45,8 @@ class PlayersController < ApplicationController
 				if @player.errors.empty?
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
-				format.json  { render :json => @player.to_json( :only => [:id, :f_name, :l_name, :nickname, :auth_token])}
+				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
+				format.json  { render :json => @player.to_json( :only => [:id, :f_n, :l_n, :n_n, :a_t]),status: :created}
 					
 				else
 					format.html { render action: "new" }

@@ -31,7 +31,7 @@ class GamesController < ApplicationController
   
   def create
 	#authenticate requesting player
-	player = Player.find_by_auth_token(params[:auth_token])
+	player = Player.find_by_a_t(params[:a_t]) #auth_token
 	
 	@game = Game.new
 	
@@ -42,10 +42,10 @@ class GamesController < ApplicationController
 		@game = GameService.create( player, params[:game])
 	
 		#reset user's token
-		player.generate_token(:auth_token)
+		player.generate_token(:a_t)
 		#player.save  temp, add this back
 		
-		@game.auth_token = player.auth_token
+		@game.a_t = player.a_t #auth_token
 	end
 	
     #@player.valid?
@@ -57,9 +57,17 @@ class GamesController < ApplicationController
 					format.html { redirect_to @game, notice: 'Post was successfully created.' }
 					
 					#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json { render json: @game, status: :created, location: @game }
-				#format.json  { render :json => @game.to_json( :only => [:id, :f_name, :l_name, :nickname, :auth_token])}
+				#format.json { render json: @game, status: :created, location: @game }
 					
+
+				format.json  { render :json => @game.to_json( :include => { :player_games => {
+												 :include => :player  } } ),status: :created }
+				 
+				 #)}
+				#	 konata.to_json(:include => { :posts => {,
+                #                 :include => { :comments => {
+                #                               :only => :body } },
+                #                 :only => :title } })
 				else
 					format.html { render action: "new" }
 					#json error handling

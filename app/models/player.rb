@@ -13,6 +13,7 @@ class Player
 
    
  # short field names!!!!!!!
+  many :player_games
   key :a_t, String #auth_token
   key :fb,  String
   key :e_m,      String #email
@@ -55,7 +56,7 @@ class Player
 
 	def authenticate_with_new_token(password)
 		if self.authenticate(password)
-			self.generate_token(:auth_token)
+			self.generate_token(:a_t)
 			true
 		else 
 			false
@@ -64,13 +65,13 @@ class Player
 	end
 	
 	def get_abbreviated_name
-		if !self.f_name.blank?
-			return self.f_name + " " + self.l_name.first(1) + "."
+		if !self.f_n.blank?
+			return self.f_n + " " + self.l_n.first(1) + "."
 		else 
-			return self.nickname
+			return self.n_n
 		end
 	end
  
   # Validations.
-  validates_presence_of  :email 
+  validates_presence_of  :e_m 
 end

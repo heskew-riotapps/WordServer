@@ -18,9 +18,9 @@ class PlayerService
 			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
 			@ok = @player.save(:validate => false)  
 		else		
-			@player = Player.find_by_email(params[:e_m])
+			@player = Player.find_by_e_m(params[:e_m])
 			if @player.nil?
-				@player = Player.find_by_nickname(params[:n_n])
+				@player = Player.find_by_n_n(params[:n_n])
 				if @player.nil?
 					@player = Player.new
 					@player.password = params[:password]

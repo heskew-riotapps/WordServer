@@ -1,8 +1,9 @@
 class PlayerGame
   include MongoMapper::EmbeddedDocument
  
- #player_id
-  key :player_id , ObjectId
+  #player_id
+#  key :player_id , ObjectId
+  belongs_to :player
   key :sc,     Integer, :default => 0 #score
   key :l_t_d, Time #last_turn_date
   key :l_a_d, Time #last_alert_date

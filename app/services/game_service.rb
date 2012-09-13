@@ -18,7 +18,7 @@ class GameService
 		@game.t = 1 #turn_num
 		@game.r_v = AlphabetService.get_random_vowels #random_vowels
 		@game.r_c = AlphabetService.get_random_consonants #random_consonants
-		@game.r_l = AlphabetService.get_letter_distribution + @game.random_vowels + @game.random_consonants 
+		@game.r_l = AlphabetService.get_letter_distribution + @game.r_v + @game.r_c 
 		@game.r_l.shuffle! #remaining_letters
 		@game.cr_d = Time.now.utc  #create_date
 		
@@ -47,7 +47,7 @@ class GameService
 			#Rails.logger.debug("value inspect #{value.inspect}")
 		 	player = Player.find_by_id(value['player_id'])
 		#  v['contact_ids']
-		  		Rails.logger.debug "player nickname: #{player.n_name}"
+		  		Rails.logger.debug "player nickname: #{player.n_n}"
 			if player.nil?
 				Rails.logger.info("invalid user being requested " + value['player_id'])
 				@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
@@ -67,19 +67,21 @@ class GameService
 				#make sure that all players are unique and sort order is unique
 				#create playerGame object
 				pg = PlayerGame.new
-				pg.player_order = value['player_order']
-				pg.player_id = value['player_id']
-				pg.tray_letters = @game.remaining_letters.slice!(0,7)
+				pg.o = value['o'] #order
+				#pg.player_id = value['player_id']
+				pg.player = player
+				pg.t_l = @game.r_l.slice!(0,7) #tray_letters
 				
 				#make sure that at least one player is the curent user (auth_token)
 				if current_player.id == player.id
 					currentPlayerIsInGame = true
-					#"hello, %s.  Where is %s?" % ["John", "Mary"]
-					pg.last_action_text =  I18n.t(:game_started_by_you) 
-				else
-					#this might not work for random games where name should not be shown
-					pg.last_action_text =  I18n.t(:game_started_by_player) % current_player.get_abbreviated_name
 				end
+				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
+				#	pg.last_action_text =  I18n.t(:game_started_by_you) 
+				#else
+				#	#this might not work for random games where name should not be shown
+				#	pg.last_action_text =  I18n.t(:game_started_by_player) % current_player.get_abbreviated_name
+				#end
 				
 				Rails.logger.debug("pg inspect #{pg.inspect}")
 				
@@ -95,8 +97,8 @@ class GameService
 			@game.errors.add(value['player_id'], I18n.t(:error_authorized_user_not_in_game))
 		end
 		#@game.save
-		Rails.logger.debug("random vowels #{@game.random_vowels.inspect}")
-		Rails.logger.debug("random rconsonants #{@game.random_consonants.inspect}")
+		#Rails.logger.debug("random vowels #{@game.r_v.inspect}")
+		#Rails.logger.debug("random rconsonants #{@game.r_c.inspect}")
 		Rails.logger.debug("game inspect #{@game.inspect}")
 		
 		#@game.save
