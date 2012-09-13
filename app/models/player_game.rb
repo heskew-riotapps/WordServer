@@ -17,5 +17,10 @@ class PlayerGame
   key :o,    Integer, :default => 0 #order
   key :t_l, Array #tray_letters
 
+  def tray(p_id)
+	if self.player_id == p_id
+		return self.t_l
+	end
+  end
   
 end

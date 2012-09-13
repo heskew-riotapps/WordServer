@@ -76,6 +76,11 @@ class GameService
 				if current_player.id == player.id
 					currentPlayerIsInGame = true
 				end
+				if pg.o == 1
+					pg.i_t = true #is_turn
+				else
+					pg.i_t = true #is_turn				
+				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
 				#	pg.last_action_text =  I18n.t(:game_started_by_you) 
 				#else

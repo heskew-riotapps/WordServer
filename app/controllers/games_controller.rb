@@ -60,11 +60,15 @@ class GamesController < ApplicationController
 				#format.json { render json: @game, status: :created, location: @game }
 					
 
-				format.json  { render :json => @game.to_json( :include => { :player_games => {
-												 :include => :player  } } ),status: :created }
+				format.json  { render :json => @game.to_json( 
+												:include => { :player_games => {
+												  :only => [:o, :i_t, :sc, :id, :n_w],  
+												 :include => {:player => 
+																{:only => [:f_n, :l_n, :n_n, :id, :n_w] } }
+												} } ),status: :created }
 				 
 				 #)}
-				#	 konata.to_json(:include => { :posts => {,
+				#	 konata.to_json(:include => { :posts => { 
                 #                 :include => { :comments => {
                 #                               :only => :body } },
                 #                 :only => :title } })
