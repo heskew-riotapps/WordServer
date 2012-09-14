@@ -25,20 +25,20 @@ class GameService
 		#if this count > 4, log an error and return
 		if params[:player_games].count > 4
 			Rails.logger.info("error: #{params[:player_games].count} players being requested for a game")
-			#@game.errors.add(@, "invalid user being requested" + value['player_id'])
+			@game.errors.add(:player_games, I18n.t(:error_too_many_players_requested))
 			return @game
 		end
 		
-		Rails.logger.info("I18n.locale: #{I18n.locale}")
-		Rails.logger.info("#myapp-#{Rails.env}")
+		#Rails.logger.info("I18n.locale: #{I18n.locale}")
+		#Rails.logger.info("#myapp-#{Rails.env}")
 		
 		#if this count < 2, log an error and return
 		if params[:player_games].count < 2
 			Rails.logger.info("error: #{params[:player_games].count} player being requested for a game")
-			#@game.errors.add(@, "invalid user being requested" + value['player_id'])
+			@game.errors.add(:player_games, I18n.t(:error_too_few_players_requested))
 			return @game
 		end
-		Rails.logger.debug "params playerGames.count: #{params[:player_games].count}"
+		#Rails.logger.debug "params playerGames.count: #{params[:player_games].count}"
 	
 		currentPlayerIsInGame = false
 		
@@ -46,11 +46,11 @@ class GameService
 			#if index > 3 throw error
 			#Rails.logger.debug("value inspect #{value.inspect}")
 		 	player = Player.find_by_id(value['player_id'])
-		#  v['contact_ids']
+		 
 		  		Rails.logger.debug "player nickname: #{player.n_n}"
 			if player.nil?
 				Rails.logger.info("invalid user being requested " + value['player_id'])
-				@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+				@game.errors.add(:player_games, I18n.t(:error_invalid_player_requested))
 				return @game	
 		 	else
 				#if params[:player_order] = 1
@@ -99,9 +99,14 @@ class GameService
 
 		#if  currentPlayerIsInGame is false, throw error
 		if  !currentPlayerIsInGame
-			@game.errors.add(value['player_id'], I18n.t(:error_authorized_user_not_in_game))
+			@game.errors.add(value['player_id'], I18n.t(:error_authorized_player_not_in_game))
 		end
-		#@game.save
+		
+		
+		@game.save
+		@game.strip_tray_tiles_from_non_context_user current_player.id
+		
+		
 		#Rails.logger.debug("random vowels #{@game.r_v.inspect}")
 		#Rails.logger.debug("random rconsonants #{@game.r_c.inspect}")
 		Rails.logger.debug("game inspect #{@game.inspect}")

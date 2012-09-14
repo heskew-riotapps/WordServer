@@ -62,7 +62,7 @@ class GamesController < ApplicationController
 
 				format.json  { render :json => @game.to_json( 
 												:include => { :player_games => {
-												  :only => [:o, :i_t, :sc, :id, :n_w],  
+												  :only => [:o, :i_t, :sc, :id, :n_w, :t_l],  
 												 :include => {:player => 
 																{:only => [:f_n, :l_n, :n_n, :id, :n_w] } }
 												} } ),status: :created }

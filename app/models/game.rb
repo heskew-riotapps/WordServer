@@ -35,6 +35,19 @@ class Game
 	end
   
   
+	#after game is saved, loop through player games, removing tray tiles so they are not sent
+	#out when they don't need to be...only the context user should receive tray tiles, to do otherwise
+	#just wastes bandwidth...this is only for sending, NOT FOR SAVING
+	#I did it this way because I couldn't figure out how to do it in controller in .to_json
+	def strip_tray_tiles_from_non_context_user(content_player_id)
+		self.player_games.each  do |value|
+			if value.player_id != content_player_id
+				value.t_l.clear 
+			end
+		end	
+	end 	
+		
+		
   
   
   # Validations.

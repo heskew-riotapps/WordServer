@@ -3,7 +3,7 @@
 
 en:
   hello: "Hello world"
-  game_started_by_player: "%s started the game."
-  game_started_by_you: "You started the game."
-  error_authorized_user_not_in_game: "Authorized user not in game."
-  
+  error_authorized_player_not_in_game: "Authorized player not in game."
+  error_too_many_players_requested: "Too many players requested for the game."
+  error_too_few_players_requested: "Too few players requested for the game."
+  error_invalid_player_requested: "Invalid player requested."
