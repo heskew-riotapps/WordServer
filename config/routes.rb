@@ -16,8 +16,19 @@ Word::Application.routes.draw do
   
   # config/routes.rb
 	scope "(:locale)", :locale => /en|es/ do
+		match "/players/find/" => "players#find"
+		
+
+		
 		resources :players, :games, :home, :rest
 	end
+	
+	
+	#		resources :players do
+	#		collection do
+	#			get 'search'
+	#		end
+	#	end
    # resources :players, :games, :home, :rest
 #    resources :games
 #	resources :home

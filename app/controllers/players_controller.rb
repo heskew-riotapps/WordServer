@@ -24,6 +24,24 @@ class PlayersController < ApplicationController
     end
   end
   
+   def find
+   logger.debug("pg inspect #{:params.inspect}")
+    @player = Player.find_by_n_n(params[:n_n])
+
+    respond_to do |format|
+		if @player.nil?
+			format.html { render action: "edit" } #wrong
+			format.json { render json: "not found", status: :not_found }
+		else
+			format.html # index.html.erb
+			#format.json { render json: @players }
+			format.json  { render :json => @player.to_json({
+						:methods => :gravatar,
+						:only => [:id, :f_n, :l_n, :n_n, :n_w] } )}
+		end		 
+    end
+  end
+  
   
   def index
     @players = Player.all#({:last_name => 'Medical'})

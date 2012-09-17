@@ -48,6 +48,14 @@ class Player
 	#!self.fb || !self.fb.empty?
   end
 
+  def gravatar 
+    if !self.fb.nil? && !self.fb.empty? 
+		return ""
+	end
+
+	return Digest::MD5::hexdigest(self.e_m)	
+  end
+  
 	def generate_token(column)
 		begin
 			self[column] = SecureRandom.urlsafe_base64
