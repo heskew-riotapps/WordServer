@@ -3,15 +3,15 @@ require 'mongo'
 #source 'http://gemcutter.org'
 source 'https://rubygems.org'
 
-ruby "1.9.3"
- 
+ruby '1.9.3'
+gem 'rails', '3.2.3'
 
 #gem 'mongo', '1.0'
 gem 'nokogiri'
-gem 'rails', '3.2.3'
-gem "mongo_mapper"
-gem "bcrypt-ruby", :require => "bcrypt"
-gem "thin"
+
+gem 'mongo_mapper'
+gem 'bcrypt-ruby', :require => 'bcrypt'
+gem 'thin'
  
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -23,10 +23,10 @@ group :test do
 end
 
 group  :development, :test do
-  gem "rspec-rails",      ">= 2.0.0"
-  gem "autotest"
-  gem "autotest-rails"
-  #gem "ruby-debug"
+  gem 'rspec-rails',      '>= 2.0.0'
+  gem 'autotest'
+  gem 'autotest-rails'
+  #gem 'ruby-debug'
 end
 
 # Gems used only for assets and not required
