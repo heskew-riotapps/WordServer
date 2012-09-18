@@ -35,6 +35,7 @@ class PlayersController < ApplicationController
 		else
 			format.html # index.html.erb
 			#format.json { render json: @players }
+			#http://apidock.com/rails/ActiveRecord/Serialization/to_json
 			format.json  { render :json => @player.to_json({
 						:methods => :gravatar,
 						:only => [:id, :f_n, :l_n, :n_n, :n_w] } )}
