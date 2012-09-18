@@ -1,15 +1,18 @@
 require 'rubygems'
-require 'mongo'
+##require 'mongo'
 #source 'http://gemcutter.org'
 source 'https://rubygems.org'
 
 ruby '1.9.3'
 gem 'rails', '3.2.3'
 
+gem 'heroku'
 #gem 'mongo', '1.0'
 gem 'nokogiri'
 
 gem 'mongo_mapper'
+gem 'bson'
+gem 'bson_ext'
 gem 'bcrypt-ruby', :require => 'bcrypt'
 gem 'thin'
  
