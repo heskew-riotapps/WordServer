@@ -4,7 +4,7 @@ defaults: &defaults
 
 development:
   <<: *defaults
-  database: "#myapp-#{Rails.env}" 
+  database: "#myapp-development"
   
   #word_development
 

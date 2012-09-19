@@ -1,4 +1,4 @@
 class Error
-  num, Integer
-  message, String
+  #num, Integer
+  #message, String
 end
