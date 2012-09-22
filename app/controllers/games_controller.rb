@@ -42,10 +42,12 @@ class GamesController < ApplicationController
 		@game = GameService.create( player, params[:game])
 	
 		#reset user's token
-		player.generate_token(:a_t)
+		#player.generate_token(:a_t)
+		#send the new token back to the client
+		@game.a_t = player.generate_token(params[:a_t])
 		#player.save  temp, add this back
 		
-		@game.a_t = player.a_t #auth_token
+		#@game.a_t = player.a_t #auth_token
 	end
 	
     #@player.valid?

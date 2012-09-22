@@ -13,7 +13,7 @@ class PlayerService
 			@player.f_n = params[:f_n] #first_name
 			@player.l_n = params[:l_n] #last_name
 			@player.e_m = params[:e_m] #email
-			@player.generate_token(:a_t) #auth_token
+			@player.generate_token("0") #auth_token
 			
 			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
 			@ok = @player.save(:validate => false)  
@@ -27,12 +27,12 @@ class PlayerService
 					@player.n_n = params[:n_n] #nickname
 					@player.e_m = params[:e_m] #email
 		
-					@player.generate_token(:a_t) #auth_token
+					@player.generate_token("0") #auth_token
 					@ok = @player.save
 				else
 					#validate password here
-					if @player.authenticate_with_new_token(params[:password])
-						#@player.generate_session_token
+					if @player.auth(params[:password])
+						@player.generate_token("1") #do not delete existing tokens  
 						#@player.nickname = params[:nickname]
 						@player.e_m = params[:e_m] #email
 						@ok = @player.save
@@ -45,8 +45,9 @@ class PlayerService
 				#player has been found...check password now.
 				#if password fails, send login failed error to client
 				#error codes via http or just error strings??
-				if @player.authenticate_with_new_token(params[:password])
-					#@player.generate_session_token
+				#if @player.authenticate_with_new_token(params[:password])
+				if @player.auth(params[:password])
+					@player.generate_token("1") #do not delete existing tokens  
 					@player.n_n = params[:n_n]
 					#@player.email = params[:email]
 					@ok = @player.save

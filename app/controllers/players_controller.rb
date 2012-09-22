@@ -65,10 +65,10 @@ class PlayersController < ApplicationController
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
 				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json  { render :json => @player.to_json( :only => [:id, :f_n, :l_n, :n_n, :a_t]),status: :created}
+				format.json  { render :json => @player.to_json( :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
 					
 				else
-					format.html { render action: "new" }
+					#format.html { render action: "new" }
 					#json error handling
 					format.json { render json: @player.errors, status: :unprocessable_entity }
 				end
@@ -76,6 +76,61 @@ class PlayersController < ApplicationController
 		end
   end
   
+	def auth_via_token
+		player = Player.find_by_a_t(params[:a_t]) #auth_token    #@player.valid?
+	
+		if player.nil?
+			unauthorized = true
+			Rails.logger.info("unauthorization failed #{params[:a_t]}")		
+		else
+			#reset user's token, remove current token
+			#send the new token back to the client
+			player.generate_token(params[:a_t])
+			player.save
+		end
+	
+		respond_to do |format|
+				if unauthorized #account for FB
+					format.json { render json: "unauthorized", status: :unauthorized }
+				else 
+					if player.errors.empty?
+						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
+						format.json  { render :json => player.to_json( 
+							:only => [:id, :f_n, :l_n, :n_n, :n_w],
+							:methods => :a__t),status: :ok}
+					else
+						#format.html { render action: "new" }
+						format.json { render json: player.errors, status: :unprocessable_entity }
+					end
+				end
+			end
+	end
+	
+	def log_out
+		player = Player.find_by_a_t(params[:a_t]) #auth_token    #@player.valid?
+	
+		if player.nil?
+			unauthorized = true
+		else
+			player.remove_token(params[:a_t])
+			player.save
+		end
+	
+		respond_to do |format|
+				if unauthorized #account for FB
+					format.json { render json: "unauthorized", status: :unauthorized }
+				else 
+					if player.errors.empty?
+						#format.html { redirect_to player, notice: 'Post was successfully created.' }
+						format.json  { render json: "ok",status: :ok}
+					else
+						#format.html { render action: "new" }
+						format.json { render json: player.errors, status: :unprocessable_entity }
+					end
+				end
+			end
+	end
+	
 	
 	def update
 		@player = Player.find(params[:id])

@@ -1,9 +1,9 @@
 class PlayedWord
   include MongoMapper::EmbeddedDocument
 
-  key :word,     String
+  key :w,     String #word
   key :player_id , ObjectId
-  key :turn_num,     Integer, :default => 0
-  key :points_scored, Integer, :default => 0
-  key :played_date, Time
+  key :t,     Integer, :default => 0 #turn_num
+  key :p_s, Integer, :default => 0 #points_scored
+  key :p_d, Time #played_date
 end

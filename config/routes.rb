@@ -17,8 +17,8 @@ Word::Application.routes.draw do
   # config/routes.rb
 	scope "(:locale)", :locale => /en|es/ do
 		match "/players/find/" => "players#find"
-		
-
+		match "/players/auth_via_token/" => "players#auth_via_token"
+		match "/players/log_out/" => "players#log_out"
 		
 		resources :players, :games, :home, :rest
 	end

@@ -11,6 +11,7 @@
     <th>Email</th>
     <th>Num Wins</th>
 	<th>digest</th>
+	<th>password</th>
   </tr>
 
 <% @players.each do |player| %>
@@ -24,6 +25,7 @@
 	<td><%= player.e_m %></td>
 	<td><%= player.n_w %></td>
 	<td><%= player.password_digest %></td>
+	<td><%= player.password %></td>
   </tr>
 <% end %>
 </table>
