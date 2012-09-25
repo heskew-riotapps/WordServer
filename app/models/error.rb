@@ -1,4 +1,4 @@
 class Error
-  #num, Integer
+  attr_accessor :code
   #message, String
 end

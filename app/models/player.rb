@@ -85,13 +85,17 @@ class Player
 		return self.a_t[0]
 	end
 	
+	def generate_password
+		self.password = ('a'..'z').to_a.shuffle[0,8].join
+	end
+	
 	def remove_token(token_to_remove)
 		self.a_t.delete_if {|x| x == token_to_remove } 		
 	end
 	
 	#def authenticate_with_new_token(password)
 	def auth(password)
-		self.authenticate(password)
+		return self.authenticate(password)
 		#if self.authenticate(password)
 		#	self.generate_token(:a_t)
 		#	true

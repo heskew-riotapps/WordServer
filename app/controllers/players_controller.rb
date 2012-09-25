@@ -55,11 +55,15 @@ class PlayersController < ApplicationController
   
   def create
   #####Player.delete_all 
-	@player = PlayerService.create params[:player]
+   
+	@player, @unauthorized, @error = PlayerService.create params[:player]
     #@player.valid?
+	
+	logger.debug("error inspect #{@error.inspect}")
+	logger.debug("unauthorized inspect #{@unauthorized.inspect}")
 	respond_to do |format|
 			if @unauthorized #account for FB
-				format.json { render json: "unauthorized", status: :unauthorized }
+				format.json { render json: @error.to_json(), status: :unauthorized }
 			else 
 				if @player.errors.empty?
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
@@ -74,6 +78,16 @@ class PlayersController < ApplicationController
 				end
 			end
 		end
+  end
+  
+  def auth_via_token_____ #test only
+  @error = Error.new
+  @error.code = 0
+	respond_to do |format|
+				 
+					format.json { render json: @error.to_json(), status: :ok }
+				 
+			end
   end
   
 	def auth_via_token
