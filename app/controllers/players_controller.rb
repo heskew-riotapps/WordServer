@@ -69,7 +69,7 @@ class PlayersController < ApplicationController
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
 				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json  { render :json => @player.to_json( :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
+				format.json  { render :json => @player.to_json( :methods => :gravatar, :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
 					
 				else
 					#format.html { render action: "new" }
@@ -99,6 +99,7 @@ class PlayersController < ApplicationController
 		else
 			#reset user's token, remove current token
 			#send the new token back to the client
+			player.n_v = player.n_v + 1
 			player.generate_token(params[:a_t])
 			player.save
 		end

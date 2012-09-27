@@ -6,8 +6,11 @@ class PlayerService
 	
 	@error = Error.new
 	@unauthorized = false
-  
-		if !params[:fb].blank?
+		if !params.has_key?(:e_m) || params[:e_m].blank?
+			Rails.logger.debug("email not supplied inspect #{params.inspect}")
+			@error.code = "2"
+			@unauthorized = true
+		elsif !params[:fb].blank?
 			@player = Player.find_by_fb(params[:fb])
 			if @player.nil?
 				@player = Player.new
@@ -24,6 +27,7 @@ class PlayerService
 			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
 			@ok = @player.save(:validate => false)  
 		else		
+			#find player by email addy
 			@player = Player.find_by_e_m(params[:e_m])
 			if @player.nil?
 				@player = Player.find_by_n_n(params[:n_n])
@@ -44,16 +48,16 @@ class PlayerService
 						@player.e_m = params[:e_m] #email
 						@player.n_v = @player.n_v + 1
 						
-						if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
-						Rails.logger.debug("duplicate email #{params[:e_m].inspect}")
+#						if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
+#						Rails.logger.debug("duplicate email #{params[:e_m].inspect}")
 						#if Player.exists?(:e_m => params[:e_m])
-							#email is taken
-							@error.code = "2"
-							#@unauthorized_reason = "2" 
-							@unauthorized = true
-						else
+#							#email is taken
+#							@error.code = "2"
+#							#@unauthorized_reason = "2" 
+#							@unauthorized = true
+#						else
 							@ok = @player.save
-						end
+#						end
 						
 						@ok = @player.save
 					else
@@ -75,6 +79,8 @@ class PlayerService
 					@player.generate_token("1") #do not delete existing tokens  
 					@player.n_n = params[:n_n]
 					@player.n_v = @player.n_v + 1
+					
+					#check for duplicate nickname
 					if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
 					Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
 					#if Player.exists?(:n_n => params[:n_n], !:id => @player.id )
@@ -85,11 +91,9 @@ class PlayerService
 					else
 						@ok = @player.save
 					end
-	
-					#@ok = @player.save
 					 
 				else
-				Rails.logger.debug("player has not been authorized with password #{params[:p_w].inspect}")
+					Rails.logger.debug("player has not been authorized with password #{params[:p_w].inspect}")
 					@error.code = "1"
 					#@unauthorized_reason = "1" 
 					@unauthorized = true
