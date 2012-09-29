@@ -31,7 +31,7 @@ class GamesController < ApplicationController
   
   def create
 	#authenticate requesting player
-	player = Player.find_by_a_t(params[:a_t]) #auth_token
+	player = Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	@game = Game.new
 	
@@ -44,7 +44,7 @@ class GamesController < ApplicationController
 		#reset user's token
 		#player.generate_token(:a_t)
 		#send the new token back to the client
-		@game.a_t = player.generate_token(params[:a_t])
+		@game.a_t = player.generate_token(params[:a_t_])
 		#player.save  temp, add this back
 		
 		#@game.a_t = player.a_t #auth_token

@@ -15,7 +15,7 @@ class Player
  # short field names!!!!!!!
   many :player_games
   #key :a_t, String #auth_token
-  key :a_t, Array #auth_token array allows same user to login from multiple devices
+  key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
   key :e_m,      String #email
   key :f_n,       String# first_name, :format => /\A[\w\.\_\-\+]+\z/
@@ -63,34 +63,34 @@ class Player
 		#end while Player.exists?(column => self[column])
 		begin
 			token = SecureRandom.urlsafe_base64
-		end while Player.exists?(:a_t => token)
+		end while Player.exists?(:a_t_ => token)
 
 		if token_to_replace == "1"
 			#do nothing, do not remove any existing tokens
 		elsif token_to_replace == "0"  
 			#coming from player create so make sure all token are cleared
-			self.a_t.clear
+			self.a_t_.clear
 		else
 			#delete old token
-			self.a_t.delete_if {|x| x == token_to_replace } 		
+			self.a_t_.delete_if {|x| x == token_to_replace } 		
 		end
 		
 		#add new token
-		self.a_t.unshift(token) #add it to front
+		self.a_t_.unshift(token) #add it to front
 				
 		return token
 	end
 
-	def a__t
-		return self.a_t[0]
+	def a_t
+		return self.a_t_[0]
 	end
 	
 	def generate_password
 		self.password = ('a'..'z').to_a.shuffle[0,8].join
 	end
 	
-	def remove_token(token_to_remove)
-		self.a_t.delete_if {|x| x == token_to_remove } 		
+	def remove_token(token)
+		self.a_t_.delete_if {|x| x == token } 		
 	end
 	
 	#def authenticate_with_new_token(password)

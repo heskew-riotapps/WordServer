@@ -59,6 +59,8 @@ class PlayersController < ApplicationController
 	@player, @unauthorized, @error = PlayerService.create params[:player]
     #@player.valid?
 	
+	logger.debug("player errors inspect #{@player.errors.inspect}")
+	logger.debug("player inspect #{@player.inspect}")
 	logger.debug("error inspect #{@error.inspect}")
 	logger.debug("unauthorized inspect #{@unauthorized.inspect}")
 	respond_to do |format|
@@ -69,7 +71,7 @@ class PlayersController < ApplicationController
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
 				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json  { render :json => @player.to_json( :methods => :gravatar, :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
+				format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
 					
 				else
 					#format.html { render action: "new" }
@@ -91,10 +93,10 @@ class PlayersController < ApplicationController
   end
   
 	def auth_via_token
-		player = Player.find_by_a_t(params[:a_t]) #auth_token    #@player.valid?
+		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		if player.nil?
-			unauthorized = true
+			not_found = true
 			Rails.logger.info("unauthorization failed #{params[:a_t]}")		
 		else
 			#reset user's token, remove current token
@@ -105,14 +107,14 @@ class PlayersController < ApplicationController
 		end
 	
 		respond_to do |format|
-				if unauthorized #account for FB
-					format.json { render json: "unauthorized", status: :unauthorized }
+				if not_found #account for FB
+					format.json { render json: "not_found", status: :not_found }
 				else 
 					if player.errors.empty?
 						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
 						format.json  { render :json => player.to_json( 
 							:only => [:id, :f_n, :l_n, :n_n, :n_w],
-							:methods => :a__t),status: :ok}
+							:methods => [:gravatar, :a_t]),status: :ok}
 					else
 						#format.html { render action: "new" }
 						format.json { render json: player.errors, status: :unprocessable_entity }
@@ -122,7 +124,7 @@ class PlayersController < ApplicationController
 	end
 	
 	def log_out
-		player = Player.find_by_a_t(params[:a_t]) #auth_token    #@player.valid?
+		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		if player.nil?
 			unauthorized = true

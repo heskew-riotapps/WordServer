@@ -68,21 +68,21 @@ class PlayerService
 				end
 				
 			else
-			Rails.logger.debug("player has been found by email inspect #{@player.inspect}")
+				Rails.logger.debug("player has been found by email inspect #{@player.inspect}")
 				#player has been found by email...check password and make sure nickname is not duplicated.
 				#if password fails, send login failed error to client
 				#error codes via http or just error strings??
 				#if @player.authenticate_with_new_token(params[:password])
 				
 				if @player.auth(params[:p_w])
-				Rails.logger.debug("player has been authorized with password #{params[:p_w].inspect}")
+					Rails.logger.debug("player has been authorized with password #{params[:p_w].inspect}")
 					@player.generate_token("1") #do not delete existing tokens  
 					@player.n_n = params[:n_n]
 					@player.n_v = @player.n_v + 1
 					
 					#check for duplicate nickname
 					if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
-					Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
+						Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
 					#if Player.exists?(:n_n => params[:n_n], !:id => @player.id )
 						#nickname is taken
 						@error.code = "3"
