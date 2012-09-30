@@ -188,7 +188,7 @@ class PlayersController < ApplicationController
 			@error.code = "6"
 			unauthorized = true
 		else
- 			@player, @unauthorized, @error = PlayerService.update_account @player params[:player]
+ 			@player, @unauthorized, @error = PlayerService.update_account @player, params[:player]
 		end
 	
 	#logger.debug("player errors inspect #{@player.errors.inspect}")
