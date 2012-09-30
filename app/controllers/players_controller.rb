@@ -59,10 +59,10 @@ class PlayersController < ApplicationController
 	@player, @unauthorized, @error = PlayerService.create params[:player]
     #@player.valid?
 	
-	logger.debug("player errors inspect #{@player.errors.inspect}")
-	logger.debug("player inspect #{@player.inspect}")
-	logger.debug("error inspect #{@error.inspect}")
-	logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+	#logger.debug("player errors inspect #{@player.errors.inspect}")
+	#logger.debug("player inspect #{@player.inspect}")
+	#logger.debug("error inspect #{@error.inspect}")
+	#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
 	respond_to do |format|
 			if @unauthorized #account for FB
 				format.json { render json: @error.to_json(), status: :unauthorized }
@@ -71,7 +71,7 @@ class PlayersController < ApplicationController
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
 				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :a_t[0]]),status: :created}
+				format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :e_m]),status: :created}
 					
 				else
 					#format.html { render action: "new" }
@@ -108,12 +108,12 @@ class PlayersController < ApplicationController
 	
 		respond_to do |format|
 				if not_found #account for FB
-					format.json { render json: "not_found", status: :not_found }
+					format.json { render json: "unauthorized", status: :unauthorized }
 				else 
 					if player.errors.empty?
 						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
 						format.json  { render :json => player.to_json( 
-							:only => [:id, :f_n, :l_n, :n_n, :n_w],
+							:only => [:id, :f_n, :l_n, :n_n, :n_w, :e_m],
 							:methods => [:gravatar, :a_t]),status: :ok}
 					else
 						#format.html { render action: "new" }
@@ -148,6 +148,69 @@ class PlayersController < ApplicationController
 			end
 	end
 	
+	def change_password 
+		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@error = Error.new
+		
+		if player.nil?
+			@error.code = "6"
+			unauthorized = true
+		else
+			player.password = params[:p_w]
+			player.generate_token(params[:a_t])
+			player.save
+		end
+	
+		respond_to do |format|
+				if unauthorized #account for FB
+					format.json { render json: @error.to_json(), status: :unauthorized }
+				else 
+					if player.errors.empty?
+						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
+						format.json  { render :json => player.to_json( 
+							:only => [:id, :f_n, :l_n, :n_n, :n_w, :e_m],
+							:methods => [:gravatar, :a_t]),status: :ok}
+					else
+						#format.html { render action: "new" }
+						format.json { render json: player.errors, status: :unprocessable_entity }
+					end
+				end
+			end
+	end
+	
+    def update_account  
+	  
+ 		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		@error = Error.new
+	
+		if @player.nil?
+			@error.code = "6"
+			unauthorized = true
+		else
+ 			@player, @unauthorized, @error = PlayerService.update_account @player params[:player]
+		end
+	
+	#logger.debug("player errors inspect #{@player.errors.inspect}")
+	#logger.debug("player inspect #{@player.inspect}")
+	#logger.debug("error inspect #{@error.inspect}")
+	#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+		respond_to do |format|
+			if @unauthorized #account for FB
+				format.json { render json: @error.to_json(), status: :unauthorized }
+			else 
+				if @player.errors.empty?
+					#format.html { redirect_to @player, notice: 'Post was successfully created.' }
+					format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :e_m]),status: :created}
+					
+				else
+					#format.html { render action: "new" }
+					#json error handling
+					format.json { render json: @player.errors, status: :unprocessable_entity }
+				end
+			end
+		end
+  end
 	
 	def update
 		@player = Player.find(params[:id])
