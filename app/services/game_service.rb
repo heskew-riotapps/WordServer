@@ -79,7 +79,7 @@ class GameService
 				if pg.o == 1
 					pg.i_t = true #is_turn
 				else
-					pg.i_t = true #is_turn				
+					pg.i_t = false #is_turn				
 				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
 				#	pg.last_action_text =  I18n.t(:game_started_by_you) 

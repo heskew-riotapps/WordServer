@@ -38,7 +38,7 @@ class PlayersController < ApplicationController
 			#http://apidock.com/rails/ActiveRecord/Serialization/to_json
 			format.json  { render :json => @player.to_json({
 						:methods => :gravatar,
-						:only => [:id, :f_n, :l_n, :n_n, :n_w] } )}
+						:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w] } )}
 		end		 
     end
   end
@@ -71,7 +71,7 @@ class PlayersController < ApplicationController
 					format.html { redirect_to @player, notice: 'Post was successfully created.' }
 				#format.json { render json: @player, status: :created, location: @player }
 				#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :e_m]),status: :created}
+				format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :fb, :f_n, :l_n, :n_n, :e_m]),status: :created}
 					
 				else
 					#format.html { render action: "new" }
@@ -97,13 +97,19 @@ class PlayersController < ApplicationController
 	
 		if player.nil?
 			not_found = true
-			Rails.logger.info("unauthorization failed #{params[:a_t]}")		
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
 		else
 			#reset user's token, remove current token
 			#send the new token back to the client
 			player.n_v = player.n_v + 1
 			player.generate_token(params[:a_t])
-			player.save
+			
+			if !player.fb.blank?
+				player.save(:validate => false)
+			else
+				player.save 
+			end
+			
 		end
 	
 		respond_to do |format|
@@ -113,7 +119,7 @@ class PlayersController < ApplicationController
 					if player.errors.empty?
 						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
 						format.json  { render :json => player.to_json( 
-							:only => [:id, :f_n, :l_n, :n_n, :n_w, :e_m],
+							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
 							:methods => [:gravatar, :a_t]),status: :ok}
 					else
 						#format.html { render action: "new" }
@@ -130,7 +136,11 @@ class PlayersController < ApplicationController
 			unauthorized = true
 		else
 			player.remove_token(params[:a_t])
-			player.save
+			if !player.fb.blank?
+				player.save(:validate => false)
+			else
+				player.save 
+			end
 		end
 	
 		respond_to do |format|
@@ -168,7 +178,7 @@ class PlayersController < ApplicationController
 					if player.errors.empty?
 						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
 						format.json  { render :json => player.to_json( 
-							:only => [:id, :f_n, :l_n, :n_n, :n_w, :e_m],
+							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
 							:methods => [:gravatar, :a_t]),status: :ok}
 					else
 						#format.html { render action: "new" }
@@ -180,28 +190,19 @@ class PlayersController < ApplicationController
 	
     def update_account  
 	  
- 		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+ 		@player, @unauthorized, @error = PlayerService.update_account params 
 	
-		@error = Error.new
-	
-		if @player.nil?
-			@error.code = "6"
-			unauthorized = true
-		else
- 			@player, @unauthorized, @error = PlayerService.update_account @player, params[:player]
-		end
-	
-	#logger.debug("player errors inspect #{@player.errors.inspect}")
-	#logger.debug("player inspect #{@player.inspect}")
-	#logger.debug("error inspect #{@error.inspect}")
-	#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+		#logger.debug("player errors inspect #{@player.errors.inspect}")
+		#logger.debug("player inspect #{@player.inspect}")
+		#logger.debug("error inspect #{@error.inspect}")
+		#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
 		respond_to do |format|
 			if @unauthorized #account for FB
 				format.json { render json: @error.to_json(), status: :unauthorized }
 			else 
 				if @player.errors.empty?
 					#format.html { redirect_to @player, notice: 'Post was successfully created.' }
-					format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :f_n, :l_n, :n_n, :e_m]),status: :created}
+					format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :fb, :f_n, :l_n, :n_n, :e_m]),status: :created}
 					
 				else
 					#format.html { render action: "new" }

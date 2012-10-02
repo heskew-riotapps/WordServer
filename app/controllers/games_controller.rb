@@ -32,12 +32,13 @@ class GamesController < ApplicationController
   def create
 	#authenticate requesting player
 	player = Player.find_by_a_t_(params[:a_t]) #auth_token
-	
+	 
 	@game = Game.new
 	
 	if player.nil?
 		Rails.logger.info("unauthorized request to start game")	
-		@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])		
+		@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+		unauthorized = true		
 	else
 		@game = GameService.create( player, params[:game])
 	
@@ -46,13 +47,18 @@ class GamesController < ApplicationController
 		#send the new token back to the client
 		@game.a_t = player.generate_token(params[:a_t_])
 		#player.save  temp, add this back
+		if !player.fb.blank?
+				player.save(:validate => false)
+		else
+			player.save 
+		end
 		
 		#@game.a_t = player.a_t #auth_token
 	end
 	
     #@player.valid?
 	respond_to do |format|
-			if @unauthorized #account for FB
+			if unauthorized #account for FB
 				format.json { render json: "unauthorized", status: :unauthorized }
 			else 
 				if @game.errors.empty?
@@ -81,6 +87,66 @@ class GamesController < ApplicationController
 				end
 			end
 	end
+  end
+  
+  def get_active_games
+#authenticate requesting player
+	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	
+	if player.nil?
+		unauthorized = true		
+	else
+		games = Game.active_by_player(player)
+	
+		#reset user's token
+		#player.generate_token(:a_t)
+		#send the new token back to the client
+		@game.a_t = player.generate_token(params[:a_t_])
+		#player.save  temp, add this back
+		if !player.fb.blank?
+				player.save(:validate => false)
+		else
+			player.save 
+		end
+		
+		#loop through each games removing excess data
+		
+		@game.strip_tray_tiles_from_non_context_user current_player.id
+		#@game.a_t = player.a_t #auth_token
+	end
+	
+	
+	respond_to do |format|
+			if unauthorized #account for FB
+				format.json { render json: "unauthorized", status: :unauthorized }
+			else 
+				if @game.errors.empty?
+					format.html { redirect_to @game, notice: 'Post was successfully created.' }
+					
+					#http://apidock.com/rails/ActiveRecord/Serialization/to_json
+				#format.json { render json: @game, status: :created, location: @game }
+					
+
+				format.json  { render :json => games.to_json( 
+												:include => { :player_games => {
+												  :only => [:o, :i_t, :sc, :id, :n_w, :t_l],  
+												 :include => {:player => 
+																{:only => [:f_n, :l_n, :n_n, :id, :n_w] } }
+												} } ),status: :created }
+				 
+				 #)}
+				#	 konata.to_json(:include => { :posts => { 
+                #                 :include => { :comments => {
+                #                               :only => :body } },
+                #                 :only => :title } })
+				else
+					format.html { render action: "new" }
+					#json error handling
+					format.json { render json: @game.errors, status: :unprocessable_entity }
+				end
+			end
+	end
+  
   end
   
 end

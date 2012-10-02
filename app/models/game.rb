@@ -5,7 +5,7 @@ class Game
   many :played_words
 #many :letters remaining vs played?#, :length => { :maximum => 2 }  
   many :played_tiles
-  
+   
   many :chatters
   key :d_c, String #dup_check..  just in case same post is sent more than once
   key :r_l, Array  #remaining letters
@@ -20,6 +20,10 @@ class Game
   key :co_d, Time #completion_date
   key :cr_d, Time #create_date
   key :st, Integer #status
+  
+  def self.active_by_player(player)
+    where(:player_game.player => player, st => 1 )
+  end
   
   def left
 	return self.r_l.count

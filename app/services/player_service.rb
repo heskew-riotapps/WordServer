@@ -13,17 +13,28 @@ class PlayerService
 		elsif !params[:fb].blank?
 			@player = Player.find_by_fb(params[:fb])
 			if @player.nil?
-				@player = Player.new
-				@player.fb = params[:fb] #facebook_id
+				#go ahead and see if player has already registered with the same email account.
+				#if so, use this player as a facebook player going forward, this ia a one way street
+				@player = Player.find_by_fb(params[:e_m])
+					if @player.nil?
+						@player = Player.new
+						@player.fb = params[:fb] #facebook_id
+						@player.password = ""
+					end
 				#@player.password = ""
+			else
+			 	if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
+					Rails.logger.debug("duplicate  email#{params[:e_m].inspect}")
+					@error.code = "7"
+					@unauthorized = true
+				else		
+					@player.n_v = @player.n_v + 1
+					@player.f_n = params[:f_n] #first_name
+					@player.l_n = params[:l_n] #last_name
+					@player.e_m = params[:e_m] #email
+					@player.generate_token("0") #auth_token
+				end
 			end
-	 
-			@player.n_v = @player.n_v + 1
-			@player.f_n = params[:f_n] #first_name
-			@player.l_n = params[:l_n] #last_name
-			@player.e_m = params[:e_m] #email
-			@player.generate_token("0") #auth_token
-			
 			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
 			@ok = @player.save(:validate => false)  
 		else		
@@ -112,10 +123,14 @@ class PlayerService
 	
 	def self.update_account(params)
 	#make sure nickname and email are unique
-	
+	@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	@error = Error.new
 	@unauthorized = false
-		if !params.has_key?(:e_m) || params[:e_m].blank?
+	
+		if @player.nil?
+			@error.code = "6"
+			@unauthorized = true 
+		elsif !params.has_key?(:e_m) || params[:e_m].blank?
 			Rails.logger.debug("email not supplied inspect #{params.inspect}")
 			@error.code = "2"
 			@unauthorized = true 
@@ -140,6 +155,11 @@ class PlayerService
 				@player.e_m = params[:e_m] #email
 				@player.generate_token(params[:a_t])
 				@ok = @player.save
+				if !player.fb.blank?
+					@ok = @player.save(:validate => false)
+				else
+					@ok = @player.save 
+				end
 			end
 		 
 		end	
