@@ -26,20 +26,22 @@ class PlayerService
 				end
 				#@player.password = ""
 			else
-			 	if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
-					Rails.logger.debug("duplicate  email#{params[:e_m].inspect}")
-					@error.code = "7"
-					@unauthorized = true
-				else		
-					@player.n_v = @player.n_v + 1
-					@player.f_n = params[:f_n] #first_name
-					@player.l_n = params[:l_n] #last_name
-					@player.e_m = params[:e_m] #email
-
-					#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
-					@ok = @player.save(:validate => false)  
-				end
+				@player.generate_token("1") #do not delete existing tokens  
 			end
+			if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
+				Rails.logger.debug("duplicate  email#{params[:e_m].inspect}")
+				@error.code = "7"
+				@unauthorized = true
+			else		
+				@player.n_v = @player.n_v + 1
+				@player.f_n = params[:f_n] #first_name
+				@player.l_n = params[:l_n] #last_name
+				@player.e_m = params[:e_m] #email
+
+				#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
+				@ok = @player.save(:validate => false)  
+			end
+			 
 			
 		else		
 			#find player by email addy

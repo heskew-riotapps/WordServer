@@ -96,7 +96,7 @@ class GamesController < ApplicationController
 	if player.nil?
 		unauthorized = true		
 	else
-		games = Game.all(:conditions => {'player_game.player_id' => player.id}) # Game.active_by_player(player.id)
+		games = Game.all(:conditions => {'st' => 1, 'player_game.player_id' => player.id}) # Game.active_by_player(player.id)
 	
 		#reset user's token
 		#player.generate_token(:a_t)
@@ -109,9 +109,9 @@ class GamesController < ApplicationController
 			player.save 
 		end
 		
-		#loop through each games removing excess data
+		#loop through each game removing excess data
 		games.each  do |value|
-			value.strip_tray_tiles_from_non_context_user current_player.id
+			value.strip_tray_tiles_from_non_context_user player.id
 		
 		end
 		#@game.a_t = player.a_t #auth_token
@@ -122,12 +122,7 @@ class GamesController < ApplicationController
 			if unauthorized #account for FB
 				format.json { render json: "unauthorized", status: :unauthorized }
 			else 
-				if games.errors.empty?
-					format.html { redirect_to @game, notice: 'Post was successfully created.' }
-					
-					#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				#format.json { render json: @game, status: :created, location: @game }
-					
+			 
 
 				format.json  { render :json => games.to_json( 
 												:only => [:id, :t, :lp_d, :id], 
@@ -137,16 +132,7 @@ class GamesController < ApplicationController
 																{:only => [:fb, :f_n, :l_n, :n_n, :id, :n_w] } }
 												} } ),status: :ok }
 				 
-				 #)}
-				#	 konata.to_json(:include => { :posts => { 
-                #                 :include => { :comments => {
-                #                               :only => :body } },
-                #                 :only => :title } })
-				else
-					format.html { render action: "new" }
-					#json error handling
-					format.json { render json: @game.errors, status: :unprocessable_entity }
-				end
+				 
 			end
 	end
   

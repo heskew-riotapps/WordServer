@@ -29,6 +29,7 @@ class Player
   key :n_l, Integer, :default => 0 #num_losses
   key :n_d, Integer, :default => 0 #num_draws
   key :n_a_g, Integer, :default => 0 #num_active_games
+  key :n_c_g, Integer, :default => 0 #num_completed_games
   key :n_v, Integer, :default => 0  #num_visits
 
   #this should record the words (turn number)
@@ -42,6 +43,8 @@ class Player
   
   key :l_w_m, Integer, :default => 0 # largest_win_margin
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
+  
+  attr_accessor :completed_games_from_date
 
    def password_required
     return false
@@ -49,6 +52,14 @@ class Player
 	#!self.fb || !self.fb.empty?
   end
 
+  def a_games #active games method
+	return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
+  end
+ 
+ def c_games  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works
+	return Game.all(:conditions => {:co_d.gte => Time.parse(self.completed_games_from_date), 'st' => 2, 'player_game.player_id' => self.id}) 
+  end
+ 
   def gravatar 
     if !self.fb.nil? && !self.fb.empty? 
 		return ""
