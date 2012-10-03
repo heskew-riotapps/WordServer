@@ -16,11 +16,14 @@ class PlayerService
 				#go ahead and see if player has already registered with the same email account.
 				#if so, use this player as a facebook player going forward, this ia a one way street
 				@player = Player.find_by_fb(params[:e_m])
-					if @player.nil?
-						@player = Player.new
-						@player.fb = params[:fb] #facebook_id
-						@player.password = ""
-					end
+				if @player.nil?
+					@player = Player.new
+					@player.fb = params[:fb] #facebook_id
+					@player.password = ""
+					@player.generate_token("0") #auth_token
+				else
+					@player.generate_token("1") #do not delete existing tokens  
+				end
 				#@player.password = ""
 			else
 			 	if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
@@ -32,11 +35,12 @@ class PlayerService
 					@player.f_n = params[:f_n] #first_name
 					@player.l_n = params[:l_n] #last_name
 					@player.e_m = params[:e_m] #email
-					@player.generate_token("0") #auth_token
+
+					#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
+					@ok = @player.save(:validate => false)  
 				end
 			end
-			#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
-			@ok = @player.save(:validate => false)  
+			
 		else		
 			#find player by email addy
 			@player = Player.find_by_e_m(params[:e_m])

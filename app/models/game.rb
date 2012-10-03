@@ -20,10 +20,14 @@ class Game
   key :co_d, Time #completion_date
   key :cr_d, Time #create_date
   key :st, Integer #status
+  key :ch_d, Time #last_chatter_date
+  key :lp_d, Time #last_played_date
   
-  def self.active_by_player(player)
-    where(:player_game.player => player, st => 1 )
-  end
+  
+#  def self.active_by_player(player_id)
+#    where(:st => 1, :player_games => {player_id => player_id, st => 1 )
+#  end
+#  Person.all(:conditions => {'addresses.city' => 'Chicago'})
   
   def left
 	return self.r_l.count

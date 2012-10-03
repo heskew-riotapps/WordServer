@@ -13,7 +13,7 @@ class Player
 
    
  # short field names!!!!!!!
-  many :player_games
+  #many :player_games
   #key :a_t, String #auth_token
   key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
