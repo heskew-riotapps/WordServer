@@ -15,6 +15,7 @@ class Player
  # short field names!!!!!!!
   #many :player_games
   #key :a_t, String #auth_token
+  many :opponents
   key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
   key :e_m,      String #email
@@ -44,7 +45,8 @@ class Player
   key :l_w_m, Integer, :default => 0 # largest_win_margin
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
   
-  attr_accessor :completed_games_from_date
+  attr_accessor :completed_games_from_date  
+  #key :completed_games_from_date 
 
    def password_required
     return false
@@ -53,11 +55,21 @@ class Player
   end
 
   def a_games #active games method
-	return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
+	return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
+	#return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
+	#return Game.where(:st => 1, :player_game (:player_id => self.id)).sort( { lp_d : -1 } )  
+	#{ "author.name" : "joe" }
+	#Patient.where(:updated_at.gte => 3.days.ago).sort(:updated_at.desc)
   end
  
  def c_games  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works
-	return Game.all(:conditions => {:co_d.gte => Time.parse(self.completed_games_from_date), 'st' => 2, 'player_game.player_id' => self.id}) 
+	if self.completed_games_from_date.nil?
+		self.completed_games_from_date	= "10/06/2012"
+	end
+	return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
+  #return Game.find(:conditions => {:co_d.gt => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id})
+ #  :started_on => {"$gte" => whatev}
+  #.sort(:last_name).limit(10)
   end
  
   def gravatar 

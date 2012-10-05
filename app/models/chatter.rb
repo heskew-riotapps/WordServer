@@ -1,5 +1,5 @@
 class Chatter
-  include MongoMapper::Document
+  include MongoMapper::EmbeddedDocument
 
   key :text,     String
   key :player_id , ObjectId
