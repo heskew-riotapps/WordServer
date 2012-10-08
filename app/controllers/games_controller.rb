@@ -32,20 +32,22 @@ class GamesController < ApplicationController
   def create
 	#authenticate requesting player
 	player = Player.find_by_a_t_(params[:a_t]) #auth_token
-	 
+logger.debug("game before create #{params.inspect}")
 	@game = Game.new
 	
 	if player.nil?
 		Rails.logger.info("unauthorized request to start game")	
-		@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+	#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
 		unauthorized = true		
 	else
-		@game = GameService.create( player, params[:game])
+		@game = GameService.create(player, params[:game])
 	
 		#reset user's token
 		#player.generate_token(:a_t)
 		#send the new token back to the client
-		@game.a_t = player.generate_token(params[:a_t_])
+		
+		@game.a_t = player.generate_token(params[:a_t])
+		logger.debug("game after create #{@game.inspect}")
 		#player.save  temp, add this back
 		if !player.fb.blank?
 				player.save(:validate => false)
@@ -69,11 +71,14 @@ class GamesController < ApplicationController
 					
 
 				format.json  { render :json => @game.to_json( 
-												:include => { :player_games => {
-												  :only => [:o, :i_t, :sc, :id, :n_w, :t_l],  
-												 :include => {:player => 
-																{:only => [:f_n, :l_n, :n_n, :id, :n_w] } }
-												} } ),status: :created }
+										:only => [:cr_d, :a_t, :t, :id],
+										:method => [:left] },										
+										:include => { :player_games => {
+										  :only => [:o, :i_t, :sc, :id, :n_w, :t_l],  
+											:include => {:player => 
+												{:only => [:f_n, :l_n, :n_n, :id, :n_w],
+												 :method => [:gravatar] } }
+										} } ),status: :created }
 				 
 				 #)}
 				#	 konata.to_json(:include => { :posts => { 

@@ -200,6 +200,38 @@ class PlayersController < ApplicationController
 			end
 	end
 	
+	def clear_tokens
+		player = Player.find_by_id(params[:id]) #auth_token    #@player.valid?
+	
+
+		if player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			player.a_t_.clear 
+			
+			if !player.fb.blank?
+				player.save(:validate => false)
+			else
+				player.save 
+			end
+			
+		end
+	
+		respond_to do |format|
+				if not_found #account for FB
+					format.json { render json: "not_found", status: :not_found }
+				else 
+					if player.errors.empty?
+						format.json { render json: "ok", status: :ok }
+					else
+						#format.html { render action: "new" }
+						format.json { render json: player.errors, status: :unprocessable_entity }
+					end
+				end
+			end
+	end
+	
 	def get_games 
 		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 		@error = Error.new

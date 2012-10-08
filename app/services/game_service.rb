@@ -15,7 +15,16 @@ class GameService
 		
 		Rails.logger.debug "params[:player_games]: #{params[:player_games].inspect}"
 		
+		#check for already posted game, duplicate check
+		#if Game.where( :d_c => auth_token).count > 0
+		#	Rails.logger.info("error: duplicate check failed, game already created")
+		#	@game.errors.add(:d_c, I18n.t(:error_game_already_created))
+		#	return @game
+		#end
+		
 		@game.t = 1 #turn_num
+		#@game.d_c = auth_token
+		@game.st = 1
 		@game.r_v = AlphabetService.get_random_vowels #random_vowels
 		@game.r_c = AlphabetService.get_random_consonants #random_consonants
 		@game.r_l = AlphabetService.get_letter_distribution + @game.r_v + @game.r_c 
@@ -47,7 +56,7 @@ class GameService
 			#Rails.logger.debug("value inspect #{value.inspect}")
 		 	player = Player.find_by_id(value['player_id'])
 		 
-		  		Rails.logger.debug "player nickname: #{player.n_n}"
+		  		#Rails.logger.debug "player nickname: #{player.n_n}"
 			if player.nil?
 				Rails.logger.info("invalid user being requested " + value['player_id'])
 				@game.errors.add(:player_games, I18n.t(:error_invalid_player_requested))
@@ -78,8 +87,12 @@ class GameService
 				end
 				if pg.o == 1
 					pg.i_t = true #is_turn
+					pg.l_t = 0
+					pg.l_t_a = 8 #started the game
 				else
 					pg.i_t = false #is_turn				
+					pg.l_t = -1
+					pg.l_t_a = 0 #no action yet 
 				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
 				#	pg.last_action_text =  I18n.t(:game_started_by_you) 
@@ -88,18 +101,19 @@ class GameService
 				#	pg.last_action_text =  I18n.t(:game_started_by_player) % current_player.get_abbreviated_name
 				#end
 				
-				Rails.logger.debug("pg inspect #{pg.inspect}")
+				#Rails.logger.debug("pg inspect #{pg.inspect}")
 				
 				#add playerGame object to the game if it's not already there
 				#make sure player_order is unique
+				#if pg.o == 1
 				@game.player_games << pg
-
+				#end
 			end
 		end
 
 		#if  currentPlayerIsInGame is false, throw error
 		if  !currentPlayerIsInGame
-			@game.errors.add(value['player_id'], I18n.t(:error_authorized_player_not_in_game))
+			@game.errors.add(:player_games, I18n.t(:error_authorized_player_not_in_game))
 		end
 		
 		
