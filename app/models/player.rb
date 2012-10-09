@@ -47,6 +47,12 @@ class Player
   
   attr_accessor :completed_games_from_date  
   #key :completed_games_from_date 
+  
+   #many :games do
+   # def active
+   #   where(:st => 1)
+   # end
+  #end
 
    def password_required
     return false
@@ -55,7 +61,8 @@ class Player
   end
 
   def a_games #active games method
-	return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
+  #return Game.all(:conditions => {'st' => 1 })
+	 return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
 	#return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
 	#return Game.where(:st => 1, :player_game (:player_id => self.id)).sort( { lp_d : -1 } )  
 	#{ "author.name" : "joe" }

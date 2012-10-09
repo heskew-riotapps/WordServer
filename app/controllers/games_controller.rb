@@ -1,3 +1,5 @@
+require 'mongo'
+
 class GamesController < ApplicationController
 	def new
 		Game.delete_all
@@ -22,12 +24,27 @@ class GamesController < ApplicationController
 	end
 
   def index
-    @games = Game.all 
+    #@games = Game.all 
+	@games = Game.find(:conditions => {'st' => 1, 'player_game.player_id' => params[:id]}, :sort => {'lp_d' => -1})
 
     respond_to do |format|
       format.html # index.html.erb
+	  format.json { render json: @games }
     end
   end
+  
+  def show
+    #@games = Game.all
+	@games = Game.all(:conditions => {'st' => 1, 'player_games.player_id' => BSON::ObjectId.from_string(params[:id])}, :sort => {'lp_d' => -1})
+	
+	#@games = Game.all(:conditions => {'st' => 1, :player_games => {:player => {:id => BSON::ObjectId.from_string(params[:id])}}})
+#User.where('alerts.name' => params[:name], :id => current_user.id).first
+    respond_to do |format|
+      format.html # index.html.erb
+	  format.json { render json: @games }
+    end
+  end
+  #Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})
   
   def create
 	#authenticate requesting player
@@ -72,12 +89,12 @@ logger.debug("game before create #{params.inspect}")
 
 				format.json  { render :json => @game.to_json( 
 										:only => [:cr_d, :a_t, :t, :id],
-										:method => [:left] },										
+										:methods => [:left] ,										
 										:include => { :player_games => {
-										  :only => [:o, :i_t, :sc, :id, :n_w, :t_l],  
+										  :only => [:o, :i_t, :sc, :id, :n_w, :t_l, :l_t, :l_t_p, :l_t_a],  
 											:include => {:player => 
 												{:only => [:f_n, :l_n, :n_n, :id, :n_w],
-												 :method => [:gravatar] } }
+												 :methods => [:gravatar] } }
 										} } ),status: :created }
 				 
 				 #)}

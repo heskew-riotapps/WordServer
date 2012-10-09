@@ -86,7 +86,7 @@ class PlayersController < ApplicationController
 				end
 			end
 		end
-  end
+	end
   
   def auth_via_token_____ #test only
   @error = Error.new
@@ -130,9 +130,28 @@ class PlayersController < ApplicationController
 				else 
 					if player.errors.empty?
 						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
-						format.json  { render :json => player.to_json( 
+						format.json  { render :json => player.to_json(
 							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
-							:methods => [:gravatar, :a_t, :a_games, :c_games]),status: :ok}
+							:methods => [:gravatar, :a_t, :c_games, 
+								:a_games => 
+									{
+									:only => [:id, :t], 
+									:include => 
+										{ 
+											:player_games => 
+												{
+												:only => [:o, :i_t, :sc, :id, :n_w, :t_l, :l_t, :l_t_p, :l_t_a],  
+												:include => 
+													{:player => 
+														{
+														:only => [:f_n, :l_n, :n_n, :id, :n_w],
+														:methods => [:gravatar] 
+														} 
+													}
+												}
+										}
+									} 
+								]),status: :ok}
 					else
 						#format.html { render action: "new" }
 						format.json { render json: player.errors, status: :unprocessable_entity }

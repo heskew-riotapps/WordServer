@@ -87,12 +87,14 @@ class GameService
 				end
 				if pg.o == 1
 					pg.i_t = true #is_turn
-					pg.l_t = 0
-					pg.l_t_a = 8 #started the game
+					pg.l_t = 0 #last turn number
+					pg.l_t_a = 8 #last turn action - started the game
+					pg.l_t_p = 0 #last turn points 
 				else
 					pg.i_t = false #is_turn				
-					pg.l_t = -1
+					pg.l_t = 0
 					pg.l_t_a = 0 #no action yet 
+					pg.l_t_p = 0 #last turn points
 				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
 				#	pg.last_action_text =  I18n.t(:game_started_by_you) 

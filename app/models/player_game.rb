@@ -6,6 +6,7 @@ class PlayerGame
   belongs_to :player
   key :sc,     Integer, :default => 0 #score
   key :l_t, Integer, :default => 0 #last turn
+  key :l_t_p, Integer, :default => 0 #last turn points
   key :l_t_a, Integer, :default => 0 #last turn action => 
 			#NO_TRANSLATION(0), (no action yet)
 			#ONE_LETTER_SWAPPED(1),
