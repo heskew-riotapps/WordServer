@@ -1,4 +1,6 @@
 class PlayersController < ApplicationController
+	 respond_to :json
+
 	def new
 		@player = Player.new
 		
@@ -99,65 +101,37 @@ class PlayersController < ApplicationController
   end
   
 	def auth_via_token
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
-
-		if player.nil?
+		Rails.logger.info("params #{params}")
+		if @player.nil?
 			not_found = true
 			Rails.logger.info("authorization failed #{params[:a_t]}")		
 		else
 			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
-				player.completed_games_from_date = params[:c_g_d]
+				@player.completed_games_from_date = params[:c_g_d]
 			else
-				player.completed_games_from_date = "10/6/2012"
+				@player.completed_games_from_date = "10/6/2012"
 			end
 			#reset user's token, remove current token
 			#send the new token back to the client
-			player.n_v = player.n_v + 1
-			player.generate_token(params[:a_t])
+			@player.n_v = @player.n_v + 1
+			@player.generate_token(params[:a_t])
 			
-			if !player.fb.blank?
-				player.save(:validate => false)
+			if !@player.fb.blank?
+				@player.save(:validate => false)
 			else
-				player.save 
+				@player.save 
 			end
 			
 		end
 	
-		respond_to do |format|
-				if not_found #account for FB
-					format.json { render json: "unauthorized", status: :unauthorized }
-				else 
-					if player.errors.empty?
-						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
-						format.json  { render :json => player.to_json(
-							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
-							:methods => [:gravatar, :a_t, :c_games, 
-								:a_games => 
-									{
-									:only => [:id, :t], 
-									:include => 
-										{ 
-											:player_games => 
-												{
-												:only => [:o, :i_t, :sc, :id, :n_w, :t_l, :l_t, :l_t_p, :l_t_a],  
-												:include => 
-													{:player => 
-														{
-														:only => [:f_n, :l_n, :n_n, :id, :n_w],
-														:methods => [:gravatar] 
-														} 
-													}
-												}
-										}
-									} 
-								]),status: :ok}
-					else
-						#format.html { render action: "new" }
-						format.json { render json: player.errors, status: :unprocessable_entity }
-					end
-				end
-			end
+		
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			respond_with @player
+		end
 	end
 	
 	def log_out

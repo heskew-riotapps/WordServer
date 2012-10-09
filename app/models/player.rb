@@ -61,8 +61,13 @@ class Player
   end
 
   def a_games #active games method
-  #return Game.all(:conditions => {'st' => 1 })
-	 return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
+  Rails.logger.debug("player class, entering a_game")
+  return Game.all(:conditions => {'st' => 1 })
+  #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
+   #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
+	#  return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :order  => {'lp_d' => -1})   
+	#return Game.where(:st => 1, :player_game => (:player_id => self.id)).sort( { :lp_d : -1 } )
+	#this is stupid and ugly but i'm shrinking the collections object here in order to minimize json transport 
 	#return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
 	#return Game.where(:st => 1, :player_game (:player_id => self.id)).sort( { lp_d : -1 } )  
 	#{ "author.name" : "joe" }
