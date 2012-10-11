@@ -18,7 +18,8 @@ Word::Application.routes.draw do
 	scope "(:locale)", :locale => /en|es/ do
 		match "/players/clear_tokens/" => "players#clear_tokens"
 		match "/players/get_games/" => "players#get_games"
-		match "/games/get_active_games/" => "games#get_active_games"
+		match "/games/get/" => "games#get"
+		match "/players/update_fb_account/" => "players#update_fb_account"
 		match "/players/update_account/" => "players#update_account"
 		match "/players/change_password/" => "players#change_password"
 		match "/players/destroy_all/" => "players#destroy_all"

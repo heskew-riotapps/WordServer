@@ -141,7 +141,7 @@ class PlayerService
 			@error.code = "2"
 			@unauthorized = true 
 		elsif !params.has_key?(:n_n) || params[:n_n].blank?
-			Rails.logger.debug("email not supplied inspect #{params.inspect}")
+			Rails.logger.debug("nickname not supplied inspect #{params.inspect}")
 			@error.code = "4"
 			@unauthorized = true 
 		else		
@@ -173,4 +173,40 @@ class PlayerService
 		return @player, @unauthorized, @error
 	end
 
+	def self.update_fb_account(params)
+		#make sure nickname is unique
+		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@error = Error.new
+		@unauthorized = false
+	
+		if @player.nil?
+			@error.code = "6"
+			@unauthorized = true 
+		elsif !params.has_key?(:n_n) || params[:n_n].blank?
+			Rails.logger.debug("nickname not supplied inspect #{params.inspect}")
+			@error.code = "4"
+			@unauthorized = true 
+		else		
+			#check for duplicate nickname
+			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
+				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
+ 
+				@error.code = "3"
+ 				@unauthorized = true
+			else
+				@player.n_n = params[:n_n] #nickname
+				@player.generate_token(params[:a_t])
+				@ok = @player.save
+				if !player.fb.blank?
+					@ok = @player.save(:validate => false)
+				else
+					@ok = @player.save 
+				end
+			end
+		 
+		end	
+		
+		return @player, @unauthorized, @error
+	end
+	
 end

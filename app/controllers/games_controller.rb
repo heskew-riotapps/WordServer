@@ -1,6 +1,8 @@
 require 'mongo'
 
 class GamesController < ApplicationController
+	respond_to :json
+	
 	def new
 		Game.delete_all
 		game = Game.new
@@ -24,16 +26,16 @@ class GamesController < ApplicationController
 	end
 
   def index
-    #@games = Game.all 
-	@games = Game.find(:conditions => {'st' => 1, 'player_game.player_id' => params[:id]}, :sort => {'lp_d' => -1})
+     @games = Game.all 
+	#@games = Game.find(:conditions => {'st' => 1, 'player_game.player_id' => params[:id]}, :sort => {'lp_d' => -1})
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html #index.html.erb
 	  format.json { render json: @games }
     end
   end
   
-  def show
+  def show____
     #@games = Game.all
 	@games = Game.all(:conditions => {'st' => 1, 'player_games.player_id' => BSON::ObjectId.from_string(params[:id])}, :sort => {'lp_d' => -1})
 	
@@ -45,6 +47,57 @@ class GamesController < ApplicationController
     end
   end
   #Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})
+  
+   def get
+		player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		logger.debug("game before create #{params.inspect}")
+	   
+
+		if player.nil?
+			Rails.logger.info("unauthorized request to start game")	
+		#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+			unauthorized = true		
+		else
+			 @game = Game.find(params[:id])
+			 
+			if @game.nil?
+				Rails.logger.info("cannot find game")	
+				not_found = true		
+			 
+			else
+				#make sure requesting user is part of the game
+				if !@game.is_player_part_of_game player.id 
+					unauthorized = true		
+				else
+					@game.strip_tray_tiles_from_non_context_user player.id
+
+					#reset user's token
+					#player.generate_token(:a_t)
+					#send the new token back to the client
+					
+					@game.a_t = player.generate_token(params[:a_t])
+					logger.debug("game after create #{@game.inspect}")
+					 
+					#if !player.fb.blank?
+					#		player.save(:validate => false)
+					#else
+					#	player.save 
+					#end
+				end	
+			end
+		end
+	
+		if unauthorized 
+			render json: "unauthorized", status: :unauthorized
+		elsif not_found 
+			render json: "not_found", status: :not_found 
+		elsif @game.errors.empty?
+			respond_with @game
+		else
+			render json: @player.errors, status: :unprocessable_entity
+		end
+  end
+  
   
   def create
 	#authenticate requesting player
@@ -111,7 +164,7 @@ logger.debug("game before create #{params.inspect}")
 	end
   end
   
-  def get_active_games
+  def get_active_games____
 #authenticate requesting player
 	player = Player.find_by_a_t_(params[:a_t]) #auth_token
 	

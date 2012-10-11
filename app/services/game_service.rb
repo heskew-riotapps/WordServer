@@ -29,6 +29,7 @@ class GameService
 		@game.r_c = AlphabetService.get_random_consonants #random_consonants
 		@game.r_l = AlphabetService.get_letter_distribution + @game.r_v + @game.r_c 
 		@game.r_l.shuffle! #remaining_letters
+		@game.r_l.shuffle! #remaining_letters shuffled again
 		@game.cr_d = Time.now.utc  #create_date
 		
 		#if this count > 4, log an error and return

@@ -7,7 +7,7 @@ class Game
   many :played_tiles
    
   many :chatters
-  key :d_c, String #dup_check..  just in case same post is sent more than once
+  #key :d_c, String #dup_check..  just in case same post is sent more than once
   key :r_l, Array  #remaining letters
   key :p_l, Array #played_letters
   key :r_v, Array #random_vowels
@@ -55,7 +55,15 @@ class Game
 		end	
 	end 	
 		
-		
+	def is_player_part_of_game(content_player_id)
+		ok = false
+		self.player_games.each  do |value|
+			if value.player_id == content_player_id
+				ok = true 
+			end
+		end	
+		return ok
+	end 	
   
   
   # Validations.
