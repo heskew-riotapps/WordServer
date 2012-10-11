@@ -78,11 +78,11 @@ class GamesController < ApplicationController
 					@game.a_t = player.generate_token(params[:a_t])
 					logger.debug("game after create #{@game.inspect}")
 					 
-					#if !player.fb.blank?
-					#		player.save(:validate => false)
-					#else
-					#	player.save 
-					#end
+					if !player.fb.blank?
+							player.save(:validate => false)
+					else
+						player.save 
+					end
 				end	
 			end
 		end
@@ -102,7 +102,7 @@ class GamesController < ApplicationController
   def create
 	#authenticate requesting player
 	player = Player.find_by_a_t_(params[:a_t]) #auth_token
-logger.debug("game before create #{params.inspect}")
+	logger.debug("game before create #{params.inspect}")
 	@game = Game.new
 	
 	if player.nil?
@@ -128,40 +128,14 @@ logger.debug("game before create #{params.inspect}")
 		#@game.a_t = player.a_t #auth_token
 	end
 	
-    #@player.valid?
-	respond_to do |format|
-			if unauthorized #account for FB
-				format.json { render json: "unauthorized", status: :unauthorized }
-			else 
-				if @game.errors.empty?
-					format.html { redirect_to @game, notice: 'Post was successfully created.' }
-					
-					#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-				#format.json { render json: @game, status: :created, location: @game }
-					
-
-				format.json  { render :json => @game.to_json( 
-										:only => [:cr_d, :a_t, :t, :id],
-										:methods => [:left] ,										
-										:include => { :player_games => {
-										  :only => [:o, :i_t, :sc, :id, :n_w, :t_l, :l_t, :l_t_p, :l_t_a],  
-											:include => {:player => 
-												{:only => [:f_n, :l_n, :n_n, :id, :n_w],
-												 :methods => [:gravatar] } }
-										} } ),status: :created }
-				 
-				 #)}
-				#	 konata.to_json(:include => { :posts => { 
-                #                 :include => { :comments => {
-                #                               :only => :body } },
-                #                 :only => :title } })
-				else
-					format.html { render action: "new" }
-					#json error handling
-					format.json { render json: @game.errors, status: :unprocessable_entity }
-				end
-			end
+	if unauthorized 
+		render json: "unauthorized", status: :unauthorized
+	elsif @game.errors.empty?
+		respond_with @game
+	else
+		render json: @player.errors, status: :unprocessable_entity
 	end
+  
   end
   
   def get_active_games____
