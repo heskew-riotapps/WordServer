@@ -79,7 +79,7 @@ class GamesController < ApplicationController
 					logger.debug("game after create #{@game.inspect}")
 					 
 					if !player.fb.blank?
-							player.save(:validate => false)
+						player.save(:validate => false)
 					else
 						player.save 
 					end
