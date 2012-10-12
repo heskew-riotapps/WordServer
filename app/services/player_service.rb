@@ -18,12 +18,12 @@ class PlayerService
 				@player = Player.find_by_e_m(params[:e_m])
 				if @player.nil?
 					@player = Player.new
-					@player.fb = params[:fb] #facebook_id
-					@player.password = ""
 					@player.generate_token("0") #auth_token
 				else
 					@player.generate_token("1") #do not delete existing tokens  
 				end
+				@player.fb = params[:fb] #facebook_id
+				@player.password = ""
 				#@player.password = ""
 			else
 				@player.generate_token("1") #do not delete existing tokens  
