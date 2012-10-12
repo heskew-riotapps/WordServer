@@ -79,7 +79,7 @@ class PlayersController < ApplicationController
    
 	@player, @unauthorized, @error = PlayerService.create params[:player]
     #@player.valid?
-	
+	 logger.debug("unauthorized inspect #{@unauthorized.inspect}")
 	#logger.debug("player errors inspect #{@player.errors.inspect}")
 	#logger.debug("player inspect #{@player.inspect}")
 	#logger.debug("error inspect #{@error.inspect}")
