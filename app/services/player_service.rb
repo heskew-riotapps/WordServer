@@ -7,7 +7,7 @@ class PlayerService
 	@error = Error.new
 	@unauthorized = false
 		if !params.has_key?(:e_m) || params[:e_m].blank?
-			Rails.logger.debug("email not supplied inspect #{params.inspect}")
+			Rails.logger.info ("email not supplied inspect #{params.inspect}")
 			@error.code = "2"
 			@unauthorized = true
 		elsif !params[:fb].blank?
@@ -29,7 +29,7 @@ class PlayerService
 				@player.generate_token("1") #do not delete existing tokens  
 			end
 			if Player.where( :e_m => params[:e_m], :id.ne => @player.id ).count > 0
-				Rails.logger.debug("duplicate  email#{params[:e_m].inspect}")
+				Rails.logger.info ("duplicate  email#{params[:e_m].inspect}")
 				@error.code = "7"
 				@unauthorized = true
 			else		
@@ -48,7 +48,7 @@ class PlayerService
 			@player = Player.find_by_e_m(params[:e_m])
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
-					Rails.logger.debug("nickname not supplied inspect #{params.inspect}")
+					Rails.logger.info ("nickname not supplied inspect #{params.inspect}")
 					@error.code = "4"
 					@unauthorized = true
 				else
@@ -90,7 +90,7 @@ class PlayerService
 					end
 				end
 			else
-				Rails.logger.debug("player has been found by email inspect #{@player.inspect}")
+				Rails.logger.info ("player has been found by email inspect #{@player.inspect}")
 				#player has been found by email...check password and make sure nickname is not duplicated.
 				#if password fails, send login failed error to client
 				#error codes via http or just error strings??
@@ -104,7 +104,7 @@ class PlayerService
 					
 					#check for duplicate nickname
 					if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
-						Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
+						Rails.logger.info ("duplicate nickname #{params[:n_n].inspect}")
 					#if Player.exists?(:n_n => params[:n_n], !:id => @player.id )
 						#nickname is taken
 						@error.code = "3"
@@ -115,7 +115,7 @@ class PlayerService
 					end
 					 
 				else
-					Rails.logger.debug("player has not been authorized with password #{params[:p_w].inspect}")
+					Rails.logger.info ("player has not been authorized with password #{params[:p_w].inspect}")
 					@error.code = "1"
 					#@unauthorized_reason = "1" 
 					@unauthorized = true
