@@ -48,10 +48,11 @@ class PlayersController < ApplicationController
   def find_by_fb
    logger.debug("pg inspect #{:params.inspect}")
    #pass big fat array of fb's into mongo
-    @players = Player.find_by_fb(params[:fb])
-
+    @players = Player.find_all_by_fb(params[:fb])
+	#@players = Player.where(:fb => params[:fb])
+	
     respond_to do |format|
-		if @player.nil?
+		if @players.nil?
 			format.html { render action: "edit" } #wrong
 			format.json { render json: "not found", status: :not_found }
 		else
@@ -59,8 +60,7 @@ class PlayersController < ApplicationController
 			#format.json { render json: @players }
 			#http://apidock.com/rails/ActiveRecord/Serialization/to_json
 			format.json  { render :json => @players.to_json({
-						:methods => :gravatar,
-						:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w] } )}
+						:only => [:id, :fb, :n_w] } )}
 		end		 
     end
   end
