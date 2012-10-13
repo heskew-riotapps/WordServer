@@ -160,8 +160,8 @@ class PlayerService
 				@player.n_n = params[:n_n] #nickname
 				@player.e_m = params[:e_m] #email
 				@player.generate_token(params[:a_t])
-				@ok = @player.save
-				if !player.fb.blank?
+				#@ok = @player.save
+				if !@player.fb.blank?
 					@ok = @player.save(:validate => false)
 				else
 					@ok = @player.save 
@@ -196,8 +196,8 @@ class PlayerService
 			else
 				@player.n_n = params[:n_n] #nickname
 				@player.generate_token(params[:a_t])
-				@ok = @player.save
-				if !player.fb.blank?
+				#@ok = @player.save
+				if !@player.fb.blank?
 					@ok = @player.save(:validate => false)
 				else
 					@ok = @player.save 

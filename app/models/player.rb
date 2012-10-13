@@ -62,8 +62,12 @@ class Player
 
   def a_games #active games method
   Rails.logger.debug("player class, entering a_game")
+     
+ # return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})  
+  
+   #return Game.where('st' => 1, 'player_games.player_id' => self.id) #, :sort => {'lp_d' => -1})  
   #return Game.all(:conditions => {'st' => 1 })
-  return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})   
+  return Game.all(:conditions => {'st' => 1, 'player_games.player_id' => self.id}, :sort => {'lp_d' => -1})   
    #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
 	#  return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :order  => {'lp_d' => -1})   
 	#return Game.where(:st => 1, :player_game => (:player_id => self.id)).sort( { :lp_d : -1 } )

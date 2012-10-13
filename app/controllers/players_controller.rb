@@ -79,7 +79,7 @@ class PlayersController < ApplicationController
    
 	@player, @unauthorized, @error = PlayerService.create params[:player]
     #@player.valid?
-	 logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+	 logger.info ("unauthorized inspect #{@unauthorized.inspect}")
 	#logger.debug("player errors inspect #{@player.errors.inspect}")
 	#logger.debug("player inspect #{@player.inspect}")
 	#logger.debug("error inspect #{@error.inspect}")
@@ -91,7 +91,7 @@ class PlayersController < ApplicationController
 	end
 	
 	if @unauthorized 
-		render json: "unauthorized", status: :unauthorized
+		render json: @error.to_json(), status: :unauthorized
 	elsif @player.errors.empty?
 		respond_with @player #rabl
 	else
@@ -292,25 +292,32 @@ class PlayersController < ApplicationController
 	  
  		@player, @unauthorized, @error = PlayerService.update_account params 
 	
+		if @unauthorized 
+			render json: @error.to_json(), status: :unauthorized
+		elsif @player.errors.empty?
+			respond_with @player #rabl
+		else
+			render json: @player.errors, status: :unprocessable_entity
+		end
 		#logger.debug("player errors inspect #{@player.errors.inspect}")
 		#logger.debug("player inspect #{@player.inspect}")
 		#logger.debug("error inspect #{@error.inspect}")
 		#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
-		respond_to do |format|
-			if @unauthorized #account for FB
-				format.json { render json: @error.to_json(), status: :unauthorized }
-			else 
-				if @player.errors.empty?
-					#format.html { redirect_to @player, notice: 'Post was successfully created.' }
-					format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :fb, :f_n, :l_n, :n_n, :e_m]),status: :created}
-					
-				else
-					#format.html { render action: "new" }
-					#json error handling
-					format.json { render json: @player.errors, status: :unprocessable_entity }
-				end
-			end
-		end
+		#respond_to do |format|
+		#	if @unauthorized #account for FB
+		#		format.json { render json: @error.to_json(), status: :unauthorized }
+		#	else 
+		#		if @player.errors.empty?
+		#			#format.html { redirect_to @player, notice: 'Post was successfully created.' }
+		#			format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t], :only => [:id, :fb, :f_n, :l_n, :n_n, :e_m]),status: :created}
+		#			
+		#		else
+		#			#format.html { render action: "new" }
+		#			#json error handling
+		#			format.json { render json: @player.errors, status: :unprocessable_entity }
+		#		end
+		#	end
+		#end
   end
 	
 	 def update_fb_account  
@@ -321,10 +328,10 @@ class PlayersController < ApplicationController
 		#logger.debug("player inspect #{@player.inspect}")
 		#logger.debug("error inspect #{@error.inspect}")
 		#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
-		if not_found 
-			render json: "unauthorized", status: :unauthorized
+		if @unauthorized 
+			render json: @error.to_json(), status: :unauthorized
 		elsif @player.errors.empty?
-			respond_with @player
+			respond_with @player #rabl
 		else
 			render json: @player.errors, status: :unprocessable_entity
 		end
