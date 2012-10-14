@@ -45,10 +45,11 @@ class PlayersController < ApplicationController
     end
   end
   
-  def find_by_fb
+  def find_all_by_fb
    logger.debug("pg inspect #{:params.inspect}")
    #pass big fat array of fb's into mongo
-    @players = Player.find_all_by_fb(params[:fb])
+   @players = Player.all(:conditions => {'st' => 1, 'fb' => params[:fb]})    
+    #@players = Player.find_all_by_fb(params[:fb])
 	#@players = Player.where(:fb => params[:fb])
 	
     respond_to do |format|
@@ -76,44 +77,28 @@ class PlayersController < ApplicationController
   
   def create
   #####Player.delete_all 
-   
-	@player, @unauthorized, @error = PlayerService.create params[:player]
-    #@player.valid?
-	 logger.info ("unauthorized inspect #{@unauthorized.inspect}")
-	#logger.debug("player errors inspect #{@player.errors.inspect}")
-	#logger.debug("player inspect #{@player.inspect}")
-	#logger.debug("error inspect #{@error.inspect}")
-	#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
-	if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
-		@player.completed_games_from_date = params[:c_g_d]
-	else
-		@player.completed_games_from_date = "10/6/2012"
-	end
-	
-	if @unauthorized 
-		render json: @error.to_json(), status: :unauthorized
-	elsif @player.errors.empty?
-		respond_with @player #rabl
-	else
-		render json: @player.errors, status: :unprocessable_entity
-	end
-	#respond_to do |format|
-	#		if @unauthorized #account for FB
-	#			format.json { render json: @error.to_json(), status: :unauthorized }
-	#		else 
-	#			if @player.errors.empty?
-	#				format.html { redirect_to @player, notice: 'Post was successfully created.' }
-	#			#format.json { render json: @player, status: :created, location: @player }
-	#			#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-	#			format.json  { render :json => @player.to_json( :methods => [:gravatar, :a_t, :a_games, :c_games], :only => [:id, :fb, :f_n, :l_n, :n_n, :e_m, :n_c_g]),status: :created}
-	#				
-	#			else
-	#				#format.html { render action: "new" }
-	#				#json error handling
-	#				format.json { render json: @player.errors, status: :unprocessable_entity }
-	#			end
-	#		end
-	#	end
+	   
+		@player, @unauthorized, @error = PlayerService.create params[:player]
+		#@player.valid?
+		 logger.info ("unauthorized inspect #{@unauthorized.inspect}")
+		#logger.debug("player errors inspect #{@player.errors.inspect}")
+		#logger.debug("player inspect #{@player.inspect}")
+		#logger.debug("error inspect #{@error.inspect}")
+		#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+		if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+			@player.completed_games_from_date = params[:c_g_d]
+		else
+			@player.completed_games_from_date = "10/6/2012"
+		end
+		
+		if @unauthorized 
+			render json: @error.to_json(), status: :unauthorized
+		elsif @player.errors.empty?
+			respond_with @player #rabl
+		else
+			render json: @player.errors, status: :unprocessable_entity
+		end
+
 	end
   
   def auth_via_token_____ #test only
@@ -323,11 +308,7 @@ class PlayersController < ApplicationController
 	 def update_fb_account  
 	  
  		@player, @unauthorized, @error = PlayerService.update_fb_account params 
-	
-		#logger.debug("player errors inspect #{@player.errors.inspect}")
-		#logger.debug("player inspect #{@player.inspect}")
-		#logger.debug("error inspect #{@error.inspect}")
-		#logger.debug("unauthorized inspect #{@unauthorized.inspect}")
+
 		if @unauthorized 
 			render json: @error.to_json(), status: :unauthorized
 		elsif @player.errors.empty?
