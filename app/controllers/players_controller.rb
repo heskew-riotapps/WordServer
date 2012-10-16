@@ -148,8 +148,10 @@ class PlayersController < ApplicationController
 	def log_out
 		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
+		unauthorized = false
 		if player.nil?
-			unauthorized = true
+			#unauthorized = true  ignore if player is not found...do nothing
+			#this normally means the token became out of sync on the client
 		else
 			player.remove_token(params[:a_t])
 			if !player.fb.blank?

@@ -112,19 +112,20 @@ class GamesController < ApplicationController
 	else
 		@game = GameService.create(player, params[:game])
 	
-		#reset user's token
-		#player.generate_token(:a_t)
-		#send the new token back to the client
-		
-		@game.a_t = player.generate_token(params[:a_t])
-		logger.debug("game after create #{@game.inspect}")
-		#player.save  temp, add this back
-		if !player.fb.blank?
-				player.save(:validate => false)
-		else
-			player.save 
-		end
-		
+		if @game.errors.empty?
+			#reset user's token
+			#player.generate_token(:a_t)
+			#send the new token back to the client
+			
+			@game.a_t = player.generate_token(params[:a_t])
+			logger.debug("game after create #{@game.inspect}")
+			#player.save  temp, add this back
+			if !player.fb.blank?
+					player.save(:validate => false)
+			else
+				player.save 
+			end
+		end	
 		#@game.a_t = player.a_t #auth_token
 	end
 	
