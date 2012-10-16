@@ -37,11 +37,11 @@ class PlayerService
 				@player.f_n = params[:f_n] #first_name
 				@player.l_n = params[:l_n] #last_name
 				@player.e_m = params[:e_m] #email
+				@player.st = 1
 
 				#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
 				@ok = @player.save(:validate => false)  
 			end
-			 
 			
 		else		
 			#find player by email addy
@@ -59,7 +59,8 @@ class PlayerService
 						@player.n_n = params[:n_n] #nickname
 						@player.e_m = params[:e_m] #email
 						@player.n_v = 1
-			
+						@player.st = 1
+						
 						@player.generate_token("0") #auth_token
 						@ok = @player.save
 					else
@@ -78,9 +79,9 @@ class PlayerService
 	#							#@unauthorized_reason = "2" 
 	#							@unauthorized = true
 	#						else
-								@ok = @player.save
+								#@ok = @player.save
 	#						end
-							
+							@player.st = 1
 							@ok = @player.save
 						else
 							@error.code = "1"
@@ -101,6 +102,7 @@ class PlayerService
 					@player.generate_token("1") #do not delete existing tokens  
 					@player.n_n = params[:n_n]
 					@player.n_v = @player.n_v + 1
+					@player.st = 1
 					
 					#check for duplicate nickname
 					if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0

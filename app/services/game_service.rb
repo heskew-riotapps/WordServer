@@ -55,8 +55,24 @@ class GameService
 		params[:player_games].each  do |value|
 			#if index > 3 throw error
 			#Rails.logger.debug("value inspect #{value.inspect}")
-		 	player = Player.find_by_id(value['player_id'])
-		 
+			
+			#if there is no player_id but there is a fb, save player in invited status if 
+			#player is not already in system
+			if value['player_id'].blank? and !value['fb'].blank?
+				player = Player.find_by_fb(value['fb'])
+					if player.nil?
+						player = Player.new
+						player.fb = value['fb']
+						player.st = 2 #invited
+						player.password = ""
+						player.n_v = 0
+						
+						player.save(:validate => false)
+					end
+			else
+				player = Player.find_by_id(value['player_id'])
+			end	
+			
 		  		#Rails.logger.debug "player nickname: #{player.n_n}"
 			if player.nil?
 				Rails.logger.info("invalid user being requested " + value['player_id'])
