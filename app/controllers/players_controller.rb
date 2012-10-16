@@ -165,13 +165,9 @@ class PlayersController < ApplicationController
 				if unauthorized #account for FB
 					format.json { render json: "unauthorized", status: :unauthorized }
 				else 
-					if player.errors.empty?
-						#format.html { redirect_to player, notice: 'Post was successfully created.' }
-						format.json  { render json: "ok",status: :ok}
-					else
-						#format.html { render action: "new" }
-						format.json { render json: player.errors, status: :unprocessable_entity }
-					end
+					#format.html { redirect_to player, notice: 'Post was successfully created.' }
+					format.json  { render json: "ok",status: :ok}
+
 				end
 			end
 	end
