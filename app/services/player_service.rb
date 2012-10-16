@@ -15,7 +15,7 @@ class PlayerService
 			if @player.nil?
 				#go ahead and see if player has already registered with the same email account.
 				#if so, use this player as a facebook player going forward, this ia a one way street
-				@player = Player.find_by_fb(params[:e_m])
+				@player = Player.find_by_em(params[:e_m])
 				if @player.nil?
 					@player = Player.new
 					@player.generate_token("0") #auth_token
