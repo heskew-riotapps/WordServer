@@ -188,4 +188,32 @@ class GamesController < ApplicationController
   
   end
   
+  
+  def destroy
+		@game = Game.find(params[:id])
+		@ok = @game.delete
+		
+		#@existing = Player.find_by_id(params[:player][:id])
+		#if @existing.nil?
+		#
+		#	@player = Player.create({
+		#	  :nickname => params[:player][:nickname],
+		#	  :email => params[:player][:email]
+		#	})
+		#
+		#	@ok = @player.delete
+		#end
+
+		respond_to do |format|
+		  if @ok
+			format.html { redirect_to @game, notice: 'Post was successfully created.' }
+			format.json { render json: "ok", status: :ok}
+		  else
+			format.html { render action: "new" }
+			#json error handling
+			format.json { render json: @game.errors, status: :unprocessable_entity }
+		  end
+		end
+	end
+	
 end
