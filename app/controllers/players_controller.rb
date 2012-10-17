@@ -333,18 +333,18 @@ class PlayersController < ApplicationController
 	
 	def destroy
 		@player = Player.find(params[:id])
-		@player.destroy
+		@player.delete
 		
-		@existing = Player.find_by_id(params[:player][:id])
-		if @existing.nil?
-		
-			@player = Player.create({
-			  :nickname => params[:player][:nickname],
-			  :email => params[:player][:email]
-			})
-
-			@ok = @player.delete
-		end
+		#@existing = Player.find_by_id(params[:player][:id])
+		#if @existing.nil?
+		#
+		#	@player = Player.create({
+		#	  :nickname => params[:player][:nickname],
+		#	  :email => params[:player][:email]
+		#	})
+		#
+		#	@ok = @player.delete
+		#end
 
 		respond_to do |format|
 		  if @ok
