@@ -7,7 +7,7 @@ child :a_games => :a_games do
   child :player_games do
     attribute :sc, :i_t
 		child :player do
-		attribute :id, :f_n, :l_n, :n_n, :gravatar, :n_w
+		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end
   end
 end
@@ -17,7 +17,7 @@ child :c_games => :c_games do
   child :player_games do
     attribute :sc
 		child :player do
-		attribute :id, :f_n, :l_n, :n_n, :gravatar, :n_w
+		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end
   end
 end
