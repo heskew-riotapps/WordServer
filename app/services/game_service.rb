@@ -63,6 +63,8 @@ class GameService
 					if player.nil?
 						player = Player.new
 						player.fb = value['fb']
+						player.f_n = value['f_n']
+						player.l_n = value['l_n']
 						player.st = 2 #invited
 						player.password = ""
 						player.n_v = 0
