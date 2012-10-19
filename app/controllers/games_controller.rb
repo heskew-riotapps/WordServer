@@ -54,7 +54,7 @@ class GamesController < ApplicationController
 	   
 
 		if player.nil?
-			Rails.logger.info("unauthorized request to start game")	
+			Rails.logger.info("unauthorized request to get game")	
 		#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
 			unauthorized = true		
 		else
@@ -86,7 +86,7 @@ class GamesController < ApplicationController
 				end	
 			end
 		end
-	
+						logger.debug("game  #{@game.inspect}")
 		if unauthorized 
 			render json: "unauthorized", status: :unauthorized
 		elsif not_found 
