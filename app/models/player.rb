@@ -3,8 +3,9 @@ class Player
   include ActiveModel::SecurePassword 
   #include ActiveModel::Serialization
   has_secure_password
+  safe # for mongo saves
  
- validates :password, :presence => true,
+  validates :password, :presence => true,
                      :on => :create
 					# :if => :password_required
   # validates_presence_of :password, :on => :create, :if => :password_required
@@ -21,7 +22,7 @@ class Player
   key :e_m,      String #email
   key :f_n,       String# first_name, :format => /\A[\w\.\_\-\+]+\z/
   key :l_n,       String# last_name, :format => /\A[\w\.\_\-\+]+\z/
-   
+  key :cr_d, Time #create_date
 
   key :n_n,       String# nickname, :format => /\A[\w\.\-\+]+\z/
   key :n_w,     Integer, :default => 0 #num_wins

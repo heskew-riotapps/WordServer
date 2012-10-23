@@ -19,6 +19,7 @@ class PlayerService
 				if @player.nil?
 					@player = Player.new
 					@player.generate_token("0") #auth_token
+					@player.cr_d = Time.now.utc  #create_date
 				else
 					@player.generate_token("1") #do not delete existing tokens  
 				end
@@ -60,7 +61,7 @@ class PlayerService
 						@player.e_m = params[:e_m] #email
 						@player.n_v = 1
 						@player.st = 1
-						
+						@player.cr_d = Time.now.utc  #create_date
 						@player.generate_token("0") #auth_token
 						@ok = @player.save
 					else

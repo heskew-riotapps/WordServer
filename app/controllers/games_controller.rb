@@ -75,14 +75,15 @@ class GamesController < ApplicationController
 					#player.generate_token(:a_t)
 					#send the new token back to the client
 					
-					@game.a_t = player.generate_token(params[:a_t])
+					@game.a_t = params[:a_t]
+					#@game.a_t = player.generate_token(params[:a_t])
 					logger.debug("game after create #{@game.inspect}")
 					 
-					if !player.fb.blank?
-						player.save(:validate => false)
-					else
-						player.save 
-					end
+					#if !player.fb.blank?
+					#	player.save(:validate => false)
+					#else
+					#	player.save 
+					#end
 				end	
 			end
 		end

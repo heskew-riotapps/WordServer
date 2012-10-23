@@ -22,7 +22,7 @@ class PlayerGame
 			#RESIGNED(11),
 			#CANCELLED(12);
 				
-  key :lt_d, Time #last_turn_date
+  key :l_t_d, Time #last_turn_date
   key :la_d, Time #last_alert_date
   key :lr_d, Time #last_reminder_date
   key :lcr_d, Time #last_chatter_received_date

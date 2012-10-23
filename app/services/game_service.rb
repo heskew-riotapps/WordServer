@@ -13,6 +13,8 @@ class GameService
 	#validate that all player id's are different
 		@game = Game.new
 		
+		nowDate = Time.now.utc
+		
 		Rails.logger.debug "params[:player_games]: #{params[:player_games].inspect}"
 		
 		#check for already posted game, duplicate check
@@ -30,7 +32,8 @@ class GameService
 		@game.r_l = AlphabetService.get_letter_distribution + @game.r_v + @game.r_c 
 		@game.r_l.shuffle! #remaining_letters
 		@game.r_l.shuffle! #remaining_letters shuffled again
-		@game.cr_d = Time.now.utc  #create_date
+		@game.cr_d = nowDate  #create_date
+		@game.lp_d = nowDate
 		
 		#if this count > 4, log an error and return
 		if params[:player_games].count > 4
@@ -109,9 +112,10 @@ class GameService
 					pg.l_t = 0 #last turn number
 					pg.l_t_a = 8 #last turn action - started the game
 					pg.l_t_p = 0 #last turn points 
+					pg.l_t_d = nowDate
 				else
 					pg.i_t = false #is_turn				
-					pg.l_t = 0
+					pg.l_t = -1
 					pg.l_t_a = 0 #no action yet 
 					pg.l_t_p = 0 #last turn points
 				end
@@ -136,7 +140,6 @@ class GameService
 		if  !currentPlayerIsInGame
 			@game.errors.add(:player_games, I18n.t(:error_authorized_player_not_in_game))
 		end
-		
 		
 		@game.save
 		@game.strip_tray_tiles_from_non_context_user current_player.id

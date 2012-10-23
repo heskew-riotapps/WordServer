@@ -1,5 +1,6 @@
 class Game
   include MongoMapper::Document
+  safe # for mongo saves
   
   many :player_games #, :length => { :maximum => 2 }  
   many :played_words
