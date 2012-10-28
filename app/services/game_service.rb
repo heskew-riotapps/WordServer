@@ -71,6 +71,7 @@ class GameService
 						player.st = 2 #invited
 						player.password = ""
 						player.n_v = 0
+						player.n_w = -1
 						
 						player.save(:validate => false)
 					end
@@ -107,17 +108,26 @@ class GameService
 				if current_player.id == player.id
 					currentPlayerIsInGame = true
 				end
+				
+				 
 				if pg.o == 1
+					#make sure that current player is first in order
+					if player.id != current_player.id
+						Rails.logger.info("error_context_player_must_start_game " + player.id)
+						@game.errors.add(:player_games, I18n.t(:error_context_player_must_start_game))
+					end
 					pg.i_t = true #is_turn
 					pg.l_t = 0 #last turn number
 					pg.l_t_a = 8 #last turn action - started the game
 					pg.l_t_p = 0 #last turn points 
 					pg.l_t_d = nowDate
+					pg.st = 1 #status - active
 				else
 					pg.i_t = false #is_turn				
 					pg.l_t = -1
 					pg.l_t_a = 0 #no action yet 
 					pg.l_t_p = 0 #last turn points
+					pg.st = 1 #status - active
 				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
 				#	pg.last_action_text =  I18n.t(:game_started_by_you) 
@@ -171,5 +181,45 @@ class GameService
 		
 	end
 
+  
+  def self.cancel(current_player, game) 
+	#update game status to cancelled (2)
+	#ensure the starting player canceled the game in turn 1, that is the only time cancel is allowed
+	#update player game status of the cancelling player to cancelled
+	#save game
+	
+	#Rails.logger.info("game cancel start #{game.inspect}")
+	@game = game
+	
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	
+	if !@game.isPlayerStarter(current_player.id)
+		#Rails.logger.info("isPlayerStarter failed")
+		@unauthorized = true
+	elsif @game.t != 1 
+		#Rails.logger.info("t failed")
+		@unauthorized = true
+	else
+		@game.player_games.each  do |value|
+		#Rails.logger.info("loop check #{value.player.id} - #{current_player.id}")
+			if value.player.id == current_player.id
+				#Rails.logger.info("loop check match")
+				value.st = 2 #status - cancelled
+			end
+			#Rails.logger.info("game before status set #{value.inspect}")
+		end	
+		#Rails.logger.info("game before status set #{@game.inspect}")
+		@game.st = 2
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
+	
+	
+	
+	return @game, @unauthorized 
+  end
   
 end

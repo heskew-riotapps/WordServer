@@ -56,16 +56,39 @@ class Game
 		end	
 	end 	
 		
-	def is_player_part_of_game(content_player_id)
+	def is_player_part_of_game(context_player_id)
 		ok = false
 		self.player_games.each  do |value|
-			if value.player_id == content_player_id
+			if value.player_id == context_player_id
 				ok = true 
 			end
 		end	
 		return ok
 	end 	
-  
+
+	#is it this player's turn?
+	def isPlayerCurrentTurn(context_player_id, turn)
+		ok = false
+		self.player_games.each  do |value|
+			if value.player_id == context_player_id && 
+					turn == self.t &&
+					value.i_t == true		
+				ok = true 
+			end
+		end	
+		return ok
+	end
+	
+	#did this player start the game?
+	def isPlayerStarter(context_player_id)
+		ok = false
+		self.player_games.each  do |value|
+			if value.player_id == context_player_id && value.o == 1
+				ok = true 
+			end
+		end	
+		return ok
+	end
   
   # Validations.
 #  validates_presence_of :first_name, :last_name, :email 

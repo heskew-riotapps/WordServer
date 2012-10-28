@@ -33,6 +33,7 @@ class PlayerGame
   key :a_e_g, Boolean, :default => false #alerted_to_end_of_game
   key :o,    Integer, :default => 0 #order
   key :t_l, Array #tray_letters
+  key :st,    Integer, :default => 1 #status
 
   def tray(p_id)
 	if self.player_id == p_id

@@ -3,7 +3,7 @@ require 'mongo'
 class GamesController < ApplicationController
 	respond_to :json
 	
-	def new
+	def new_____
 		Game.delete_all
 		game = Game.new
 		game.test = "test"
@@ -139,6 +139,54 @@ class GamesController < ApplicationController
 	end
   
   end
+  
+   def cancel
+		@player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		#logger.debug("game before cancel #{params.inspect}")
+	   
+
+		if @player.nil?
+			Rails.logger.info("unauthorized request to cancel game")	
+		#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+			unauthorized = true		
+		else
+			@game = Game.find(params[:id])
+			 #Rails.logger.info("game pre  #{@game.inspect}")	
+			if @game.nil?
+				Rails.logger.info("cannot find game")	
+				not_found = true		
+			 
+			else
+				@game, @unauthorized = GameService.cancel(@player, @game)
+
+				#Rails.logger.info("game post  #{@game.inspect}")
+				if @game.errors.empty?
+					#reset user's token
+					#player.generate_token(:a_t)
+					#send the new token back to the client
+			
+					#player.save  temp, add this back
+					if !@player.fb.blank?
+						@player.save(:validate => false)
+					else
+						@player.save 
+					end
+				end	
+			end	
+		end
+		
+		 #logger.debug("game errors  #{@game.inspect}")
+		if @unauthorized 
+			render json: "unauthorized", status: :unauthorized
+		elsif not_found 
+			render json: "not_found", status: :not_found 
+		elsif @game.errors.empty?
+			respond_with @player
+		else
+			render json: "error", status: :unprocessable_entity
+		end
+  end
+  
   
   def get_active_games____
 #authenticate requesting player

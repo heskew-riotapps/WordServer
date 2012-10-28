@@ -8,3 +8,4 @@ en:
   error_too_few_players_requested: "Too few players requested for the game."
   error_invalid_player_requested: "Invalid player requested."
   error_game_already_created: "This game has already been created."
+  error_context_player_must_start_game: "The starting player must have the first move."
