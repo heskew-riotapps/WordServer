@@ -331,7 +331,7 @@ class PlayersController < ApplicationController
 		end
 	end
 	
-	def destroy__
+	def destroy
 		@player = Player.find(params[:id])
 		@player.delete
 		
