@@ -4,6 +4,7 @@ class Game
   
   many :player_games #, :length => { :maximum => 2 }  
   many :played_words
+  many :played_turns
 #many :letters remaining vs played?#, :length => { :maximum => 2 }  
   many :played_tiles
    
@@ -65,6 +66,26 @@ class Game
 		end	
 		return ok
 	end 	
+
+	def update_played_tile_by_board_position(board_position, letter, turn)
+		found = false
+		self.played_tiles.each  do |value|
+			if value.player_id == board_position
+				value.p = board_position
+				value.l = letter
+				value.t = turn
+				found = true
+			end
+		end	
+		if !found 
+			played_tile = PlayedTile.new
+			played_tile.p = board_position
+			played_tile.l = letter
+			played_tile.t = turn
+			self.@played_tiles << played_tile
+		end
+	end 	
+
 
 	#is it this player's turn?
 	def isPlayerCurrentTurn(context_player_id, turn)

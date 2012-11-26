@@ -21,7 +21,7 @@ class PlayerGame
 			#TURN_SKIPPED(10),
 			#RESIGNED(11),
 			#CANCELLED(12);
-				
+  key :t_v, Integer, :default => 1 #tray version, used by GameState on client...incremented as the player takes a turn that affects the tray			
   key :l_t_d, Time #last_turn_date
   key :la_d, Time #last_alert_date
   key :lr_d, Time #last_reminder_date
