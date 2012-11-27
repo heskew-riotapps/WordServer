@@ -11,7 +11,7 @@ class Game
   many :chatters
   #key :d_c, String #dup_check..  just in case same post is sent more than once
   key :r_l, Array  #remaining letters
-  key :p_l, Array #played_letters
+  #key :p_l, Array #played_letters  #don't think we need this, played tiles should be enough
   key :r_v, Array #random_vowels
   key :r_c, Array #random_consonants
   key :t,    Integer, :default => 0 #turn
@@ -22,6 +22,9 @@ class Game
   key :co_d, Time #completion_date
   key :cr_d, Time #create_date
   key :st, Integer #status
+	#1 -> active
+	#2 -> cancelled
+	#3 -> completed
   key :ch_d, Time #last_chatter_date
   key :lp_d, Time #last_played_date
   
@@ -111,6 +114,85 @@ class Game
 		return ok
 	end
   
+	def numActivePlayers
+		count = 0
+		self.player_games.each  do |value|
+			if value.st == 1 
+				count += 1
+			end
+		end
+		return count
+	end
+  
+  	def assignNextPlayerToTurn(context_player_id)
+		order = self.getContextPlayerGame(context_player_id).o
+		
+		player_game == nil
+		
+		if order == 1
+			player_game = self.getActivePlayerGameByOrder(2)
+			if player_game.nil
+				player_game = self.getActivePlayerGameByOrder(3)
+			end
+			if player_game.nil
+				player_game = self.getPlayerGameByOrder(4)
+			end
+		end
+		
+		if order == 2
+			player_game = self.getActivePlayerGameByOrder(3)
+			if player_game.nil
+				player_game = self.getActivePlayerGameByOrder(4)
+			end
+			if player_game.nil
+				player_game = self.getPlayerGameByOrder(1)
+			end
+		end
+
+		if order == 3
+			player_game = self.getActivePlayerGameByOrder(4)
+			if player_game.nil
+				player_game = self.getActivePlayerGameByOrder(1)
+			end
+			if player_game.nil
+				player_game = self.getPlayerGameByOrder(2)
+			end
+		end
+
+		if order == 4
+			player_game = self.getActivePlayerGameByOrder(1)
+			if player_game.nil
+				player_game = self.getActivePlayerGameByOrder(2)
+			end
+			if player_game.nil
+				player_game = self.getPlayerGameByOrder(3)
+			end
+		end
+		
+		self.player_games.each  do |value|
+			value.i_t = false
+		end
+
+		player_game.i_t == true #is_turn
+		
+	end
+	
+	def getActivePlayerGameByOrder(order)
+		self.player_games.each  do |value|
+			if value.o == order && value.st == 1  
+				return value
+			end
+		end	
+		return nil
+	end
+	
+	def getContextPlayerGame(context_player_id)
+		self.player_games.each  do |value|
+			if value.player_id == context_player_id 
+				return value
+			end
+		end	
+	end
   # Validations.
 #  validates_presence_of :first_name, :last_name, :email 
 

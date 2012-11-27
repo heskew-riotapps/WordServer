@@ -9,3 +9,7 @@ en:
   error_invalid_player_requested: "Invalid player requested."
   error_game_already_created: "This game has already been created."
   error_context_player_must_start_game: "The starting player must have the first move."
+  error_game_play_out_of_turn: "The turn was out of sync and was not saved.  The game should be synched now."
+  error_game_play_not_context_players_turn: "Unforunately, it was not your turn.  The game should be synched properly now."
+  error_game_play_tray_tiles_out_of_sync: "Unforunately, your tray tiles were out of sync.  The game should be synched properly now."
+  error_game_play_player_not_active_in_game: "Unforunately, you are no longer active in this game.  Please play again."

@@ -238,6 +238,35 @@ class GamesController < ApplicationController
   end
   
   
+  def play
+	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	
+	if player.nil?
+		unauthorized = true		
+	else
+		else
+			@game = Game.find(params[:id])
+			 #Rails.logger.info("game pre  #{@game.inspect}")	
+			if @game.nil?
+				Rails.logger.info("cannot find game")	
+				not_found = true		
+			else
+				@game, @unauthorized = GameService.play(@player, @game)
+			end	
+		end
+		
+		 #logger.debug("game errors  #{@game.inspect}")
+		if @unauthorized 
+			render json: "unauthorized", status: :unauthorized
+		elsif not_found 
+			render json: "not_found", status: :not_found 
+		elsif @game.errors.empty?
+			respond_with @game  ###return differently if game is this turn completed the game??
+		else
+			render json: "error", status: :unprocessable_entity
+		end
+  end
+  
   def destroy
 		@game = Game.find(params[:id])
 		@ok = @game.delete

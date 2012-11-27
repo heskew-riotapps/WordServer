@@ -84,7 +84,7 @@ class Player
 	if self.completed_games_from_date.nil?
 		self.completed_games_from_date	= "10/06/2012"
 	end
-	return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
+	return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 3, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
   #return Game.find(:conditions => {:co_d.gt => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id})
  #  :started_on => {"$gte" => whatev}
   #.sort(:last_name).limit(10)

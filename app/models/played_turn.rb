@@ -5,5 +5,6 @@
 	key :t, Integer #turn
 	key :a, Integer, :default => 0 #action, see playerGame last_turn_action for options
 	key :p, Integer, :default => 0 #points for this turn
+	key :p_d, Time #played_date
 end
  

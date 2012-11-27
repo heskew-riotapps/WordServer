@@ -12,4 +12,8 @@ class AlphabetService
 		return AlphabetENService.get_letter_distribution
 	end
 	
+	def self.get_letter_value(letter)
+		return AlphabetENService.get_letter_value(letter)
+	end
+	
 end
