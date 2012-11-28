@@ -70,7 +70,7 @@ class GamesController < ApplicationController
 			 
 			else
 				#make sure requesting user is part of the game
-				if !@game.is_player_part_of_game player.id 
+				if !@game.is_player_part_of_game? player.id 
 					unauthorized = true		
 				else
 					@game.strip_tray_tiles_from_non_context_user player.id
@@ -117,21 +117,21 @@ class GamesController < ApplicationController
 	else
 		@game = GameService.create(player, params[:game])
 	
-		if @game.errors.empty?
+		#if @game.errors.empty?
 			#reset user's token
 			#player.generate_token(:a_t)
 			#send the new token back to the client
 			
-			@game.a_t = player.generate_token(params[:a_t])
-			logger.debug("game after create #{@game.inspect}")
-			#player.save  temp, add this back
-			if !player.fb.blank?
-					player.save(:validate => false)
-			else
-				player.save 
-			end
-		end	
-		#@game.a_t = player.a_t #auth_token
+		#	@game.a_t = player.generate_token(params[:a_t])
+		#	logger.debug("game after create #{@game.inspect}")
+		#	#player.save  temp, add this back
+		#	if !player.fb.blank?
+		#			player.save(:validate => false)
+		#	else
+		#		player.save 
+		#	end
+		#end	
+		############@game.a_t = player.a_t #auth_token
 	end
 	
 	if unauthorized 
@@ -255,7 +255,8 @@ class GamesController < ApplicationController
 				Rails.logger.info("cannot find game")	
 				not_found = true		
 			else
-				@game, @unauthorized = GameService.play(@player, @game)
+				@game, @unauthorized = GameService.play(player, @game, params)
+				@game.strip_tray_tiles_from_non_context_user player.id
 			end	
 		end
 		

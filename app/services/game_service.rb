@@ -37,8 +37,8 @@ class GameService
 		
 			#add a PlayedTurn record
 		played_turn = PlayedTurn.new
-		played_turn.player = current_player
-		played_turn.t = @game.t #turn_num
+		played_turn.player_id = current_player.id
+		played_turn.t = 0 #turn_num (zero represents the starting of the game)
 		played_turn.a = 8 #last turn action - started the game
 		played_turn.p = params[:p] #points
 		played_turn.p_d = nowDate #played_date
@@ -205,7 +205,7 @@ class GameService
 	@unauthorized = false
 	@ok = false
 	
-	if !@game.isPlayerStarter(current_player.id)
+	if !@game.isPlayerStarter?(current_player.id)
 		#Rails.logger.info("isPlayerStarter failed")
 		@unauthorized = true
 	elsif @game.t != 1 
@@ -245,15 +245,17 @@ class GameService
 	@ok = false
 	nowDate = Time.now.utc
 	
-	if !@game.is_player_part_of_game(current_player.id)
-		#Rails.logger.info("isPlayerStarter failed")
+	if !@game.is_player_part_of_game?(current_player.id)
+		Rails.logger.info("is_player_part_of_game failed")
 		@unauthorized = true
 	elsif @game.t != params[:t] #make sure turn is the same as the server's turn
-		#Rails.logger.info("t failed")
+		Rails.logger.info("turn check failed")
 		@game.errors.add(:t, I18n.t(:error_game_play_out_of_turn))
 		#	return @game
 		@unauthorized = true
-	elsif @game.isPlayerCurrentTurn(current_player.id, @game.t) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+		
+		Rails.logger.info("isPlayerCurrentTurn failed")
 		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
 		#	return @game
 		@unauthorized = true
@@ -265,29 +267,29 @@ class GameService
 			played_word.p_s = value['p']
 			played_word.t = @game.t
 			played_word.p_d = nowDate
-			played_word.player = current_player
+			played_word.player_id = current_player.id
 			@game.played_words << played_word
 		end	
 		
 		player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
-		if player_game.st != 1 
+		if player_game[0].st != 1 
 			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
 			return @game, @unauthorized 
 		end
 		played_tiles_count = params[:played_tiles].length
-		prev_tray_letter_count = player_game.t_l.length
+		prev_tray_letter_count = player_game[0].t_l.length
 		#save played tiles and remove them from players tray letters
 		params[:played_tiles].each  do |value|
-			@game.update_played_tile_by_board_position(value.p, value.l, @game.t)
+			@game.update_played_tile_by_board_position(value['p'], value['l'], @game.t)
 			
 			#remove played letters from players tray
 			#magic to delete first letter that matches
 			#http://stackoverflow.com/questions/4595305/delete-first-instance-of-matching-element-from-array
-			player_game.t_l.delete_at(player_game.t_l.index(value.l) || player_game.t_l.length)
+			player_game[0].t_l.delete_at(player_game[0].t_l.index(value['l']) || player_game[0].t_l.length)
 		end	
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
-		if prev_tray_letter_count - played_tiles_count != player_game.t_l.length
+		if prev_tray_letter_count - played_tiles_count != player_game[0].t_l.length
 			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
 			return @game, @unauthorized 
 		end
@@ -301,15 +303,15 @@ class GameService
 		   hopper_letter = @game.r_l.shift
 		   
 		   #if that letter existed (we might be close to the end of the hopper) add it to the players tray
-		   if !hopper_letter.nil
-			  player_game.t_l.push(hopper_letter)
+		   if !hopper_letter.nil?
+			  player_game[0].t_l.push(hopper_letter)
 		   end
 		   i +=1
 		end
 		
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
-		played_turn.player = current_player
+		played_turn.player_id = current_player.id
 		played_turn.t = @game.t #turn_num
 		played_turn.a = 9 #WORDS_PLAYED(9), action
 		played_turn.p = params[:p] #points
@@ -317,10 +319,11 @@ class GameService
 		@game.played_turns << played_turn
 
 		#add score to players score
-		player_game.sc = player_game.sc + params[:p]
+		player_game[0].sc = player_game[0].sc + params[:p]
+		Rails.logger.info("new score #{player_game[0].sc}")
 		
 		#add 1 to players tray version
-		player_game.t_v = player_game + 1
+		player_game[0].t_v = player_game[0].t_v + 1
 		 
  
 		#refill tray

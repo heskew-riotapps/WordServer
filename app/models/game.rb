@@ -34,15 +34,15 @@ class Game
 #  end
 #  Person.all(:conditions => {'addresses.city' => 'Chicago'})
   
-  def l_t_action #last turn action
+  def l_t_a #last turn action
 	return self.played_turns.last.a
   end
 
-  def l_t_player_id #last turn playerId
+  def l_t_p #last turn playerId
 	return self.played_turns.last.player_id
   end
   
-  def l_t_date #last turn date
+  def l_t_d #last turn date
 	return self.played_turns.last.p_d
   end
   
@@ -72,58 +72,62 @@ class Game
 		end	
 	end 	
 		
-	def is_player_part_of_game(context_player_id)
+	def is_player_part_of_game?(context_player_id)
 		ok = false
 		self.player_games.each  do |value|
 			if value.player_id == context_player_id
-				ok = true 
+				ok = true
+				break
 			end
 		end	
-		return ok
+		ok
 	end 	
 
 	def update_played_tile_by_board_position(board_position, letter, turn)
 		found = false
+	
 		self.played_tiles.each  do |value|
-			if value.player_id == board_position
-				value.p = board_position
-				value.l = letter
-				value.t = turn
+			if value.p == board_position
+				#add latest letter and turn placed on this board position
+				value.l << letter
+				value.t << turn
 				found = true
 			end
 		end	
 		if !found 
 			played_tile = PlayedTile.new
 			played_tile.p = board_position
-			played_tile.l = letter
-			played_tile.t = turn
+			played_tile.l << letter
+			played_tile.t << turn
 			self.played_tiles << played_tile
 		end
 	end 	
 
 
 	#is it this player's turn?
-	def isPlayerCurrentTurn(context_player_id, turn)
+	def isPlayerCurrentTurn?(context_player_id)
 		ok = false
 		self.player_games.each  do |value|
+		 Rails.logger.info("isPlayerCurrentTurn check #{value.player.id} - #{context_player_id} isTurn #{value.i_t}")
 			if value.player_id == context_player_id && 
-					turn == self.t &&
 					value.i_t == true		
-				ok = true 
+				ok = true
+				break
 			end
 		end	
-		return ok
+		ok
 	end
 	
 	#did this player start the game?
-	def isPlayerStarter(context_player_id)
+	def isPlayerStarter?(context_player_id)
 		ok = false
 		self.player_games.each  do |value|
 			if value.player_id == context_player_id && value.o == 1
-				ok = true 
+				ok = true
+				break
 			end
 		end	
-		return ok
+		ok
 	end
   
 	def numActivePlayers
@@ -139,44 +143,44 @@ class Game
   	def assignNextPlayerToTurn(context_player_id)
 		order = self.getContextPlayerGame(context_player_id).o
 		
-		player_game == nil
+		player_game = nil
 		
 		if order == 1
 			player_game = self.getActivePlayerGameByOrder(2)
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getActivePlayerGameByOrder(3)
 			end
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getPlayerGameByOrder(4)
 			end
 		end
 		
 		if order == 2
 			player_game = self.getActivePlayerGameByOrder(3)
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getActivePlayerGameByOrder(4)
 			end
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getPlayerGameByOrder(1)
 			end
 		end
 
 		if order == 3
 			player_game = self.getActivePlayerGameByOrder(4)
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getActivePlayerGameByOrder(1)
 			end
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getPlayerGameByOrder(2)
 			end
 		end
 
 		if order == 4
 			player_game = self.getActivePlayerGameByOrder(1)
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getActivePlayerGameByOrder(2)
 			end
-			if player_game.nil
+			if player_game.nil?
 				player_game = self.getPlayerGameByOrder(3)
 			end
 		end

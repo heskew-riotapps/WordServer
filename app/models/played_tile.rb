@@ -8,7 +8,7 @@
   #figure this out...Array does not make sense when there is only one player
   #perhaps playerId is not needed
 	def l_ #return the last letter
-		return self.l.last
+		return self.l.last  
         # return self.l.count() > 0 ? self.l.substr(self.l.count - 1, self.l.count) : ""
  	end	
 

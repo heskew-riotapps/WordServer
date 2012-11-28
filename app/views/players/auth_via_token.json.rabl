@@ -3,9 +3,9 @@ object @player
 attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t
 
 child :a_games => :a_games do
-  attribute :id, :cr_d, :lp_d, :ch_d, :t, :l_t_action, :l_t_date, :l_t_player_id 
+  attribute :id, :cr_d, :lp_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p 
   child :player_games do
-    attribute :sc, :i_t, :l_t_a,:l_t, :l_t_p, :l_t_d  
+    attribute :sc, :i_t  
 		child :player do
 		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end

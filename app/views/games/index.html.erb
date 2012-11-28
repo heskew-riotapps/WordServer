@@ -3,15 +3,15 @@
 <table>
   <tr>
     <th>Id</th>
-    <th>LettersLeft</th>
-    <th>Email</th>
-    <th>Num Wins</th>
+    <th>Status</th>
+	<th>Turn</th>
   </tr>
 
 <% @games.each do |game| %>
   <tr>
     <td><%= game.id  %></td>
 	  <td><%= game.st  %></td>
+	   <td><%= game.t  %></td>
   </tr>
 <% end %>
 </table>
