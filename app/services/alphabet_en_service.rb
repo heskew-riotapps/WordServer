@@ -40,34 +40,64 @@ class AlphabetENService
 	end
 	
 	def self.get_letter_value(letter)
-		char = letter.upcase
-
-		if char == "A" return 1
-		if char == "B" return 6
-		if char == "C" return 5
-		if char == "D" return 3
-		if char == "E" return 1
-		if char == "F" return 5
-		if char == "G" return 5
-		if char == "H" return 2
-		if char == "I" return 1
-		if char == "J" return 10
-		if char == "K" return 7
-		if char == "L" return 3
-		if char == "M" return 5
-		if char == "N" return 2
-		if char == "O" return 1
-		if char == "P" return 6
-		if char == "Q" return 10
-		if char == "R" return 2
-		if char == "S" return 1
-		if char == "T" return 1
-		if char == "U" return 2
-		if char == "V" return 7
-		if char == "W" return 5
-		if char == "X" return 10
-		if char == "Y" return 6
-		if char == "Z" return 10
+		value = 1
+		
+		case letter.upcase
+		when "A"
+			value = 1
+		when "B"
+			value = 6
+		when "C"
+			value = 5
+		when "D"
+			value = 3
+		when "E"
+			value = 1
+		when "F"
+			value = 5
+		when "G"
+			value = 5
+		when "H"
+			value = 2
+		when "I"
+			value = 5
+		when "J"
+			value = 10
+		when "K"
+			value = 7
+		when "L"
+			value = 3
+		when "M"
+			value = 5
+		when "N"
+			value = 2
+		when "O"
+			value = 1
+		when "P"
+			value = 6			
+		when "Q"
+			value = 10
+		when "R"
+			value = 2
+		when "S"
+			value = 1
+		when "T"
+			value = 1
+		when "U"
+			value = 2
+		when "V"
+			value = 7
+		when "W"
+			value = 5
+		when "X"
+			value = 10
+		when "Y"
+			value = 6
+		when "Z"
+			value = 10	
+		end
+		
+		return value
 	end
 	
 end

@@ -5,9 +5,9 @@ class PlayerGame
 #  key :player_id , ObjectId
   belongs_to :player
   key :sc,     Integer, :default => 0 #score
-  key :l_t, Integer, :default => 0 #last turn
-  key :l_t_p, Integer, :default => 0 #last turn points
-  key :l_t_a, Integer, :default => 0 #last turn action => 
+  #key :l_t, Integer, :default => 0 #last turn
+  #key :l_t_p, Integer, :default => 0 #last turn points
+  #key :l_t_a, Integer, :default => 0 #last turn action => 
 			#NO_TRANSLATION(0), (no action yet)
 			#ONE_LETTER_SWAPPED(1),
 			#TWO_LETTERS_SWAPPED(2),
@@ -22,7 +22,7 @@ class PlayerGame
 			#RESIGNED(11),
 			#CANCELLED(12);
   key :t_v, Integer, :default => 1 #tray version, used by GameState on client...incremented as the player takes a turn that affects the tray			
-  key :l_t_d, Time #last_turn_date
+  #key :l_t_d, Time #last_turn_date
   key :la_d, Time #last_alert_date
   key :lr_d, Time #last_reminder_date
   key :lcr_d, Time #last_chatter_received_date

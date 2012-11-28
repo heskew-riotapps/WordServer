@@ -3,6 +3,10 @@ require 'mongo'
 class GamesController < ApplicationController
 	respond_to :json
 	
+	def clear_all
+		Game.delete_all
+	end
+	
 	def new_____
 		Game.delete_all
 		game = Game.new
@@ -166,11 +170,11 @@ class GamesController < ApplicationController
 					#send the new token back to the client
 			
 					#player.save  temp, add this back
-					if !@player.fb.blank?
-						@player.save(:validate => false)
-					else
-						@player.save 
-					end
+					#if !@player.fb.blank?
+					#	@player.save(:validate => false)
+					#else
+					#	@player.save 
+					#end
 				end	
 			end	
 		end
@@ -244,7 +248,7 @@ class GamesController < ApplicationController
 	if player.nil?
 		unauthorized = true		
 	else
-		else
+		if
 			@game = Game.find(params[:id])
 			 #Rails.logger.info("game pre  #{@game.inspect}")	
 			if @game.nil?
@@ -265,6 +269,7 @@ class GamesController < ApplicationController
 		else
 			render json: "error", status: :unprocessable_entity
 		end
+	end
   end
   
   def destroy

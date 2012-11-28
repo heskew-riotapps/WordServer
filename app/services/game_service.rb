@@ -35,6 +35,15 @@ class GameService
 		@game.cr_d = nowDate  #create_date
 		@game.lp_d = nowDate
 		
+			#add a PlayedTurn record
+		played_turn = PlayedTurn.new
+		played_turn.player = current_player
+		played_turn.t = @game.t #turn_num
+		played_turn.a = 8 #last turn action - started the game
+		played_turn.p = params[:p] #points
+		played_turn.p_d = nowDate #played_date
+		@game.played_turns << played_turn
+		
 		#if this count > 4, log an error and return
 		if params[:player_games].count > 4
 			Rails.logger.info("error: #{params[:player_games].count} players being requested for a game")
@@ -117,16 +126,16 @@ class GameService
 						@game.errors.add(:player_games, I18n.t(:error_context_player_must_start_game))
 					end
 					pg.i_t = true #is_turn
-					pg.l_t = 0 #last turn number
-					pg.l_t_a = 8 #last turn action - started the game
-					pg.l_t_p = 0 #last turn points 
-					pg.l_t_d = nowDate
+				#	pg.l_t = 0 #last turn number
+				#	pg.l_t_a = 8 #last turn action - started the game
+				#	pg.l_t_p = 0 #last turn points 
+				#	pg.l_t_d = nowDate
 					pg.st = 1 #status - active
 				else
 					pg.i_t = false #is_turn				
-					pg.l_t = -1
-					pg.l_t_a = 0 #no action yet 
-					pg.l_t_p = 0 #last turn points
+				#	pg.l_t = -1
+				#	pg.l_t_a = 0 #no action yet 
+				#	pg.l_t_p = 0 #last turn points
 					pg.st = 1 #status - active
 				end
 				#	#"hello, %s.  Where is %s?" % ["John", "Mary"]
@@ -265,6 +274,7 @@ class GameService
 			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
 			return @game, @unauthorized 
 		end
+		played_tiles_count = params[:played_tiles].length
 		prev_tray_letter_count = player_game.t_l.length
 		#save played tiles and remove them from players tray letters
 		params[:played_tiles].each  do |value|
@@ -277,13 +287,25 @@ class GameService
 		end	
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
-		if prev_tray_letter_count - params[:played_tiles] != player_game.t_l.length
+		if prev_tray_letter_count - played_tiles_count != player_game.t_l.length
 			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
 			return @game, @unauthorized 
 		end
 		
+		i = 0
+		
 		#add letters from hopper into players tray to make up for played letters that were removed
-		!!!!
+		while i < played_tiles_count  do
+		
+		   #pull letter off the front of the hopper	
+		   hopper_letter = @game.r_l.shift
+		   
+		   #if that letter existed (we might be close to the end of the hopper) add it to the players tray
+		   if !hopper_letter.nil
+			  player_game.t_l.push(hopper_letter)
+		   end
+		   i +=1
+		end
 		
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
@@ -300,11 +322,7 @@ class GameService
 		#add 1 to players tray version
 		player_game.t_v = player_game + 1
 		 
-		#update players last turn information 
-		player_game.l_t = @game.t #last turn 
-		player_game.l_t_d = nowDate #last turn date
-		player_game.l_t_p = played_turn.p #last turn points
-		player_game.l_t_a = 9 #last turn action
+ 
 		#refill tray
 		
 		if @game.r_l.count == 0
@@ -318,8 +336,11 @@ class GameService
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper
-	
+			#send notifications
 			@game.st = 1  # active --just to be sure 
+			
+			#increment the official turn counter
+			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
 			
 		end
@@ -328,6 +349,10 @@ class GameService
 		
 		#Rails.logger.info("game after status set #{@game.inspect}")
 		@game.save
+		
+		if @game.st == 3
+			#send notifications as needed
+		end
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
 	

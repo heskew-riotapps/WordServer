@@ -34,6 +34,18 @@ class Game
 #  end
 #  Person.all(:conditions => {'addresses.city' => 'Chicago'})
   
+  def l_t_action #last turn action
+	return self.played_turns.last.a
+  end
+
+  def l_t_player_id #last turn playerId
+	return self.played_turns.last.player_id
+  end
+  
+  def l_t_date #last turn date
+	return self.played_turns.last.p_d
+  end
+  
   def left
 	return self.r_l.count
   end
@@ -85,7 +97,7 @@ class Game
 			played_tile.p = board_position
 			played_tile.l = letter
 			played_tile.t = turn
-			self.@played_tiles << played_tile
+			self.played_tiles << played_tile
 		end
 	end 	
 
