@@ -34,6 +34,14 @@ class PlayerGame
   key :o,    Integer, :default => 0 #order
   key :t_l, Array #tray_letters
   key :st,    Integer, :default => 1 #status
+			#NO_TRANSLATION(0), (no action yet)
+			#ACTIVE(1),
+			#CANCELLED(2),
+			#DECLINED(3),
+			#WON(4),
+			#LOST(5),
+			#DRAW(6),
+			#RESIGNED(7) //a temp status, will be changed to LOST after the game is over
 
   def tray(p_id)
 	if self.player_id == p_id

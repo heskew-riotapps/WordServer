@@ -3,12 +3,15 @@ object @player
 attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t
 
 child :a_games => :a_games do
-  attribute :id, :cr_d, :lp_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p 
+  attribute :id, :cr_d, :lp_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p, :l_t_pl 
   child :player_games do
     attribute :sc, :i_t  
 		child :player do
 		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end
+  end
+  child :played_words do
+	attribute :w, :t, :player_id, :p_s, :p_d 
   end
 end
 

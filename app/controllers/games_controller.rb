@@ -260,7 +260,7 @@ class GamesController < ApplicationController
 			end	
 		end
 		
-		 #logger.debug("game errors  #{@game.inspect}")
+		logger.debug("game play  #{@game.inspect}")
 		if @unauthorized 
 			render json: "unauthorized", status: :unauthorized
 		elsif not_found 
@@ -272,6 +272,38 @@ class GamesController < ApplicationController
 		end
 	end
   end
+  
+  def skip
+	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	
+	if player.nil?
+		unauthorized = true		
+	else
+		if
+			@game = Game.find(params[:id])
+			 #Rails.logger.info("game pre  #{@game.inspect}")	
+			if @game.nil?
+				Rails.logger.info("cannot find game")	
+				not_found = true		
+			else
+				@game, @unauthorized = GameService.play(player, @game, params)
+				@game.strip_tray_tiles_from_non_context_user player.id
+			end	
+		end
+		
+		logger.debug("game play  #{@game.inspect}")
+		if @unauthorized 
+			render json: "unauthorized", status: :unauthorized
+		elsif not_found 
+			render json: "not_found", status: :not_found 
+		elsif @game.errors.empty?
+			respond_with @game  ###return differently if game is this turn completed the game??
+		else
+			render json: "error", status: :unprocessable_entity
+		end
+	end
+  end
+  
   
   def destroy
 		@game = Game.find(params[:id])

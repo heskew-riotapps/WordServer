@@ -40,7 +40,7 @@ class GameService
 		played_turn.player_id = current_player.id
 		played_turn.t = 0 #turn_num (zero represents the starting of the game)
 		played_turn.a = 8 #last turn action - started the game
-		played_turn.p = params[:p] #points
+		played_turn.p = 0 #points
 		played_turn.p_d = nowDate #played_date
 		@game.played_turns << played_turn
 		
@@ -232,12 +232,6 @@ class GameService
 
 
   def self.play(current_player, game, params) 
-	#update game status to cancelled (2)
-	#ensure the starting player canceled the game in turn 1, that is the only time cancel is allowed
-	#update player game status of the cancelling player to cancelled
-	#save game
-	
-	#Rails.logger.info("game cancel start #{game.inspect}")
 	@game = game
 	
 	#Rails.logger.info("game cancel assignment #{@game.inspect}")
@@ -264,7 +258,7 @@ class GameService
 		params[:played_words].each  do |value|
 			played_word = PlayedWord.new
 			played_word.w = value['w'] 
-			played_word.p_s = value['p']
+			played_word.p = value['p']
 			played_word.t = @game.t
 			played_word.p_d = nowDate
 			played_word.player_id = current_player.id
@@ -317,6 +311,9 @@ class GameService
 		played_turn.p = params[:p] #points
 		played_turn.p_d = nowDate #played_date
 		@game.played_turns << played_turn
+		
+		#set last played date...this will be used as the sort for game list on client
+		@game.lp_d = nowDate
 
 		#add score to players score
 		player_game[0].sc = player_game[0].sc + params[:p]
@@ -330,11 +327,15 @@ class GameService
 		
 		if @game.r_l.count == 0
 			#game is over...determine who has won
-			#calculate bonuses for context player
-			#determine winner
+	 			
 			#send notifications
 			#update statuses
 			#make sure last alert dates are set properly
+			#calculate bonuses for context player
+			player_game[0].sc = player_game[0].sc + @game.getBonusScore(current_player.id)
+			
+			#determine winner
+			@game.assignWinner
 			@game.st = 3  # completed
 		else
 			#game is still in progress
@@ -363,5 +364,83 @@ class GameService
 	
 	return @game, @unauthorized 
   end
+  
+  def self.skip(current_player, game, params) 
+
+	#Rails.logger.info("game cancel start #{game.inspect}")
+	@game = game
+	
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	nowDate = Time.now.utc
+	
+	if !@game.is_player_part_of_game?(current_player.id)
+		Rails.logger.info("is_player_part_of_game failed")
+		@unauthorized = true
+	elsif @game.t != params[:t] #make sure turn is the same as the server's turn
+		Rails.logger.info("turn check failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_out_of_turn))
+		#	return @game
+		@unauthorized = true
+	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+		
+		Rails.logger.info("isPlayerCurrentTurn failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
+		#	return @game
+		@unauthorized = true
+	else
+		
+		#add a PlayedTurn record
+		played_turn = PlayedTurn.new
+		played_turn.player_id = current_player.id
+		played_turn.t = @game.t #turn_num
+		played_turn.a = 10 #TURN_SKIPPED(10),, action
+		played_turn.p = 0 #points
+		played_turn.p_d = nowDate #played_date
+		@game.played_turns << played_turn
+
+ 
+		#refill tray
+		#to do..has every active player has skipped twice in a row???
+		#if so game is over, determine the winner, etc
+		
+		if @game.getNumConsecutiveSkips >= (@game.numActivePlayers * 2)
+			#game is over...determine who has won
+			#determine winner
+			#send notifications
+			#update statuses
+			#make sure last alert dates are set properly
+			#update opponent stats as needed
+			@game.assignWinner
+			@game.st = 3  # completed
+		else
+			#game is still in progress
+			#remove the letters that were just played and replace them with letters from the hopper
+			#send notifications
+			@game.st = 1  # active --just to be sure 
+			
+			#increment the official turn counter
+			@game.t = @game.t + 1
+			@game.assignNextPlayerToTurn(current_player.id)
+			
+		end
+		
+		#Rails.logger.info("game before status set #{@game.inspect}")
+		
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+		
+		if @game.st == 3
+			#send notifications as needed
+		end
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
+	
+	
+	
+	return @game, @unauthorized 
+  end
+  
   
 end

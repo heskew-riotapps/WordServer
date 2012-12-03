@@ -38,8 +38,12 @@ class Game
 	return self.played_turns.last.a
   end
 
-  def l_t_p #last turn playerId
+  def l_t_pl #last turn playerId
 	return self.played_turns.last.player_id
+  end
+  
+   def l_t_p #last turn points
+	return self.played_turns.last.p
   end
   
   def l_t_d #last turn date
@@ -67,6 +71,15 @@ class Game
 	def strip_tray_tiles_from_non_context_user(content_player_id)
 		self.player_games.each  do |value|
 			if value.player_id != content_player_id
+				value.t_l.clear 
+			end
+		end	
+	end 
+
+	#only send latest words when possible, do not save this
+	def strip_excess_words(content_player_id)
+		self.played_words.each  do |value|
+			if value.t != self.t - 1 
 				value.t_l.clear 
 			end
 		end	
@@ -137,11 +150,13 @@ class Game
 				count += 1
 			end
 		end
-		return count
+		count
 	end
   
   	def assignNextPlayerToTurn(context_player_id)
 		order = self.getContextPlayerGame(context_player_id).o
+		
+		Rails.logger.info("assignNextPlayerToTurn order #{order}")
 		
 		player_game = nil
 		
@@ -151,7 +166,7 @@ class Game
 				player_game = self.getActivePlayerGameByOrder(3)
 			end
 			if player_game.nil?
-				player_game = self.getPlayerGameByOrder(4)
+				player_game = self.getActivePlayerGameByOrder(4)
 			end
 		end
 		
@@ -161,7 +176,7 @@ class Game
 				player_game = self.getActivePlayerGameByOrder(4)
 			end
 			if player_game.nil?
-				player_game = self.getPlayerGameByOrder(1)
+				player_game = self.getActivePlayerGameByOrder(1)
 			end
 		end
 
@@ -171,7 +186,7 @@ class Game
 				player_game = self.getActivePlayerGameByOrder(1)
 			end
 			if player_game.nil?
-				player_game = self.getPlayerGameByOrder(2)
+				player_game = self.getActivePlayerGameByOrder(2)
 			end
 		end
 
@@ -181,7 +196,7 @@ class Game
 				player_game = self.getActivePlayerGameByOrder(2)
 			end
 			if player_game.nil?
-				player_game = self.getPlayerGameByOrder(3)
+				player_game = self.getActivePlayerGameByOrder(3)
 			end
 		end
 		
@@ -189,26 +204,93 @@ class Game
 			value.i_t = false
 		end
 
-		player_game.i_t == true #is_turn
+		player_game.i_t = true #is_turn
+		
+		Rails.logger.info("assignNextPlayerToTurn playerId#{player_game.player_id}")
 		
 	end
 	
 	def getActivePlayerGameByOrder(order)
+	    pg = nil
 		self.player_games.each  do |value|
 			if value.o == order && value.st == 1  
-				return value
+				pg = value
+				break
 			end
 		end	
-		return nil
+		pg
+	end
+	
+	def assignWinner 
+	#how to account for ties?
+		score = self.getHighestScore
+		winners = self.player_games.select {|v| v.sc == score && v.st == 1}
+		win_status = 1 #WON(4)
+		if winners.size > 1
+			#if more than one player has the high score its a draw between those players
+			win_status = 6 #DRAW(6)
+		end
+
+		self.player_games.each  do |value|
+			if value.st == 1 && value.sc == score 
+				value.st = win_status
+			elsif value.st == 1 || value.st == 7 #active or resigned, do not flip the status of cancels or declines
+				value.st = 5 #LOST(5)
+			end
+		end	
+	end
+	
+	def getHighestScore 
+		score = 0
+		pg = nil
+		self.player_games.each  do |value|
+			if value.st == 1  
+				if value.sc > score
+					score = value.sc
+				end
+			end
+		end	
+		score
+	end
+	
+	def getBonusScore(context_player_id) 
+		bonus = 0
+		#only calculate bonus from active players, not resigns or declines
+		pg = nil
+		self.player_games.each  do |value|
+			if value.player_id != context_player_id 
+				#loop through all letter in players tray and add values together
+				value.t_l.each do |letter|
+					bonus = bonus + AlphabetService.get_letter_value(letter)
+				end
+			end
+		end	
+		bonus
 	end
 	
 	def getContextPlayerGame(context_player_id)
+		pg = nil
 		self.player_games.each  do |value|
 			if value.player_id == context_player_id 
-				return value
+				pg = value
 			end
 		end	
+		pg
 	end
+	
+	def getNumConsecutiveSkips(context_player_id)
+		#loop through played turns backwards 
+		i = 0
+		self.played_turns.reverse_each  do |value|
+			if value.a == 10 #skipped 
+				i = i + 1
+			else
+				break
+			end
+		end	
+		i
+	end
+	
   # Validations.
 #  validates_presence_of :first_name, :last_name, :email 
 
