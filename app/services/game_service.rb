@@ -378,6 +378,11 @@ class GameService
 	if !@game.is_player_part_of_game?(current_player.id)
 		Rails.logger.info("is_player_part_of_game failed")
 		@unauthorized = true
+	elsif @game.st != 1 #make sure game is active
+		Rails.logger.info("turn check failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_game_over))
+		#	return @game
+		@unauthorized = true
 	elsif @game.t != params[:t] #make sure turn is the same as the server's turn
 		Rails.logger.info("turn check failed")
 		@game.errors.add(:t, I18n.t(:error_game_play_out_of_turn))
@@ -400,12 +405,22 @@ class GameService
 		played_turn.p_d = nowDate #played_date
 		@game.played_turns << played_turn
 
+			#ONE_LETTER_SWAPPED(1),
+			#TWO_LETTERS_SWAPPED(2),
+			#THREE_LETTERS_SWAPPED(3),
+			#FOUR_LETTERS_SWAPPED(4),
+			#FIVE_LETTERS_SWAPPED(5),
+			#SIX_LETTERS_SWAPPED(6),
+			#SEVEN_LETTERS_SWAPPED(7),
  
 		#refill tray
 		#to do..has every active player has skipped twice in a row???
 		#if so game is over, determine the winner, etc
+		@game.lp_d = nowDate
 		
 		if @game.getNumConsecutiveSkips >= (@game.numActivePlayers * 2)
+		Rails.logger.info("consecutive skips =#{@game.getNumConsecutiveSkips}")
+		
 			#game is over...determine who has won
 			#determine winner
 			#send notifications
@@ -434,10 +449,144 @@ class GameService
 		if @game.st == 3
 			#send notifications as needed
 		end
+		
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
 	
+	return @game, @unauthorized 
+end	
 	
+	
+	def self.swap(current_player, game, params) 
+
+	#Rails.logger.info("game cancel start #{game.inspect}")
+	@game = game
+	
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	nowDate = Time.now.utc
+	
+	if !@game.is_player_part_of_game?(current_player.id)
+		Rails.logger.info("is_player_part_of_game failed")
+		@unauthorized = true
+	elsif @game.st != 1 #make sure game is active
+		Rails.logger.info("error_game_play_game_over failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_game_over))
+		#	return @game
+		@unauthorized = true
+	elsif @game.t != params[:t] #make sure turn is the same as the server's turn
+		Rails.logger.info("turn check failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_out_of_turn))
+		#	return @game
+		@unauthorized = true
+	elsif @game.left < 1 #make sure the hopper has letters 
+		Rails.logger.info("error_game_play_hopper_is_empty failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_hopper_is_empty))
+		#	return @game
+		@unauthorized = true
+	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+		
+		Rails.logger.info("isPlayerCurrentTurn failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
+
+		@unauthorized = true
+	elsif params[:s_l].nil? || params[:s_l].blank? || params[:s_l].count == 0 	
+		Rails.logger.info("error_game_play_no_swapped_letters failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_no_swapped_letters))
+		@unauthorized = true
+	elsif params[:s_l].count > @game.left  	
+		Rails.logger.info("error_game_play_too_few_letters_in_hopper failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_too_few_letters_in_hopper))
+		@unauthorized = true
+	else
+
+		#add a PlayedTurn record
+		played_turn = PlayedTurn.new
+		played_turn.player_id = current_player.id
+		played_turn.t = @game.t #turn_num
+		played_turn.a = params[:s_l].length #action
+		played_turn.p = 0 #points
+		played_turn.p_d = nowDate #played_date
+		@game.played_turns << played_turn
+
+		#ONE_LETTER_SWAPPED(1),
+		#TWO_LETTERS_SWAPPED(2),
+		#THREE_LETTERS_SWAPPED(3),
+		#FOUR_LETTERS_SWAPPED(4),
+		#FIVE_LETTERS_SWAPPED(5),
+		#SIX_LETTERS_SWAPPED(6),
+		#SEVEN_LETTERS_SWAPPED(7),
+		
+		player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
+		if player_game[0].st != 1 
+			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
+			return @game, @unauthorized 
+		end
+		swapped_letters_count = params[:s_l].length
+		prev_tray_letter_count = player_game[0].t_l.length
+		#save played tiles and remove them from players tray letters
+		params[:s_l].each  do |value|
+			#remove played letters from players tray
+			#magic to delete first letter that matches
+			#http://stackoverflow.com/questions/4595305/delete-first-instance-of-matching-element-from-array
+			player_game[0].t_l.delete_at(player_game[0].t_l.index(value) || player_game[0].t_l.length)
+			
+			#add this letter back to the hopper
+			@game.r_l << value 
+		end	
+		
+		#make sure the proper number of letters were removed from the tray letters in the loop above
+		if prev_tray_letter_count - swapped_letters_count != player_game[0].t_l.length
+			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
+			return @game, @unauthorized 
+		end
+		
+		
+		#shuffle letters again before pulling letters back out
+		@game.r_l.shuffle! #remaining_letters
+		@game.r_l.shuffle! #remaining_letters shuffled again?? is this needed
+		
+		i = 0
+		
+		#add letters from hopper into players tray to make up for played letters that were removed
+		while i < swapped_letters_count  do
+		
+		   #pull letter off the front of the hopper	
+		   hopper_letter = @game.r_l.shift
+		   
+		   #if that letter existed (we might be close to the end of the hopper) add it to the players tray
+		   if !hopper_letter.nil?
+			  player_game[0].t_l.push(hopper_letter)
+		   end
+		   i +=1
+		end
+		
+ 
+		#refill tray
+		#to do..has every active player has skipped twice in a row???
+		#if so game is over, determine the winner, etc
+		
+	 
+		#game is still in progress
+		#remove the letters that were just played and replace them with letters from the hopper
+		#send notifications
+		@game.lp_d = nowDate
+		
+		#increment the official turn counter
+		@game.t = @game.t + 1
+		@game.assignNextPlayerToTurn(current_player.id)
+
+		#Rails.logger.info("game before status set #{@game.inspect}")
+		
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+		
+		if @game.st == 3
+			#send notifications as needed
+		end
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
 	
 	return @game, @unauthorized 
   end

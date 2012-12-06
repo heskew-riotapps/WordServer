@@ -278,7 +278,7 @@ class Game
 		pg
 	end
 	
-	def getNumConsecutiveSkips(context_player_id)
+	def getNumConsecutiveSkips
 		#loop through played turns backwards 
 		i = 0
 		self.played_turns.reverse_each  do |value|
