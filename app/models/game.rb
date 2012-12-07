@@ -8,7 +8,7 @@ class Game
 #many :letters remaining vs played?#, :length => { :maximum => 2 }  
   many :played_tiles
    
-  many :chatters
+  many :chats
   #key :d_c, String #dup_check..  just in case same post is sent more than once
   key :r_l, Array  #remaining letters
   #key :p_l, Array #played_letters  #don't think we need this, played tiles should be enough

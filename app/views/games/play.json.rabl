@@ -8,7 +8,7 @@ object @game
 	end
   end
   child :played_words do
-	attribute :w, :t, :player_id, :p_s, :p_d 
+	attribute :w, :t, :player_id, :p, :p_d 
   end
   child :played_tiles do
 	attribute :p, :l_, :t_ 

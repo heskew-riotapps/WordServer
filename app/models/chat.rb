@@ -1,9 +1,8 @@
-class Chatter
+class Chat
   include MongoMapper::EmbeddedDocument
 
   belongs_to :game
-  key :text,     String
+  key :t,     String
   key :player_id , ObjectId
-  key :game_id , ObjectId
-  key :chatter_date, Time
+  key :ch_d, Time
 end
