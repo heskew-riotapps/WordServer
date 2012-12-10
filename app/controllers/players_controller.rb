@@ -28,10 +28,12 @@ class PlayersController < ApplicationController
   
    def find
    logger.debug("pg inspect #{:params.inspect}")
-    @player = Player.find_by_n_n(params[:n_n])
-
+    #@player = Player.find_by_n_n(params[:n_n]) #Player.where(n_n:/^{params[:n_n]}$/i ) #(##Player.find_by_n_n(params[:n_n])  #/^bar$/i regex can use index because it starts with ^
+    @player = Player.where({n_n:/^#{params[:n_n]}$/i} ) #(##Player.find_by_n_n(params[:n_n])  #/^bar$/i regex can use index because it starts with ^
+#
+	# /^#{params[:q]}/ 
     respond_to do |format|
-		if @player.nil?
+		if @player.nil? || @player.empty?
 			format.html { render action: "edit" } #wrong
 			format.json { render json: "not found", status: :not_found }
 		else

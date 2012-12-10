@@ -3,8 +3,10 @@ class PlayerService
   def self.create(params)
 	#check for facebookId if it is sent in
 	#make sure nickname and email are unique
-	
-	
+	if params.has_key?(:e_m) && !params[:e_m].blank?
+		@email = params[:e_m].downcase
+		#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+	end
 	@error = Error.new
 	@unauthorized = false
 		if !params.has_key?(:e_m) || params[:e_m].blank?
@@ -13,13 +15,13 @@ class PlayerService
 			@unauthorized = true
 		elsif !params[:fb].blank?
 			#always convert email to lower case, since mongo is case sensitive
-			email = params[:e_m].downcase
+			
 		
 			@player = Player.find_by_fb(params[:fb])
 			if @player.nil?
 				#go ahead and see if player has already registered with the same email account.
 				#if so, use this player as a facebook player going forward, this ia a one way street
-				@player = Player.find_by_e_m(email)
+				@player = Player.find_by_e_m(@email)
 				if @player.nil?
 					@player = Player.new
 					@player.generate_token("0") #auth_token
@@ -33,15 +35,15 @@ class PlayerService
 			else
 				@player.generate_token("1") #do not delete existing tokens  
 			end
-			if Player.where( :e_m => email, :id.ne => @player.id ).count > 0
-				Rails.logger.info ("duplicate  email#{email.inspect}")
+			if Player.where( :e_m => @email, :id.ne => @player.id ).count > 0
+				Rails.logger.info ("duplicate  email#{@email.inspect}")
 				@error.code = "7"
 				@unauthorized = true
 			else		
 				@player.n_v = @player.n_v + 1
 				@player.f_n = params[:f_n] #first_name
 				@player.l_n = params[:l_n] #last_name
-				@player.e_m = email #email
+				@player.e_m = @email #email
 				@player.st = 1
 
 				#validate is false so that has_secure_password does not fire and password_digest is not stored for fb users
@@ -50,7 +52,7 @@ class PlayerService
 			
 		else		
 			#find player by email addy
-			@player = Player.find_by_e_m(email)
+			@player = Player.find_by_e_m(@email)
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
 					Rails.logger.info ("nickname not supplied inspect #{params.inspect}")
@@ -62,7 +64,7 @@ class PlayerService
 						@player = Player.new
 						@player.password = params[:p_w]
 						@player.n_n = params[:n_n] #nickname
-						@player.e_m = email #email
+						@player.e_m = @email #email
 						@player.n_v = 1
 						@player.st = 1
 						@player.cr_d = Time.now.utc  #create_date
@@ -73,7 +75,7 @@ class PlayerService
 						if @player.auth(params[:p_w])
 							@player.generate_token("1") #do not delete existing tokens  
 							#@player.nickname = params[:nickname]
-							@player.e_m = email #email
+							@player.e_m = @email #email
 							@player.n_v = @player.n_v + 1
 							
 	#						if Player.where( :e_m => email, :id.ne => @player.id ).count > 0
@@ -143,7 +145,7 @@ class PlayerService
 		if @player.nil?
 			@error.code = "6"
 			@unauthorized = true 
-		elsif !params.has_key?(:e_m) || email.blank?
+		elsif !params.has_key?(:e_m) || params[:e_m].blank?
 			Rails.logger.debug("email not supplied inspect #{params.inspect}")
 			@error.code = "2"
 			@unauthorized = true 
@@ -152,7 +154,7 @@ class PlayerService
 			@error.code = "4"
 			@unauthorized = true 
 		else		
-			email = params[:e_m].downcase
+			@email = params[:e_m].downcase
 			
 			#check for duplicate nickname
 			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
@@ -161,13 +163,13 @@ class PlayerService
 				@error.code = "3"
  				@unauthorized = true
 			#check for duplicate email
-			elsif Player.where( :e_m => email, :id.ne => @player.id ).count > 0 
+			elsif Player.where( :e_m => @email, :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate  email#{params[:n_n].inspect}")
 				@error.code = "5"
  				@unauthorized = true
 			else
 				@player.n_n = params[:n_n] #nickname
-				@player.e_m = email #email
+				@player.e_m = @email #email
 				@player.generate_token(params[:a_t])
 				#@ok = @player.save
 				if !@player.fb.blank?

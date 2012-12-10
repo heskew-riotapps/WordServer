@@ -591,5 +591,54 @@ end
 	return @game, @unauthorized 
   end
   
+  def self.chat(current_player, game, params) 
+
+	Rails.logger.info("game cancel chat #{game.inspect}")
+	@game = game
+	
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	nowDate = Time.now.utc
+	
+	if !@game.is_player_part_of_game?(current_player.id)
+		Rails.logger.info("is_player_part_of_game failed")
+		@unauthorized = true
+	elsif @game.st == 2
+		Rails.logger.info("no chat allowed in cancelled games")
+		@game.errors.add(:st, I18n.t(:error_game_play_game_over))
+		#	return @game
+		@unauthorized = true
+	
+	elsif @game.st == 3 && ((nowDate - @game.co_d) / 1.hour).round > 8 #make sure game is active or has only been completed for less than 8 hours
+		Rails.logger.info("game play is over for this game")
+		@game.errors.add(:st, I18n.t(:error_game_play_game_over))
+		#	return @game
+		@unauthorized = true
+	else
+		#if game has been over for 8 hours, don't accept chat
+		#add a Chat record
+		chat = Chat.new
+		chat.player_id = current_player.id
+		chat.t = params[:t] #chat text
+		chat.ch_d = nowDate #played_date
+		@game.chats << chat 
+
+		# belongs_to :game
+		#  key :t,     String
+		#  key :player_id , ObjectId
+		# key :ch_d, Time
   
+		@game.ch_d = nowDate
+		
+    	#Rails.logger.info("game before status set #{@game.inspect}")
+		
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
+	
+	return @game, @unauthorized 
+end	
 end

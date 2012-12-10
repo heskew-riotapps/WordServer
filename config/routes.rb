@@ -25,6 +25,7 @@ Word::Application.routes.draw do
 		match "/games/play/" => "games#play"
 		match "/games/swap/" => "games#swap"
 		match "/games/skip/" => "games#skip"
+		match "/games/chat/" => "games#chat"
 		match "/games/resign/" => "games#resign"
 		match "/players/update_fb_account/" => "players#update_fb_account"
 		match "/players/update_account/" => "players#update_account"

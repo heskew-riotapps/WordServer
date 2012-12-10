@@ -13,3 +13,6 @@ object @game
   child :played_tiles do
 	attribute :p, :l_, :t_ 
   end 
+child :chats do
+	attribute :t, :player_id, :ch_d 
+  end
