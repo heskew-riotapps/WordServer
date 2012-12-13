@@ -291,16 +291,18 @@ class GameService
 		i = 0
 		
 		#add letters from hopper into players tray to make up for played letters that were removed
-		while i < played_tiles_count  do
-		
-		   #pull letter off the front of the hopper	
-		   hopper_letter = @game.r_l.shift
-		   
-		   #if that letter existed (we might be close to the end of the hopper) add it to the players tray
-		   if !hopper_letter.nil?
-			  player_game[0].t_l.push(hopper_letter)
-		   end
-		   i +=1
+		if @game.r_l.count > 0
+			while i < played_tiles_count  do
+			
+			   #pull letter off the front of the hopper	
+			   hopper_letter = @game.r_l.shift
+			   
+			   #if that letter existed (we might be close to the end of the hopper) add it to the players tray
+			   if !hopper_letter.nil?
+				  player_game[0].t_l.push(hopper_letter)
+			   end
+			   i +=1
+			end
 		end
 		
 		#add a PlayedTurn record
@@ -325,7 +327,7 @@ class GameService
  
 		#refill tray
 		
-		if @game.r_l.count == 0
+		if @game.r_l.count == 0 && player_game[0].t_l.length == 0 #no letters in hopper and player's tray is empty
 			#game is over...determine who has won
 	 			
 			#send notifications
@@ -457,7 +459,7 @@ class GameService
 end	
 	
 	
-	def self.swap(current_player, game, params) 
+def self.swap(current_player, game, params) 
 
 	#Rails.logger.info("game cancel start #{game.inspect}")
 	@game = game
