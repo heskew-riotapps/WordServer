@@ -229,6 +229,9 @@ class Game
 		if winners.size > 1
 			#if more than one player has the high score its a draw between those players
 			win_status = 6 #DRAW(6)
+			
+			#update player add to NumWins
+
 		end
 
 		self.player_games.each  do |value|
@@ -236,6 +239,8 @@ class Game
 				value.st = win_status
 			elsif value.st == 1 || value.st == 7 #active or resigned, do not flip the status of cancels or declines
 				value.st = 5 #LOST(5)
+				
+				#update player add to NumLosses
 			end
 		end	
 	end

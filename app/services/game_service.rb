@@ -339,6 +339,7 @@ class GameService
 			#determine winner
 			@game.assignWinner
 			@game.st = 3  # completed
+			#player_game[0].cpa_d = nowDate #completion alert date
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper
