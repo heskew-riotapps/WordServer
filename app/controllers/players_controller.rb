@@ -28,7 +28,7 @@ class PlayersController < ApplicationController
   
    def find
    logger.debug("pg inspect #{:params.inspect}")
-    #@player = Player.find_by_n_n(params[:n_n]) #Player.where(n_n:/^{params[:n_n]}$/i ) #(##Player.find_by_n_n(params[:n_n])  #/^bar$/i regex can use index because it starts with ^
+   # @player = Player.find_by_n_n(params[:n_n]) #Player.where(n_n:/^{params[:n_n]}$/i ) #(##Player.find_by_n_n(params[:n_n])  #/^bar$/i regex can use index because it starts with ^
     @player = Player.where({n_n:/^#{params[:n_n]}$/i} ) #(##Player.find_by_n_n(params[:n_n])  #/^bar$/i regex can use index because it starts with ^
 #
 	# /^#{params[:q]}/ 
@@ -40,7 +40,7 @@ class PlayersController < ApplicationController
 			format.html # index.html.erb
 			#format.json { render json: @players }
 			#http://apidock.com/rails/ActiveRecord/Serialization/to_json
-			format.json  { render :json => @player.to_json({
+			format.json  { render :json => @player.first.to_json({
 						:methods => :gravatar,
 						:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w] } )}
 		end		 
