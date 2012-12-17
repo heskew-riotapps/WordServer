@@ -25,6 +25,7 @@ class Game
 	#1 -> active
 	#2 -> cancelled
 	#3 -> completed
+	#4 -> completed
   key :ch_d, Time #last_chatter_date
   key :lp_d, Time #last_played_date
   

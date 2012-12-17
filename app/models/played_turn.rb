@@ -16,7 +16,8 @@
 			#WORDS_PLAYED(9),
 			#TURN_SKIPPED(10),
 			#RESIGNED(11),
-			#CANCELLED(12);
+			#CANCELLED(12),
+			#DECLINED(13);
 	key :p, Integer, :default => 0 #points for this turn
 	key :p_d, Time #played_date
 end

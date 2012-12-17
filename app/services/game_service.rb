@@ -212,7 +212,7 @@ class GameService
 		#Rails.logger.info("t failed")
 		@unauthorized = true
 	else
-		@game.played_tiles.each  do |value|
+		@game.player_games.each  do |value|
 		#Rails.logger.info("loop check #{value.player.id} - #{current_player.id}")
 			if value.player.id == current_player.id
 				#Rails.logger.info("loop check match")
@@ -230,7 +230,154 @@ class GameService
 	return @game, @unauthorized 
   end
 
+def self.decline(current_player, game) 
+	#update game status to cancelled (2)
+	#ensure the starting player canceled the game in turn 1, that is the only time cancel is allowed
+	#update player game status of the cancelling player to cancelled
+	#save game
+	
+	
+	#Rails.logger.info("game cancel start #{game.inspect}")
+	@game = game
+	numActivePlayers = @game.numActivePlayers
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	
+	if @game.isPlayerStarter?(current_player.id)
+		#Rails.logger.info("isPlayerStarter failed")
+		@unauthorized = true
+	elsif @game.st != 1 #game is not active
+		#Rails.logger.info("t failed")
+		@unauthorized = true
+	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+		
+		Rails.logger.info("decline isPlayerCurrentTurn failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
+		#	return @game
+		@unauthorized = true
+	elsif @game.t == 1		#probably not needed because of the if not isStarter check 
+		@unauthorized = true
+	elsif ((numActivePlayers == 2 && @game.t != 2) || #make sure the player declined in his/her first turn
+		   (numActivePlayers == 3 && @game.t > 3) ||
+		   (numActivePlayers == 4 && @game.t > 4))
+		#Rails.logger.info("t failed")
+		@unauthorized = true
+	else
 
+		@game.player_games.each  do |value|
+		#Rails.logger.info("loop check #{value.player.id} - #{current_player.id}")
+			if value.player.id == current_player.id
+				#Rails.logger.info("loop check match")
+				value.st = 3 #status - cancelled
+			end
+			#Rails.logger.info("game before status set #{value.inspect}")
+		end	
+		#add a PlayedTurn record
+		played_turn = PlayedTurn.new
+		played_turn.player_id = current_player.id
+		played_turn.t = @game.t #turn_num
+		played_turn.a = 13 #DECLINED(13); action
+		played_turn.p = 0 #points
+		played_turn.p_d = nowDate #played_date
+		@game.played_turns << played_turn
+		
+		if numActivePlayers == 2 
+			#game is over and there is no winner 
+			@game.st = 4 #declined 
+		else
+			@game.st = 1  # active --just to be sure 
+			
+			#increment the official turn counter
+			@game.t = @game.t + 1
+			@game.assignNextPlayerToTurn(current_player.id)
+		
+		end 	
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
+
+	return @game, @unauthorized 
+  end
+  
+  def self.resign(current_player, game) 
+	#update game status to cancelled (2)
+	#ensure the starting player canceled the game in turn 1, that is the only time cancel is allowed
+	#update player game status of the cancelling player to cancelled
+	#save game
+	
+	
+	#Rails.logger.info("game cancel start #{game.inspect}")
+	@game = game
+	numActivePlayers = @game.numActivePlayers
+	#Rails.logger.info("game cancel assignment #{@game.inspect}")
+	@unauthorized = false
+	@ok = false
+	player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
+
+	if @game.isPlayerStarter?(current_player.id)
+		#Rails.logger.info("isPlayerStarter failed")
+		@unauthorized = true
+	elsif @game.st != 1 #game is not active
+		#Rails.logger.info("t failed")
+		@unauthorized = true
+	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
+		
+		Rails.logger.info("decline isPlayerCurrentTurn failed")
+		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
+		#	return @game
+		@unauthorized = true
+	elsif @game.t == 1		#probably not needed because of the if not isStarter check 
+		@unauthorized = true
+	elsif ((numActivePlayers == 2 && @game.t <= 2) || #make sure the player resigns after his/her first turn
+		   (numActivePlayers == 3 && @game.t <= 3) ||
+		   (numActivePlayers == 4 && @game.t <= 4))
+		#Rails.logger.info("t failed")
+		@unauthorized = true
+	else
+		player_game[0].st = 7 #RESIGNED(7)
+
+		#add a PlayedTurn record
+		played_turn = PlayedTurn.new
+		played_turn.player_id = current_player.id
+		played_turn.t = @game.t #turn_num
+		played_turn.a = 11 #RESIGNED(11)
+		played_turn.p = 0 #points
+		played_turn.p_d = nowDate #played_date
+		@game.played_turns << played_turn
+		
+		if numActivePlayers == 2 
+			#game is over, the last person resigned
+			@game.st = 3 #completed 
+			
+			#on the off-chance player resigned even though sh/she had more points 
+			#if resigning player had more points than winning player, assign resignee points + 1 to winner
+			if @game.getHighestScore == player_game[0].sc
+				self.player_games.each  do |value|
+					if value.st == 1 && value.player.id != current_player.id 
+						value.sc =  player_game[0].sc + 1
+					end	
+				end	
+			end 
+			@game.assignWinner
+			@game.st = 3 
+		else
+			@game.st = 1  # active --just to be sure 
+			
+			#increment the official turn counter
+			@game.t = @game.t + 1
+			@game.assignNextPlayerToTurn(current_player.id)
+		
+		end 	
+		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.save
+		#Rails.logger.info("game after save #{@game.inspect}")
+	end
+
+	return @game, @unauthorized 
+  end
+  
   def self.play(current_player, game, params) 
 	@game = game
 	
