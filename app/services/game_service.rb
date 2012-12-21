@@ -243,6 +243,7 @@ def self.decline(current_player, game)
 	#Rails.logger.info("game cancel assignment #{@game.inspect}")
 	@unauthorized = false
 	@ok = false
+	nowDate = Time.now.utc
 	
 	if @game.isPlayerStarter?(current_player.id)
 		#Rails.logger.info("isPlayerStarter failed")
@@ -311,6 +312,7 @@ def self.decline(current_player, game)
 	#Rails.logger.info("game cancel start #{game.inspect}")
 	@game = game
 	numActivePlayers = @game.numActivePlayers
+	nowDate = Time.now.utc
 	#Rails.logger.info("game cancel assignment #{@game.inspect}")
 	@unauthorized = false
 	@ok = false
@@ -336,7 +338,7 @@ def self.decline(current_player, game)
 		#Rails.logger.info("t failed")
 		@unauthorized = true
 	else
-		player_game[0].st = 7 #RESIGNED(7)
+		player_game[0].st =  7 #RESIGNED(7),
 
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
@@ -346,11 +348,12 @@ def self.decline(current_player, game)
 		played_turn.p = 0 #points
 		played_turn.p_d = nowDate #played_date
 		@game.played_turns << played_turn
+		@game.t = @game.t + 1
+		Rails.logger.info("resigning game - #{@game.id} numActivePlayers=#{numActivePlayers}")
 		
 		if numActivePlayers == 2 
 			#game is over, the last person resigned
-			@game.st = 3 #completed 
-			
+			Rails.logger.info("resigning - finishing game now")
 			#on the off-chance player resigned even though sh/she had more points 
 			#if resigning player had more points than winning player, assign resignee points + 1 to winner
 			if @game.getHighestScore == player_game[0].sc
@@ -362,6 +365,7 @@ def self.decline(current_player, game)
 			end 
 			@game.assignWinner
 			@game.st = 3 
+			@game.co_d = nowDate
 		else
 			@game.st = 1  # active --just to be sure 
 			
@@ -486,6 +490,7 @@ def self.decline(current_player, game)
 			#determine winner
 			@game.assignWinner
 			@game.st = 3  # completed
+			@game.co_d = nowDate
 			#player_game[0].cpa_d = nowDate #completion alert date
 		else
 			#game is still in progress
@@ -579,6 +584,7 @@ def self.decline(current_player, game)
 			#update opponent stats as needed
 			@game.assignWinner
 			@game.st = 3  # completed
+			@game.co_d = nowDate
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper

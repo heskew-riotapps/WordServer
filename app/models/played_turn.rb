@@ -17,7 +17,10 @@
 			#TURN_SKIPPED(10),
 			#RESIGNED(11),
 			#CANCELLED(12),
-			#DECLINED(13);
+			#DECLINED(13),
+			#WON(14),
+			#LOST(15),
+			#DRAW(16);
 	key :p, Integer, :default => 0 #points for this turn
 	key :p_d, Time #played_date
 end

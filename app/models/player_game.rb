@@ -5,22 +5,6 @@ class PlayerGame
 #  key :player_id , ObjectId
   belongs_to :player
   key :sc,     Integer, :default => 0 #score
-  #key :l_t, Integer, :default => 0 #last turn
-  #key :l_t_p, Integer, :default => 0 #last turn points
-  #key :l_t_a, Integer, :default => 0 #last turn action => 
-			#NO_TRANSLATION(0), (no action yet)
-			#ONE_LETTER_SWAPPED(1),
-			#TWO_LETTERS_SWAPPED(2),
-			#THREE_LETTERS_SWAPPED(3),
-			#FOUR_LETTERS_SWAPPED(4),
-			#FIVE_LETTERS_SWAPPED(5),
-			#SIX_LETTERS_SWAPPED(6),
-			#SEVEN_LETTERS_SWAPPED(7),
-			#STARTED_GAME(8),
-			#WORDS_PLAYED(9),
-			#TURN_SKIPPED(10),
-			#RESIGNED(11),
-			#CANCELLED(12);
   key :t_v, Integer, :default => 1 #tray version, used by GameState on client...incremented as the player takes a turn that affects the tray			
   #key :l_t_d, Time #last_turn_date
   key :la_d, Time #last_alert_date
@@ -42,7 +26,7 @@ class PlayerGame
 			#WON(4),
 			#LOST(5),
 			#DRAW(6),
-			#RESIGNED(7) //a temp status, will be changed to LOST after the game is over
+			#RESIGNED(7) //a temp status, will be changed to LOST after the game is over????
 
   def tray(p_id)
 	if self.player_id == p_id

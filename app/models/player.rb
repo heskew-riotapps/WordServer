@@ -12,7 +12,7 @@ class Player
 	#validates_presence_of :password_digest, :on => :create, :if => :password_required
    #attr_accessible :email, :nickname, :password
 
-   
+     
  # short field names!!!!!!!
   #many :player_games
   #key :a_t, String #auth_token
@@ -63,14 +63,47 @@ class Player
   end
 
   def a_games #active games method
-  Rails.logger.debug("player class, entering a_game")
-     
- # return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})  
+  #Rails.logger.debug("player class, entering a_game")
+	#return Game.all(:conditions => {'player_games' => {'player_id' => self.id}}, :sort => {'lp_d' => -1})   
+ 	#return Game.find( {player_games: {st : 1, player_id : self.id}}).sort({lp_d : -1})   
+ 
+ 
+  #db.collection.find( { type : 'city', value : 'Washington 
+#D.C.' } ).sort( { relevance : -1 } ) 
+
+
+  ##return Game.all(:conditions => {'player_games' => {'st' => 1, 'player_id' => self.id}}, :sort => {:lp_d => -1})   
+ 
+   #db.recipes.find( { "ingredients" : { "name" : "butter", "qty" : "1 lb" } } );
+ #db.games.find( { "player_games" : { "st" : 1, "player_id" : self.id } } );
+	#return Game.find( {"player_games" => { "st" => 1} } ) 
+   
+   #return Game.all( :conditions => {"player_games" => { "player_games.st" => 1, "player_games.player_id" => self.id } } );
+   
+    #return Game.all(:conditions => {'player_games.st' => 1, 'player_games.player_id' => self.id}, :sort => {'lp_d' => -1})  
+ 
+ 
+ #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})  
   
-   #return Game.where('st' => 1, 'player_games.player_id' => self.id) #, :sort => {'lp_d' => -1})  
-  #return Game.all(:conditions => {'st' => 1 })
-  return Game.all(:conditions => {'st' => 1, 'player_games.player_id' => self.id}, :sort => {'lp_d' => -1})   
-   #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
+    return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc)  
+ 
+   #return Game.all(:conditions => {'st' => 1, 'player_games.player_id' => self.id}, :sort => {'lp_d' => -1})  
+
+   #Game.find({$and: [{"subdoc.group": {$not: {$in: ["c"]}}}, {"subdoc.role": 5}]});
+   
+    # return Game.where( 
+	#	{$all: [{'player_games.st': 1, 'player_games.player_id': self.id}]}).sort({'lp_d': -1})   
+     
+	 
+	 #return Game.all(:player_game => { $and => [{:player_id => self.id}, {:st => 1 }]}) 
+	
+	
+		#db.blogpost.find({ 'tag' : { $all : [ 'tag1', 'tag2' ] }}); //2
+     ##return Game.all(:conditions => {'player_games.st' => 1, 'player_games.player_id' => self.id}, :sort => {'lp_d' => -1})   
+     #return Game.find({'player_games.st' : '1', 'player_games.player_id' : self.id}).sort({'lp_d' : -1})   
+ 
+
+  #return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id})  
 	#  return Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :order  => {'lp_d' => -1})   
 	#return Game.where(:st => 1, :player_game => (:player_id => self.id)).sort( { :lp_d : -1 } )
 	#this is stupid and ugly but i'm shrinking the collections object here in order to minimize json transport 
@@ -84,8 +117,26 @@ class Player
 	if self.completed_games_from_date.nil?
 		self.completed_games_from_date	= "10/06/2012"
 	end
-	return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 3, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
-  #return Game.find(:conditions => {:co_d.gt => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id})
+	#{ field: { $in: [<value1>, <value2>, ... <valueN> ] } }
+	#			:$or => [{'player_game.st' => 4}, {'player_game.st' => 5}, {'player_game.st' => 6}, {'player_game.st' => 7}],
+
+	#return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 3, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
+	
+	return Game.where("co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
+			'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7]}, 'player_id' => self.id}}).sort(:'co_d'.desc).limit(10)  
+	
+	
+	#return Game.where("co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
+#		#'player_game.st' => {$in: [ 4 , 5, 6, 7]},
+#			'player_game.player_id' => self.id, 
+#			:sort => {'co_d' => -1}, :limit => 10)
+ # 
+#  	return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
+#			#'player_game.st' => {$in: [ 4 , 5, 6, 7]},
+#			'player_game.player_id' => self.id}, 
+#			:sort => {'co_d' => -1}, :limit => 10)
+  
+	#return Game.find(:conditions => {:co_d.gt => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 2, 'player_game.player_id' => self.id})
  #  :started_on => {"$gte" => whatev}
   #.sort(:last_name).limit(10)
   end

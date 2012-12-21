@@ -132,9 +132,9 @@ class PlayersController < ApplicationController
 			@player.generate_token(params[:a_t])
 			
 			if !@player.fb.blank?
-				@player.save(:validate => false)
+			#	@player.save(:validate => false)
 			else
-				@player.save 
+			#	@player.save 
 			end
 			
 		end
