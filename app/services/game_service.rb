@@ -325,10 +325,11 @@ def self.decline(current_player, game)
 	@ok = false
 	player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
 
-	if @game.isPlayerStarter?(current_player.id)
-		#Rails.logger.info("isPlayerStarter failed")
-		@unauthorized = true
-	elsif @game.st != 1 #game is not active
+	#if @game.isPlayerStarter?(current_player.id)
+	#	#Rails.logger.info("isPlayerStarter failed")
+	#	@unauthorized = true
+	#els
+	if @game.st != 1 #game is not active
 		#Rails.logger.info("t failed")
 		@unauthorized = true
 	elsif !@game.isPlayerCurrentTurn?(current_player.id) #make sure something weird didn't happen and turns match but players don't		#Rails.logger.info("t failed")
