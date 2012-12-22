@@ -3,6 +3,7 @@
 <table>
   <tr>
     <th>Id</th>
+	<th>Completion Date</th>
     <th>Status</th>
 	<th>Turn</th>
   </tr>
@@ -10,6 +11,7 @@
 <% @games.each do |game| %>
   <tr>
     <td><%= game.id  %></td>
+	<td><%= game.co_d  %></td>
 	  <td><%= game.st  %></td>
 	   <td><%= game.t  %></td>
 	   <td><%= game.l_t_a %></td>

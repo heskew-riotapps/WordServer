@@ -122,9 +122,11 @@ class Player
 
 	#return Game.all(:conditions => {"co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 'st' => 3, 'player_game.player_id' => self.id}, :sort => {'co_d' => -1}, :limit => 10)
 	
-	return Game.where("co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
-			'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7]}, 'player_id' => self.id}}).sort(:'co_d'.desc).limit(10)  
+	 return Game.where("co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
+	 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}}).sort(:'co_d'.desc).limit(10)   
 	
+	#return Game.where('player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}}).sort(:'co_d'.desc).limit(10)  
+
 	
 	#return Game.where("co_d.gt" => {"$gt" => Time.parse(self.completed_games_from_date)}, 
 #		#'player_game.st' => {$in: [ 4 , 5, 6, 7]},

@@ -465,5 +465,7 @@ class GamesController < ApplicationController
 		  end
 		end
 	end
-	
+	def destroy_all
+		Game.delete_all #this is temp
+	end
 end

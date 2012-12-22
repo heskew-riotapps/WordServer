@@ -283,9 +283,16 @@ def self.decline(current_player, game)
 		played_turn.p_d = nowDate #played_date
 		@game.played_turns << played_turn
 		
+		@game.t = @game.t + 1
+		@game.lp_d = nowDate
+		
 		if numActivePlayers == 2 
 			#game is over and there is no winner 
 			@game.st = 4 #declined 
+			@game.co_d = nowDate
+			
+			#assign #DECLINED_BY_INVITEES(8), to inviter, who should be the only active player left
+			@game.assignStatusToRemainingActivePlayers(8)
 		else
 			@game.st = 1  # active --just to be sure 
 			

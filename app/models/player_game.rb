@@ -27,6 +27,7 @@ class PlayerGame
 			#LOST(5),
 			#DRAW(6),
 			#RESIGNED(7) //a temp status, will be changed to LOST after the game is over????
+			#DECLINED_BY_INVITEES(8),
 
   def tray(p_id)
 	if self.player_id == p_id

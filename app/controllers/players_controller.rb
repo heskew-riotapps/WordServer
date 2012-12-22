@@ -129,12 +129,13 @@ class PlayersController < ApplicationController
 			#reset user's token, remove current token
 			#send the new token back to the client
 			@player.n_v = @player.n_v + 1
-			@player.generate_token(params[:a_t])
+			
+			#@player.generate_token(params[:a_t])
 			
 			if !@player.fb.blank?
-			#	@player.save(:validate => false)
+			 #	@player.save(:validate => false)
 			else
-			#	@player.save 
+			 #	@player.save 
 			end
 			
 		end

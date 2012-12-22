@@ -154,6 +154,14 @@ class Game
 		count
 	end
   
+	def assignStatusToRemainingActivePlayers(status)
+		self.player_games.each  do |value|
+			if value.st == 1
+				value.st = status
+			end
+		end		
+	end
+  
   	def assignNextPlayerToTurn(context_player_id)
 		order = self.getContextPlayerGame(context_player_id).o
 		
