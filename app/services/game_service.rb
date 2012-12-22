@@ -365,7 +365,7 @@ def self.decline(current_player, game)
 			#on the off-chance player resigned even though sh/she had more points 
 			#if resigning player had more points than winning player, assign resignee points + 1 to winner
 			if @game.getHighestScore == player_game[0].sc
-				self.player_games.each  do |value|
+				@game.player_games.each  do |value|
 					Rails.logger.info("resigning player=#{value.player_id} score=#{value.sc} status=#{value.st}")
 					if value.st == 1 && value.player.id != current_player.id 
 						value.sc =  player_game[0].sc + 1
