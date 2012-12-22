@@ -338,7 +338,7 @@ def self.decline(current_player, game)
 		@game.errors.add(:t, I18n.t(:error_game_play_not_context_players_turn))
 		#	return @game
 		@unauthorized = true
-	elsif @game.t == 1		#probably not needed because of the if not isStarter check 
+	elsif @game.t == 1		  
 		@unauthorized = true
 	elsif ((numActivePlayers == 2 && @game.t <= 2) || #make sure the player resigns after his/her first turn
 		   (numActivePlayers == 3 && @game.t <= 3) ||
@@ -361,11 +361,12 @@ def self.decline(current_player, game)
 		
 		if numActivePlayers == 2 
 			#game is over, the last person resigned
-			Rails.logger.info("resigning - finishing game now")
+			Rails.logger.info("resigning - finishing game now current player #{current_player.id} score=#{player_game[0].sc}")
 			#on the off-chance player resigned even though sh/she had more points 
 			#if resigning player had more points than winning player, assign resignee points + 1 to winner
 			if @game.getHighestScore == player_game[0].sc
 				self.player_games.each  do |value|
+					Rails.logger.info("resigning player=#{value.player_id} score=#{value.sc} status=#{value.st}")
 					if value.st == 1 && value.player.id != current_player.id 
 						value.sc =  player_game[0].sc + 1
 					end	
