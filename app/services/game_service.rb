@@ -346,7 +346,6 @@ def self.decline(current_player, game)
 		#Rails.logger.info("t failed")
 		@unauthorized = true
 	else
-		player_game[0].st =  7 #RESIGNED(7),
 
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
@@ -361,7 +360,7 @@ def self.decline(current_player, game)
 		
 		if numActivePlayers == 2 
 			#game is over, the last person resigned
-			Rails.logger.info("resigning - finishing game now current player #{current_player.id} score=#{player_game[0].sc}")
+			Rails.logger.info("resigning - finishing game high score=#{@game.getHighestScore} current player #{current_player.id} score=#{player_game[0].sc}")
 			#on the off-chance player resigned even though sh/she had more points 
 			#if resigning player had more points than winning player, assign resignee points + 1 to winner
 			if @game.getHighestScore == player_game[0].sc
@@ -372,10 +371,15 @@ def self.decline(current_player, game)
 					end	
 				end	
 			end 
+			
 			@game.assignWinner
+			
+			#assign status at the last minute so other methods like getHighestScore and assignWinner works
+			player_game[0].st =  7 #RESIGNED(7)
 			@game.st = 3 
 			@game.co_d = nowDate
 		else
+			player_game[0].st =  7 #RESIGNED(7)
 			@game.st = 1  # active --just to be sure 
 			
 			#increment the official turn counter
