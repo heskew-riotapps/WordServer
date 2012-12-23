@@ -238,9 +238,6 @@ class Game
 		if winners.size > 1
 			#if more than one player has the high score its a draw between those players
 			win_status = 6 #DRAW(6)
-			
-			#update player add to NumWins
-
 		end
 
 		self.player_games.each  do |value|
@@ -248,10 +245,69 @@ class Game
 				value.st = win_status
 			elsif value.st == 1 || value.st == 7 #active or resigned, do not flip the status of cancels or declines
 				value.st = 5 #LOST(5)
-				
-				#update player add to NumLosses
 			end
 		end	
+	end
+	
+	def update_players_after_completion
+		#loop through each player_game and update the player and player opponent combination based on whether the player
+		#won or lost or tied, them loop through each opponent for each player
+		self.player_games.each  do |value|
+			#if opponent or player did not win, don't update the player/opponent win loss stats, just num games
+			#WON(4),
+			#LOST(5),
+			#DRAW(6),
+			#RESIGNED(7)
+			if value.st == 4   
+				value.player.n_w += 1
+				#this player won
+				#update opponent record for each opponent that did not decline
+				self.player_games.each  do |inner|
+					if inner.player_id != value.player_id
+						is_win = false # this will stay false since the player won
+						is_loss = false
+						is_draw = false #this will stay false since the player won
+						if value.st == 5 || value.st == 7
+							is_loss = true
+						end
+						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
+						value.player.save
+					end
+				end
+			elsif value.st == 5 || value.st == 7 #lost or resigned 
+				value.player.n_l += 1
+				self.player_games.each  do |inner|
+					if inner.player_id != value.player_id
+						is_win = false
+						is_loss = false  # this will stay false since the player lost
+						is_draw = false #this will stay false since the player lost
+						if value.st == 4  
+							is_win = true
+						end
+						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
+						value.player.save
+					end
+				end
+			elsif value.st == 6 #draw
+				value.player.n_d += 1
+				self.player_games.each  do |inner|
+					if inner.player_id != value.player_id
+						is_win = false
+						is_loss = false  # this will stay false since the player lost
+						is_draw = false #this will stay false since the player lost
+						if value.st == 5 || value.st == 7
+							is_loss = true
+						end
+						if value.st == 6  
+							is_draw = true
+						end
+						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
+						value.player.save
+					end
+				end
+			end
+		end	
+	
 	end
 	
 	def getHighestScore 

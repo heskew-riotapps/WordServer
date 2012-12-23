@@ -1,7 +1,9 @@
 class Opponent
   include MongoMapper::EmbeddedDocument
  
-  belongs_to :player #this is the opponent, not the parent player
+  belongs_to :player 
+  key :opponent_id , ObjectId
+  key :n_g,     Integer, :default => 0 #num_games
   key :n_w,     Integer, :default => 0 #num_wins
   key :n_l, Integer, :default => 0 #num_losses
   key :n_d, Integer, :default => 0 #num_draws

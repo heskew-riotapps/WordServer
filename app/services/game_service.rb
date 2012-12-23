@@ -373,6 +373,7 @@ def self.decline(current_player, game)
 			end 
 			
 			@game.assignWinner
+			@game.update_players_after_completion
 			
 			#assign status at the last minute so other methods like getHighestScore and assignWinner works
 			player_game[0].st =  7 #RESIGNED(7)
@@ -387,6 +388,9 @@ def self.decline(current_player, game)
 			@game.assignNextPlayerToTurn(current_player.id)
 		
 		end 	
+		
+
+		
 		#Rails.logger.info("game after status set #{@game.inspect}")
 		@game.save
 		#Rails.logger.info("game after save #{@game.inspect}")
@@ -502,6 +506,7 @@ def self.decline(current_player, game)
 			
 			#determine winner
 			@game.assignWinner
+			@game.update_players_after_completion
 			@game.st = 3  # completed
 			@game.co_d = nowDate
 			#player_game[0].cpa_d = nowDate #completion alert date
@@ -596,6 +601,7 @@ def self.decline(current_player, game)
 			#make sure last alert dates are set properly
 			#update opponent stats as needed
 			@game.assignWinner
+			@game.update_players_after_completion
 			@game.st = 3  # completed
 			@game.co_d = nowDate
 		else

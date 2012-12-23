@@ -62,6 +62,51 @@ class Player
 	#!self.fb || !self.fb.empty?
   end
 
+# def update_totals(is_win, is_loss, is_draw)
+#	if is_win == true
+#		self.n_w += 1
+#	end
+#	if is_loss == true
+#		self.n_l += 1
+#	end
+#	if is_draw == true
+#		self.n_d += 1
+#	end
+# end
+  
+  def update_opponent(opponent_id, is_win, is_loss, is_draw)
+	    opponent = self.opponents.select {|v| v.opponent_id == opponent_id}  
+
+		#is_win, is_loss, is_draw represent the opponents outcome in relation to the player for a specific game
+		if opponent[0].nil?
+			o = Opponent.new
+			o.opponent_id = opponent_id
+			o.n_g = 1
+			if is_win == true
+				o.n_w = 1
+			end
+			if is_loss == true
+				o.n_l = 1
+			end
+			if is_draw == true
+				o.n_d = 1
+			end
+			self.opponents << o
+		else	
+			opponent[0].n_g += 1
+			if is_win == true
+				opponent[0].n_w += 1
+			end
+			if is_loss == true
+				opponent[0].n_l += 1
+			end
+			if is_draw == true
+				opponent[0].n_d += 1
+			end
+		end	
+  end
+ 
+  
   def a_games #active games method
   #Rails.logger.debug("player class, entering a_game")
 	#return Game.all(:conditions => {'player_games' => {'player_id' => self.id}}, :sort => {'lp_d' => -1})   
