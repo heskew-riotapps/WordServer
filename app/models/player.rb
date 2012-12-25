@@ -75,12 +75,12 @@ class Player
 # end
   
   def update_opponent(opponent_id, is_win, is_loss, is_draw)
-	    opponent = self.opponents.select {|v| v.opponent_id == opponent_id}  
+	    opponent = self.opponents.select {|v| v.player_id == opponent_id}  
 
 		#is_win, is_loss, is_draw represent the opponents outcome in relation to the player for a specific game
 		if opponent[0].nil?
 			o = Opponent.new
-			o.opponent_id = opponent_id
+			o.player_id = opponent_id
 			o.n_g = 1
 			if is_win == true
 				o.n_w = 1
