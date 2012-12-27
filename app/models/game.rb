@@ -234,7 +234,7 @@ class Game
 	#how to account for ties?
 		score = self.getHighestScore
 		winners = self.player_games.select {|v| v.sc == score && v.st == 1}
-		win_status = 1 #WON(4)
+		win_status = 4 #WON(4)
 		if winners.size > 1
 			#if more than one player has the high score its a draw between those players
 			win_status = 6 #DRAW(6)
@@ -258,54 +258,35 @@ class Game
 			#LOST(5),
 			#DRAW(6),
 			#RESIGNED(7)
-			if value.st == 4   
-				value.player.n_w += 1
-				#this player won
-				#update opponent record for each opponent that did not decline
-				self.player_games.each  do |inner|
-					if inner.player_id != value.player_id
-						is_win = false # this will stay false since the player won
-						is_loss = false
-						is_draw = false #this will stay false since the player won
-						if value.st == 5 || value.st == 7
-							is_loss = true
-						end
-						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
-						value.player.save
+			 Rails.logger.info("update_players_after_completion main loop #{value.player.id} - #{value.st}")
+			  
+			value.player.n_w += 1
+			#this player won
+			#update opponent record for each opponent that did not decline
+			self.player_games.each  do |inner|
+			 Rails.logger.info("update_players_after_completion inner loop #{inner.player.id} - #{inner.st}")
+			
+				if inner.player_id != value.player_id
+					is_win = false # this will stay false since the player won
+					is_loss = false
+					is_draw = false #this will stay false since the player won
+					if value.st == 4
+						is_win = true
+					end					
+					if inner.st == 5 || inner.st == 7
+						is_loss = true
 					end
-				end
-			elsif value.st == 5 || value.st == 7 #lost or resigned 
-				value.player.n_l += 1
-				self.player_games.each  do |inner|
-					if inner.player_id != value.player_id
-						is_win = false
-						is_loss = false  # this will stay false since the player lost
-						is_draw = false #this will stay false since the player lost
-						if value.st == 4  
-							is_win = true
-						end
-						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
-						value.player.save
-					end
-				end
-			elsif value.st == 6 #draw
-				value.player.n_d += 1
-				self.player_games.each  do |inner|
-					if inner.player_id != value.player_id
-						is_win = false
-						is_loss = false  # this will stay false since the player lost
-						is_draw = false #this will stay false since the player lost
-						if value.st == 5 || value.st == 7
-							is_loss = true
-						end
-						if value.st == 6  
-							is_draw = true
-						end
-						value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
-						value.player.save
-					end
+					if value.st == 6
+						is_draw = true
+					end	
+					 Rails.logger.info("update_players_after_completion inner loop #{inner.player.id} - isWin=#{is_win} - isLoss=#{is_loss} - isDraw=#{is_draw}")
+					value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
+					
 				end
 			end
+			 
+			
+			value.player.save
 		end	
 	
 	end
