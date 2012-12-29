@@ -16,6 +16,7 @@ Word::Application.routes.draw do
   
   # config/routes.rb
 	scope "(:locale)", :locale => /en|es/ do
+		match "/facebook/android/" => "facebook#android"
 		match "/players/clear_tokens/" => "players#clear_tokens"
 		match "/players/find_all_by_fb/" => "players#find_all_by_fb"
 		match "/players/get_games/" => "players#get_games"
@@ -34,7 +35,7 @@ Word::Application.routes.draw do
 		match "/players/destroy_all/" => "players#destroy_all"
 		match "/players/destroy" => "players#destroy"
 		match "/games/destroy" => "games#destroy"
-		match "/games/destroy_all" => "games#destroy_all"
+		match "/games/destroy_all____" => "games#destroy_all"
 		match "/players/find/" => "players#find"
 		match "/players/auth_via_token/" => "players#auth_via_token"
 		match "/players/log_out/" => "players#log_out"
