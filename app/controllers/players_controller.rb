@@ -148,6 +148,30 @@ class PlayersController < ApplicationController
 		end
 	end
 	
+	def get_via_token
+		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
+			
+		end
+	
+		
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			respond_with @player
+		end
+	end
+	
 	def log_out
 		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
