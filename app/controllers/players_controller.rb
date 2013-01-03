@@ -358,6 +358,44 @@ class PlayersController < ApplicationController
 		end
 	end
 	
+	def gcm_register
+		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@error = Error.new
+		
+		if player.nil?
+			@error.code = "6"
+			unauthorized = true
+		else
+			player.password = params[:p_w]
+			player.generate_token(params[:a_t])
+			if !player.fb.blank?
+				player.save(:validate => false)
+			else
+				player.save 
+			end
+			
+			player.completed_games_from_date = params[:c_g_d]
+		end
+	
+		respond_to do |format|
+				if unauthorized #account for FB
+					format.json { render json: @error.to_json(), status: :unauthorized }
+				else 
+					if player.errors.empty?
+						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
+						format.json  { render :json => player.to_json( 
+							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
+							:methods => [:gravatar, :a_t, :a_games, :c_games]),status: :ok}
+					else
+						#format.html { render action: "new" }
+						format.json { render json: player.errors, status: :unprocessable_entity }
+					end
+				end
+			end
+	
+	end
+	
+	
 	def destroy
 		@player = Player.find(params[:id])
 		@player.delete
