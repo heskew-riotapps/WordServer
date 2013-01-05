@@ -47,6 +47,8 @@ class Player
   key :l_w_m, Integer, :default => 0 # largest_win_margin
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
   
+  key :o_n_a, Boolean, :default => false #option-no ads
+  
   attr_accessor :completed_games_from_date  
   #key :completed_games_from_date 
   

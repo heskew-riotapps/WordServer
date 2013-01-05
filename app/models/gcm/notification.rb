@@ -6,15 +6,16 @@ class Gcm::Notification
 
    key :device_id, Integer, :null => false
    key :collapse_key, String
-   key    t.text :data
-      t.boolean :delay_while_idle
-      t.datetime :sent_at
-      t.integer :time_to_live
-      t.timestamps
+   key :data, String #text???
+   key :delay_while_idle, Boolean
+   key :sent_at, Time
+   key :time_to_live, Integer
+   
+   timestamps!
   
   include ::ActionView::Helpers::TextHelper
   extend ::ActionView::Helpers::TextHelper
-  serialize :data
+  #serialize :data
 
   belongs_to :device, :class_name => 'Gcm::Device'
   validates_presence_of :collapse_key if :time_to_live?

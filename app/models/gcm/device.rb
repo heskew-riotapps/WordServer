@@ -11,6 +11,7 @@
 class Gcm::Device 
 	 include MongoMapper::Document
 	safe # for mongo saves
+	set_collection_name "gcm_devices"
   #self.table_name = "gcm_devices"
 
   key :registration_id, String, :size => 120, :null => false
