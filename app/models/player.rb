@@ -17,7 +17,9 @@ class Player
   #many :player_games
   #key :a_t, String #auth_token
   many :opponents
-  key :a_t_, Array #auth_token array allows same user to login from multiple devices
+  many :devices
+
+  #key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
   key :e_m,      String #email
   key :f_n,       String# first_name, :format => /\A[\w\.\_\-\+]+\z/
@@ -47,9 +49,11 @@ class Player
   key :l_w_m, Integer, :default => 0 # largest_win_margin
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
   
-  key :o_n_a, Boolean, :default => false #option-no ads
+  key :o_n_i_a, Boolean, :default => false #option-no interstitial ads
   
+  timestamps!
   attr_accessor :completed_games_from_date  
+  attr_accessor :a_t 
   #key :completed_games_from_date 
   
    #many :games do
@@ -136,39 +140,53 @@ class Player
   end
   
 	def generate_token(token_to_replace)
-		#begin
-		#	self[column] = SecureRandom.urlsafe_base64
-		#end while Player.exists?(column => self[column])
 		begin
 			token = SecureRandom.urlsafe_base64
-		end while Player.exists?(:a_t_ => token)
-
-		if token_to_replace == "1"
-			#do nothing, do not remove any existing tokens
-		elsif token_to_replace == "0"  
-			#coming from player create so make sure all token are cleared
-			self.a_t_.clear
+		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
+	
+		devices = self.devices.select {|v| v.a_t == token_to_replace} #getContextPlayerGame(current_player.id)
+		if devices.count == 0  
+			device = Device.new	
+			device.a_t = token
+			self.devices << device
 		else
-			#delete old token
-			self.a_t_.delete_if {|x| x == token_to_replace } 		
+			devices[0].a_t = token
 		end
 		
-		#add new token
-		self.a_t_.unshift(token) #add it to front
-				
-		return token
+		self.a_t = token
+		token
 	end
 
-	def a_t
-		return self.a_t_[0]
+	def update_gcm_registration_id(token, reg_id)
+		devices = self.devices.select {|v| v.a_t == token} #getContextPlayerGame(current_player.id)
+		if devices.count == 0  
+			device = Device.new	
+			device.a_t = token
+			device.l_r_d = Time.now.utc
+			device.i_a = true
+			devices[0].r_id = reg_id
+			self.devices << device
+		else
+			device.i_a = true
+			devices[0].r_id = reg_id
+			devide.l_r_d = Time.now.utc
+		end
 	end
+	
+	
+	#def a_t
+	#	#return self.a_t_[0]
+	#	return self.devices[0].a_t_
+	#end
 	
 	def generate_password
 		self.password = ('a'..'z').to_a.shuffle[0,8].join
 	end
 	
 	def remove_token(token)
-		self.a_t_.delete_if {|x| x == token } 		
+		#self.a_t_.delete_if {|x| x == token } 
+
+		self.devices.delete_if {|x| v.a_t == token }		
 	end
 	
 	#def authenticate_with_new_token(password)

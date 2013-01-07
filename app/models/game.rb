@@ -28,7 +28,7 @@ class Game
 	#4 -> completed
   key :ch_d, Time #last_chat_date
   key :lp_d, Time #last_played_date
-  
+    timestamps!
   #attr_accessor :a_t ##auth_token not stored, only used to return back through json to client
 #  def self.active_by_player(player_id)
 #    where(:st => 1, :player_games => {player_id => player_id, st => 1 )

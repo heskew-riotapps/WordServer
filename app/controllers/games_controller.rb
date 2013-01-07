@@ -53,7 +53,7 @@ class GamesController < ApplicationController
   #Game.all(:conditions => {'st' => 1, 'player_game.player_id' => self.id}, :sort => {'lp_d' => -1})
   
    def get
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 		logger.debug("game before create #{params.inspect}")
 	   
 
@@ -91,7 +91,7 @@ class GamesController < ApplicationController
 				end	
 			end
 		end
-						logger.debug("game  #{@game.inspect}")
+		logger.debug("game  #{@game.inspect}")
 		if unauthorized 
 			render json: "unauthorized", status: :unauthorized
 		elsif not_found 
@@ -106,7 +106,7 @@ class GamesController < ApplicationController
   
   def create
 	#authenticate requesting player
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	logger.debug("game before create #{params.inspect}")
 	@game = Game.new
 	
@@ -145,7 +145,7 @@ class GamesController < ApplicationController
   end
   
    def cancel
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 		#logger.debug("game before cancel #{params.inspect}")
 	   
 
@@ -162,7 +162,7 @@ class GamesController < ApplicationController
 			 
 			else
 				@game, @unauthorized = GameService.cancel(@player, @game)
-
+				@player.a_t = params[:a_t]
 				#Rails.logger.info("game post  #{@game.inspect}")
 				if @game.errors.empty?
 					#reset user's token
@@ -192,7 +192,7 @@ class GamesController < ApplicationController
   end
   
    def decline
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 		#logger.debug("game before cancel #{params.inspect}")
 	   
 
@@ -209,7 +209,7 @@ class GamesController < ApplicationController
 			 
 			else
 				@game, @unauthorized = GameService.decline(@player, @game)
-
+				@player.a_t = params[:a_t]
 				#Rails.logger.info("game post  #{@game.inspect}")
 			end	
 		end
@@ -227,7 +227,7 @@ class GamesController < ApplicationController
   end
   
   def resign
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 		#logger.debug("game before cancel #{params.inspect}")
 	   
 
@@ -244,7 +244,7 @@ class GamesController < ApplicationController
 			 
 			else
 				@game, @unauthorized = GameService.resign(@player, @game)
-
+				@player.a_t = params[:a_t]
 				#Rails.logger.info("game post  #{@game.inspect}")
 			end	
 		end
@@ -263,7 +263,7 @@ class GamesController < ApplicationController
   
   def get_active_games____
 #authenticate requesting player
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	if player.nil?
 		unauthorized = true		
@@ -312,7 +312,7 @@ class GamesController < ApplicationController
   
   
   def play
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	if player.nil?
 		unauthorized = true		
@@ -343,7 +343,7 @@ class GamesController < ApplicationController
   end
   
   def skip
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	if player.nil?
 		unauthorized = true		
@@ -374,7 +374,7 @@ class GamesController < ApplicationController
   end
   
   def swap
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	if player.nil?
 		unauthorized = true		
@@ -388,6 +388,7 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.swap(player, @game, params)
 				@game.strip_tray_tiles_from_non_context_user player.id
+				
 			end	
 		end
 		
@@ -406,7 +407,7 @@ class GamesController < ApplicationController
   end
   
   def chat
-	player = Player.find_by_a_t_(params[:a_t]) #auth_token
+	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
 	
 	if player.nil?
 		Rails.logger.info("chat - played not found  #{params.inspect}")	

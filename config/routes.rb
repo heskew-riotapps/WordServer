@@ -17,6 +17,8 @@ Word::Application.routes.draw do
   # config/routes.rb
 	scope "(:locale)", :locale => /en|es/ do
 		match "/facebook/android/" => "facebook#android"
+		match "/players/gcm_register/" => "players#gcm_register"
+		match "/players/gcm_unregister/" => "players#gcm_unregister"
 		match "/players/clear_tokens/" => "players#clear_tokens"
 		match "/players/find_all_by_fb/" => "players#find_all_by_fb"
 		match "/players/get_games/" => "players#get_games"

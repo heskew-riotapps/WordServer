@@ -1,5 +1,29 @@
 class PlayerService
 
+  def self.findPlayer(auth_token)
+	#players = Player.where('devices.a_t' => auth_token ) 
+	#db.wrappers.find({"lastArray.url":{$regex:/\.com$/}});
+	#{:"devices.a_t"=>"1hvXSNwqnAO-s_EHgHI7aw"}
+	# players = Player.all('devices.a_t' => auth_token) 
+	# players = Player.find_by_devices('a_t' => auth_token) 
+	# players = Player.where('devices.a_t' => auth_token)
+	# players = Player.where('devices' => {'a_t' => auth_token})
+	 players = Player.all(:conditions => {'devices.a_t' => auth_token}) 
+	#User.where('alerts.name' => params[:name], :id => current_user.id).first
+	#:stories => {:posted_by => "Josh"}}
+	# return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc)  
+#:devices=>{"a_t"=>"1hvXSNwqnAO-s_EHgHI7aw"}
+	
+	Rails.logger.info ("findPlayer  players=#{players.inspect}")
+	player = nil
+	if players.count > 0
+		player = players[0]
+	end
+	Rails.logger.info ("findPlayer  player=#{player.inspect}")
+	player
+	#Player.devices.where(:a_t => auth_token).first
+  end	
+
   def self.create(params)
 	#check for facebookId if it is sent in
 	#make sure nickname and email are unique
@@ -36,7 +60,7 @@ class PlayerService
 				@player.generate_token("1") #do not delete existing tokens  
 			end
 			if Player.where( :e_m => @email, :id.ne => @player.id ).count > 0
-				Rails.logger.info ("duplicate  email#{@email.inspect}")
+				#Rails.logger.info ("duplicate  email#{@email.inspect}")
 				@error.code = "7"
 				@unauthorized = true
 			else		
@@ -136,9 +160,9 @@ class PlayerService
 	end
 
 	
-	def self.update_account(params)
+  def self.update_account(params)
 	#make sure nickname and email are unique
-	@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	@player = self.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	@error = Error.new
 	@unauthorized = false
 	
@@ -155,7 +179,7 @@ class PlayerService
 			@unauthorized = true 
 		else		
 			@email = params[:e_m].downcase
-			
+			@player.a_t = params[:a_t]
 			#check for duplicate nickname
 			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
@@ -186,7 +210,7 @@ class PlayerService
 
 	def self.update_fb_account(params)
 		#make sure nickname is unique
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@player = self.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 		@error = Error.new
 		@unauthorized = false
 	
@@ -197,7 +221,8 @@ class PlayerService
 			Rails.logger.debug("nickname not supplied inspect #{params.inspect}")
 			@error.code = "4"
 			@unauthorized = true 
-		else		
+		else	
+			@player.a_t = params[:a_t]
 			#check for duplicate nickname
 			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")

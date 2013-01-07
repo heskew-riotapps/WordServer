@@ -1,6 +1,6 @@
 object @player 
 
-attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t
+attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t, :o_n_i_a
 
 child :opponents do
 	attribute :n_g 

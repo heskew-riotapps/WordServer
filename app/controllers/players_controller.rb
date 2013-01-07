@@ -114,7 +114,7 @@ class PlayersController < ApplicationController
   end
   
 	def auth_via_token
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		Rails.logger.info("params #{params}")
 		if @player.nil?
@@ -149,13 +149,14 @@ class PlayersController < ApplicationController
 	end
 	
 	def get_via_token
-		@player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		Rails.logger.info("params #{params}")
 		if @player.nil?
 			not_found = true
 			Rails.logger.info("authorization failed #{params[:a_t]}")		
 		else
+			@player.a_t = params[:a_t]
 			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
 				@player.completed_games_from_date = params[:c_g_d]
 			else
@@ -173,7 +174,7 @@ class PlayersController < ApplicationController
 	end
 	
 	def log_out
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		unauthorized = false
 		if player.nil?
@@ -200,7 +201,7 @@ class PlayersController < ApplicationController
 	end
 	
 	def change_password 
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 		@error = Error.new
 		
 		if player.nil?
@@ -229,8 +230,8 @@ class PlayersController < ApplicationController
 			end
 	end
 	
-	def clear_tokens
-		player = Player.find_by_id(params[:id]) #auth_token    #@player.valid?
+	def clear_tokens___
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_id(params[:id]) #auth_token    #@player.valid?
 	
 
 		if player.nil?
@@ -262,7 +263,7 @@ class PlayersController < ApplicationController
 	end
 	
 	def get_games 
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 		@error = Error.new
 		
 		if player.nil?
@@ -270,13 +271,13 @@ class PlayersController < ApplicationController
 			unauthorized = true
 		else
 			player.password = params[:p_w]
-			player.generate_token(params[:a_t])
-			if !player.fb.blank?
-				player.save(:validate => false)
-			else
-				player.save 
-			end
-			
+			#player.generate_token(params[:a_t])
+			#if !player.fb.blank?
+			#	player.save(:validate => false)
+			#else
+			#	player.save 
+			#end
+			player.a_t = params[:a_t]
 			player.completed_games_from_date = params[:c_g_d]
 		end
 	
@@ -359,43 +360,80 @@ class PlayersController < ApplicationController
 	end
 	
 	def gcm_register
-		player = Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 		@error = Error.new
+		
+		#params[:r_id] -- registration id
+		
+		#to support multiple devices for one user
+		#update registrationId associated with the auth_token
+		#if another registrationID is associated
 		
 		if player.nil?
 			@error.code = "6"
 			unauthorized = true
 		else
-			player.password = params[:p_w]
-			player.generate_token(params[:a_t])
+			player.update_gcm_registration_id(params[:a_t], params[:r_id])
+			#player.generate_token(params[:a_t])
 			if !player.fb.blank?
 				player.save(:validate => false)
 			else
 				player.save 
 			end
-			
-			player.completed_games_from_date = params[:c_g_d]
 		end
 	
 		respond_to do |format|
-				if unauthorized #account for FB
-					format.json { render json: @error.to_json(), status: :unauthorized }
-				else 
-					if player.errors.empty?
-						#format.html { redirect_to @player, notice: 'Post was successfully created.' }
-						format.json  { render :json => player.to_json( 
-							:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
-							:methods => [:gravatar, :a_t, :a_games, :c_games]),status: :ok}
-					else
-						#format.html { render action: "new" }
-						format.json { render json: player.errors, status: :unprocessable_entity }
-					end
+			if unauthorized #account for FB
+				format.json { render json: @error.to_json(), status: :unauthorized }
+			else 
+				if player.errors.empty?
+					format.json  { render json: "ok",status: :ok}
+				else
+					#format.html { render action: "new" }
+					format.json { render json: player.errors, status: :unprocessable_entity }
 				end
 			end
+		end
 	
 	end
 	
+	def gcm_unregister
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+		@error = Error.new
+		
+		#params[:r_id] -- registration id
+		
+		#to support multiple devices for one user
+		#update registrationId associated with the auth_token
+		#if another registrationID is associated
+		
+		if player.nil?
+			@error.code = "6"
+			unauthorized = true
+		else
+			player.update_gcm_registration_id(params[:a_t], "")
+			#player.generate_token(params[:a_t])
+			if !player.fb.blank?
+				player.save(:validate => false)
+			else
+				player.save 
+			end
+		end
 	
+		respond_to do |format|
+			if unauthorized #account for FB
+				format.json { render json: @error.to_json(), status: :unauthorized }
+			else 
+				if player.errors.empty?
+					format.json  { render json: "ok",status: :ok}
+				else
+					#format.html { render action: "new" }
+					format.json { render json: player.errors, status: :unprocessable_entity }
+				end
+			end
+		end
+	
+	end
 	def destroy
 		@player = Player.find(params[:id])
 		@player.delete

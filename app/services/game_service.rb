@@ -614,6 +614,9 @@ def self.decline(current_player, game)
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
 			
+			
+			
+			
 		end
 		
 		#Rails.logger.info("game before status set #{@game.inspect}")

@@ -1,3 +1,6 @@
-class GoogleNotifierService
+module GoogleNotifierService
+	
+	
+
 
 end
