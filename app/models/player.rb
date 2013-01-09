@@ -139,16 +139,18 @@ class Player
 	return Digest::MD5::hexdigest(self.e_m)	
   end
   
-	def generate_token(token_to_replace)
+	def generate_token_only(token_to_replace)
 		begin
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
-		devices = self.devices.select {|v| v.a_t == token_to_replace} #getContextPlayerGame(current_player.id)
+	
+		devices = self.devices.select {|v| v.a_t == token_to_replace} 
 		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
 			self.devices << device
+		
 		else
 			devices[0].a_t = token
 		end
@@ -156,24 +158,110 @@ class Player
 		self.a_t = token
 		token
 	end
+  
+	def generate_token(token_to_replace, gcm_registration_id)
+		begin
+			token = SecureRandom.urlsafe_base64
+		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
+	
+		#just check to see if another token is not already associated with this registration Id
+		if !gcm_registration_id.empty?
+			#find by registrationId
+			self.devices.delete_if {|x| v.a_t != token && v.r_id == gcm_registration_id}
+		end
 
-	def update_gcm_registration_id(token, reg_id)
+		devices = self.devices.select {|v| v.a_t == token_to_replace} 
+		if devices.count == 0  
+			device = Device.new	
+			device.a_t = token
+			device.r_id = gcm_registration_id
+			self.devices << device
+		
+		else
+			devices[0].a_t = token
+			devices[0].r_id = gcm_registration_id
+		end
+		
+		self.a_t = token
+		token
+	end
+	
+	def generate_new_player_token(gcm_registration_id)
+		begin
+			token = SecureRandom.urlsafe_base64
+		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
+	
+		self.devices.clear
+		
+		device = Device.new	
+		device.a_t = token
+		device.r_id = gcm_registration_id
+		self.devices << device 
+		
+		self.a_t = token
+		token
+	end
+	
+	def generate_token_for_gcm_registration_id(gcm_registration_id)
+		begin
+			token = SecureRandom.urlsafe_base64
+		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
+	
+		if !gcm_registration_id.empty?
+			#find by registrationId
+			devices = self.devices.select {|v| v.r_id == gcm_registration_id} 
+			
+			if devices.count == 0  
+				device = Device.new	
+				device.a_t = token
+				device.r_id = gcm_registration_id
+				self.devices << device
+			else
+				devices[0].a_t = token
+				devices[0].r_id = gcm_registration_id
+			end
+		else
+			device = Device.new	
+			device.a_t = token
+			device.r_id = ""
+			self.devices << device
+		end
+		
+		self.a_t = token
+		token
+	end
+	
+	def update_or_add_gcm_registration_id(token, gcm_registration_id)
 		devices = self.devices.select {|v| v.a_t == token} #getContextPlayerGame(current_player.id)
 		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
 			device.l_r_d = Time.now.utc
 			device.i_a = true
-			devices[0].r_id = reg_id
+			devices[0].r_id = gcm_registration_id
 			self.devices << device
 		else
 			device.i_a = true
-			devices[0].r_id = reg_id
+			devices[0].r_id = gcm_registration_id
 			devide.l_r_d = Time.now.utc
 		end
 	end
 	
-	
+	def update_gcm_registration_id?(token, gcm_registration_id)
+		devices = self.devices.select {|v| v.a_t == token} #getContextPlayerGame(current_player.id)
+		if devices.count == 0  
+			device = Device.new	
+			device.a_t = token
+			device.l_r_d = Time.now.utc
+			device.i_a = true
+			devices[0].r_id = gcm_registration_id
+			self.devices << device
+			
+			true
+		else
+			false
+		end
+	end
 	#def a_t
 	#	#return self.a_t_[0]
 	#	return self.devices[0].a_t_
@@ -186,7 +274,7 @@ class Player
 	def remove_token(token)
 		#self.a_t_.delete_if {|x| x == token } 
 
-		self.devices.delete_if {|x| v.a_t == token }		
+		self.devices.delete_if {|x| x.a_t == token }		
 	end
 	
 	#def authenticate_with_new_token(password)

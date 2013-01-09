@@ -31,6 +31,11 @@ class PlayerService
 		@email = params[:e_m].downcase
 		#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 	end
+	@gcm_reg_id = ""
+	if params.has_key?(:r_id) && !params[:r_id].blank?
+		@gcm_reg_id = params[:r_id] 
+		#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+	end
 	@error = Error.new
 	@unauthorized = false
 		if !params.has_key?(:e_m) || params[:e_m].blank?
@@ -48,16 +53,16 @@ class PlayerService
 				@player = Player.find_by_e_m(@email)
 				if @player.nil?
 					@player = Player.new
-					@player.generate_token("0") #auth_token
+					@player.generate_new_player_token(@gcm_reg_id) #auth_token
 					@player.cr_d = Time.now.utc  #create_date
 				else
-					@player.generate_token("1") #do not delete existing tokens  
+					@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 				end
 				@player.fb = params[:fb] #facebook_id
 				@player.password = ""
 				#@player.password = ""
 			else
-				@player.generate_token("1") #do not delete existing tokens  
+				@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 			end
 			if Player.where( :e_m => @email, :id.ne => @player.id ).count > 0
 				#Rails.logger.info ("duplicate  email#{@email.inspect}")
@@ -92,12 +97,12 @@ class PlayerService
 						@player.n_v = 1
 						@player.st = 1
 						@player.cr_d = Time.now.utc  #create_date
-						@player.generate_token("0") #auth_token
+						@player.generate_new_player_token(@gcm_reg_id) #auth_token
 						@ok = @player.save
 					else
 						#validate password here
 						if @player.auth(params[:p_w])
-							@player.generate_token("1") #do not delete existing tokens  
+							@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 							#@player.nickname = params[:nickname]
 							@player.e_m = @email #email
 							@player.n_v = @player.n_v + 1
@@ -130,7 +135,7 @@ class PlayerService
 				
 				if @player.auth(params[:p_w])
 					Rails.logger.debug("player has been authorized with password #{params[:p_w].inspect}")
-					@player.generate_token("1") #do not delete existing tokens  
+					@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 					@player.n_n = params[:n_n]
 					@player.n_v = @player.n_v + 1
 					@player.st = 1

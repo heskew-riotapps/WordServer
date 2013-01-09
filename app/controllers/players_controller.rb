@@ -126,11 +126,17 @@ class PlayersController < ApplicationController
 			else
 				@player.completed_games_from_date = "10/6/2012"
 			end
+			
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
 			#reset user's token, remove current token
 			#send the new token back to the client
 			@player.n_v = @player.n_v + 1
 			
-			@player.generate_token(params[:a_t])
+			@player.generate_token(params[:a_t], @gcm_reg_id)
 			
 			if !@player.fb.blank?
 			 	@player.save(:validate => false)
@@ -162,7 +168,20 @@ class PlayersController < ApplicationController
 			else
 				@player.completed_games_from_date = "10/6/2012"
 			end
-			
+			#if registration id is passed in, check to see if it has changed, if so update it
+			#this can happen because the client side does not send registration id right away
+			#it might happen the next call to get the player's games
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+				if @player.update_gcm_registration_id?(params[:a_t], params[:r_id])
+					if !@player.fb.blank?
+						@player.save(:validate => false)
+					else
+						@player.save 
+					end
+				end
+			end
 		end
 	
 		
@@ -209,7 +228,7 @@ class PlayersController < ApplicationController
 			unauthorized = true
 		else
 			player.password = params[:p_w]
-			player.generate_token(params[:a_t])
+			player.generate_token_only(params[:a_t])
 			player.save
 		end
 	
@@ -373,7 +392,7 @@ class PlayersController < ApplicationController
 			@error.code = "6"
 			unauthorized = true
 		else
-			player.update_gcm_registration_id(params[:a_t], params[:r_id])
+			player.update_or_add_gcm_registration_id(params[:a_t], params[:r_id])
 			#player.generate_token(params[:a_t])
 			if !player.fb.blank?
 				player.save(:validate => false)
@@ -411,7 +430,7 @@ class PlayersController < ApplicationController
 			@error.code = "6"
 			unauthorized = true
 		else
-			player.update_gcm_registration_id(params[:a_t], "")
+			player.update_or_add_gcm_registration_id(params[:a_t], "")
 			#player.generate_token(params[:a_t])
 			if !player.fb.blank?
 				player.save(:validate => false)

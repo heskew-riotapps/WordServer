@@ -275,11 +275,11 @@ class GamesController < ApplicationController
 		#send the new token back to the client
 		#@game.a_t = player.generate_token(params[:a_t_])
 		#player.save  temp, add this back
-		if !player.fb.blank?
-				player.save(:validate => false)
-		else
-			player.save 
-		end
+		#if !player.fb.blank?
+		#		player.save(:validate => false)
+		#else
+		#	player.save 
+		#end
 		
 		#loop through each game removing excess data
 		games.each  do |value|
