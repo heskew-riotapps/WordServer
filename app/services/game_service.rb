@@ -160,6 +160,7 @@ class GameService
 			@game.errors.add(:player_games, I18n.t(:error_authorized_player_not_in_game))
 		end
 		
+		@game.update_players_last_refresh_date
 		@game.save
 		@game.strip_tray_tiles_from_non_context_user current_player.id
 		
@@ -223,6 +224,7 @@ class GameService
 		#Rails.logger.info("game before status set #{@game.inspect}")
 		@game.st = 2
 		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.update_players_last_refresh_date
 		@game.save
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
@@ -302,6 +304,7 @@ def self.decline(current_player, game)
 		
 		end 	
 		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.update_players_last_refresh_date
 		@game.save
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
@@ -358,6 +361,8 @@ def self.decline(current_player, game)
 		@game.t = @game.t + 1
 		Rails.logger.info("resigning game - #{@game.id} numActivePlayers=#{numActivePlayers}")
 		
+		@game.update_players_last_refresh_date #do this before setting resigned status
+		
 		if numActivePlayers == 2 
 			#game is over, the last person resigned
 			Rails.logger.info("resigning - finishing game high score=#{@game.getHighestScore} current player #{current_player.id} score=#{player_game[0].sc}")
@@ -389,8 +394,7 @@ def self.decline(current_player, game)
 		
 		end 	
 		
-
-		
+ 
 		#Rails.logger.info("game after status set #{@game.inspect}")
 		@game.save
 		#Rails.logger.info("game after save #{@game.inspect}")
@@ -494,6 +498,7 @@ def self.decline(current_player, game)
 		 
  
 		#refill tray
+		@game.update_players_last_refresh_date  
 		
 		if @game.r_l.count == 0 && player_game[0].t_l.length == 0 #no letters in hopper and player's tray is empty
 			#game is over...determine who has won
@@ -590,6 +595,8 @@ def self.decline(current_player, game)
 		#to do..has every active player has skipped twice in a row???
 		#if so game is over, determine the winner, etc
 		@game.lp_d = nowDate
+		
+		@game.update_players_last_refresh_date 
 		
 		if @game.getNumConsecutiveSkips >= (@game.numActivePlayers * 2)
 		Rails.logger.info("consecutive skips =#{@game.getNumConsecutiveSkips}")
@@ -758,6 +765,7 @@ def self.swap(current_player, game, params)
 		#Rails.logger.info("game before status set #{@game.inspect}")
 		
 		#Rails.logger.info("game after status set #{@game.inspect}")
+		@game.update_players_last_refresh_date  
 		@game.save
 		
 		if @game.st == 3

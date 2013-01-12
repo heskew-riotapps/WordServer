@@ -252,6 +252,9 @@ class Game
 	def update_players_after_completion
 		#loop through each player_game and update the player and player opponent combination based on whether the player
 		#won or lost or tied, them loop through each opponent for each player
+		
+		nowDate = Time.now.utc
+		
 		self.player_games.each  do |value|
 			#if opponent or player did not win, don't update the player/opponent win loss stats, just num games
 			#WON(4),
@@ -259,8 +262,10 @@ class Game
 			#DRAW(6),
 			#RESIGNED(7)
 			 Rails.logger.info("update_players_after_completion main loop #{value.player.id} - #{value.st}")
-			  
-			value.player.n_w += 1
+			 
+			 #value.player.n_w += 1
+			value.player.n_c_g += 1
+			value.player.l_rf_d = nowDate
 			#this player won
 			#update opponent record for each opponent that did not decline
 			self.player_games.each  do |inner|
@@ -285,8 +290,31 @@ class Game
 				end
 			end
 			 
-			
-			value.player.save
+			if !value.player.fb.blank?
+			 	value.player.save(:validate => false)
+			else
+			 	value.player.save 
+			end
+			#value.player.save
+		end	
+	
+	end
+	
+	def update_players_last_refresh_date
+		#this can be refactored to only save players in combination
+		#with other saves
+		nowDate = Time.now.utc
+		
+		self.player_games.each  do |value|
+			if value.st == 1
+				value.player.l_rf_d = nowDate
+				
+				if !value.player.fb.blank?
+					value.player.save(:validate => false)
+				else
+					value.player.save 
+				end
+			end
 		end	
 	
 	end

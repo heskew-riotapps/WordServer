@@ -192,6 +192,39 @@ class PlayersController < ApplicationController
 		end
 	end
 	
+	def game_list_check
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		datePassed = false
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			@player.a_t = params[:a_t]
+			if @player.l_rf_d.nil?
+				datePassed = true
+			elsif  params.has_key?(:l_rf_d) && !params[:l_rf_d].blank? && !params[:l_rf_d].nil?
+				
+				if @player.l_rf_d > Date.parse(params[:l_rf_d])
+					datePassed = true
+				end
+			
+			end
+		
+		end
+	Rails.logger.info("datePassed=#{datePassed}")
+		
+		
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		elsif datePassed = false
+			render json: "not_found", status: :not_found 
+		else
+			respond_with @player
+		end
+	end
+	
 	def log_out
 		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
