@@ -168,7 +168,7 @@ class Player
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
 			#find by registrationId
-			self.devices.delete_if {|x| v.a_t != token && v.r_id == gcm_registration_id}
+			self.devices.delete_if {|v| v.a_t != token && v.r_id == gcm_registration_id}
 		end
 
 		devices = self.devices.select {|v| v.a_t == token_to_replace} 
