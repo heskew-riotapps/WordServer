@@ -25,26 +25,25 @@ module GoogleNotifierService
 			error = response[:message].split('=')[1]
 		  end
 
-
 		  case error
 			when "MissingRegistration"
 			  ex = Gcm::Errors::MissingRegistration.new(response[:message])
 			  logger.warn("GCM error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-			  notification.device.destroy
+			  #set device.i_ur to true (unregister device) 
 			when "InvalidRegistration"
 			  ex = Gcm::Errors::InvalidRegistration.new(response[:message])
 			  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-			  notification.device.destroy
+			  #set device.i_ur to true (unregister device) 
 			when "MismatchedSenderId"
 			  ex = Gcm::Errors::MismatchSenderId.new(response[:message])
 			  logger.warn(ex.message)
 			when "NotRegistered"
 			  ex = Gcm::Errors::NotRegistered.new(response[:message])
 			  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-			  notification.device.destroy
+			  #set device.i_ur to true (unregister device)
 			when "MessageTooBig"
 			  ex = Gcm::Errors::MessageTooBig.new(response[:message])
-			  logger.warn(ex.message)
+			   
 			else
 			  notification.sent_at = Time.now
 			  notification.save!

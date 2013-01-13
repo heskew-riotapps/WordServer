@@ -20,7 +20,7 @@ class Player
   many :devices
   many :gcm_notifications
 
-  key :lp_a_t, String #last played auth token, used for notification for gcm
+  key :lp_d_id, String #last played device, used for notification for gcm
   #key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
   key :e_m,      String #email
@@ -142,6 +142,13 @@ class Player
 	return Digest::MD5::hexdigest(self.e_m)	
   end
   
+	def update_last_device_id(token)
+		devices = self.devices.select {|v| v.a_t == token_to_replace} 
+		if devices.count > 0  
+			self.lp_d_id = devices[0].id #last played device
+		end
+	end
+	
 	def generate_token_only(token_to_replace)
 		begin
 			token = SecureRandom.urlsafe_base64
@@ -153,9 +160,10 @@ class Player
 			device = Device.new	
 			device.a_t = token
 			self.devices << device
-		
+			self.lp_d_id = device.id #last played device
 		else
-			devices[0].a_t = token
+			devices[0].a_t = 
+			self.lp_d_id = devices[0].id #last played device
 		end
 		
 		self.a_t = token
@@ -179,13 +187,15 @@ class Player
 			device.a_t = token
 			device.r_id = gcm_registration_id
 			self.devices << device
-		
+			self.lp_d_id = device.id #last played device
 		else
 			devices[0].a_t = token
 			devices[0].r_id = gcm_registration_id
+			self.lp_d_id = devices[0].id #last played device
 		end
 		
 		self.a_t = token
+		
 		token
 	end
 	
@@ -200,6 +210,7 @@ class Player
 		device.a_t = token
 		device.r_id = gcm_registration_id
 		self.devices << device 
+		self.lp_d_id = device.id #last played device
 		
 		self.a_t = token
 		token
@@ -210,25 +221,41 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
-		if !gcm_registration_id.empty?
-			#find by registrationId
-			devices = self.devices.select {|v| v.r_id == gcm_registration_id} 
-			
-			if devices.count == 0  
-				device = Device.new	
-				device.a_t = token
-				device.r_id = gcm_registration_id
-				self.devices << device
-			else
-				devices[0].a_t = token
-				devices[0].r_id = gcm_registration_id
-			end
-		else
+		#find by registrationId
+		#this might need to be refactored to better handle multi-device
+		#especially if one device has a blank reg id
+		devices = self.devices.select {|v| v.r_id == gcm_registration_id} 
+		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
-			device.r_id = ""
+			device.r_id = gcm_registration_id
 			self.devices << device
+			self.lp_d_id = device.id #last played device
+		else
+			devices[0].a_t = token
+			devices[0].r_id = gcm_registration_id
+			self.lp_d_id = devices[0].id #last played device
 		end
+	
+#		if !gcm_registration_id.empty?
+#			#find by registrationId
+#			devices = self.devices.select {|v| v.r_id == gcm_registration_id} 
+#			
+#			if devices.count == 0  
+#				device = Device.new	
+#				device.a_t = token
+#				device.r_id = gcm_registration_id
+#				self.devices << device
+#			else
+#				devices[0].a_t = token
+#				devices[0].r_id = gcm_registration_id
+#			end
+#		else
+#			device = Device.new	
+#			device.a_t = token
+#			device.r_id = ""
+#			self.devices << device
+#		end
 		
 		self.a_t = token
 		token
@@ -274,7 +301,7 @@ class Player
 		if self.lp_a_t.nil?
 			nil	
 		else
-			devices = self.devices.select {|v| v.a_t == self.lp_a_t}  
+			devices = self.devices.select {|v| v.id == self.lp_d_id}  
 			if devices.count == 0  
 				devices[0]
 			else

@@ -175,12 +175,17 @@ class PlayersController < ApplicationController
 				@gcm_reg_id = params[:r_id] 
 				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 				if @player.update_gcm_registration_id?(params[:a_t], params[:r_id])
-					if !@player.fb.blank?
-						@player.save(:validate => false)
-					else
-						@player.save 
-					end
+					#player will be updated, boolean return not really needed for this method
 				end
+			end
+			
+			#update last device used
+			self.update_last_device_id(params[:a_t])
+			
+			if !@player.fb.blank?
+				@player.save(:validate => false)
+			else
+				@player.save 
 			end
 		end
 	

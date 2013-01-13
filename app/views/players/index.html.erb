@@ -4,7 +4,7 @@
   <tr>
 	<th>Id</th>
 	<th>FB</th>
-	<th>auth_token</th>
+	<th>devices</th>
     <th>Nickname</th>
 	<th>First Name</th>
     <th>Last Name</th>
@@ -18,10 +18,8 @@
 <% @players.each do |player| %>
   <tr>
     <td><%= player.id %></td> 
-	<td><%= player.o_n_i_a %></td>
     <td><%= player.fb %></td>
 	<td><%= player.devices %></td>
-	<td><%= player.a_t_ %></td>
     <td><%= player.n_n %></td>
 	<td><%= player.f_n %></td>
 	<td><%= player.l_n %></td>

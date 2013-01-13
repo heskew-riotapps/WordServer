@@ -8,7 +8,7 @@ class GcmNotification
    key :data, String #text???
    key :delay_while_idle, Boolean
    key :sent_at, Time
-   key :time_to_live, Integer
+   key :time_to_live, Integer, :default => 345600 #4 days
    key :st, Integer #status
    
    timestamps!

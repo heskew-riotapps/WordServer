@@ -627,14 +627,22 @@ def self.decline(current_player, game)
 			#loop through active players sending
 			
 			self.player_games.each  do |value|
-				if v.i_a && !v.r_id.empty?			
-					notification = GCMNotification.new
-					notification.player = v.player
-					notification.collapse_key = "updates_available"
-					notification.delay_while_idle = true
-					notification.data = {:registration_ids => [v.r_id], :data => {:id => @game.id,:message_text => "x skipped a turn"}}
-					notification.save
-					GoogleNotifierService.send_notification(notification)	
+				#get player's last device used to send to that particular device
+				device = v.player.get_last_device
+
+				if !device.nil?
+					#is this an android device? (i_a = isAndroid)
+					#is registrationID populated? (!device.r_id.empty?)
+					#make sure device has not been unregistered with gcm (!device.i_ur)
+					if device.i_a && !device.r_id.empty?  && !device.i_ur			
+						notification = GCMNotification.new
+						notification.player = v.player
+						notification.collapse_key = "updates_available"
+						notification.delay_while_idle = true
+						notification.data = {:registration_ids => [v.r_id], :data => {:id => @game.id,:message_text => "x skipped a turn"}}
+						notification.save
+						GoogleNotifierService.send_notification(notification)
+					end			
 				end
 			end					
 		end
