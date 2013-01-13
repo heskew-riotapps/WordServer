@@ -11,7 +11,7 @@ class Gcm::Notification
    key :delay_while_idle, Boolean
    key :sent_at, Time
    key :time_to_live, Integer
-   key :st, int
+ 
    timestamps!
   
   include ::ActionView::Helpers::TextHelper
