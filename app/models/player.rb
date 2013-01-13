@@ -18,7 +18,9 @@ class Player
   #key :a_t, String #auth_token
   many :opponents
   many :devices
+  many :gcm_notifications
 
+  key :lp_a_t, String #last played auth token, used for notification for gcm
   #key :a_t_, Array #auth_token array allows same user to login from multiple devices
   key :fb,  String
   key :e_m,      String #email
@@ -267,6 +269,19 @@ class Player
 	#	#return self.a_t_[0]
 	#	return self.devices[0].a_t_
 	#end
+	
+	def get_last_device
+		if self.lp_a_t.nil?
+			nil	
+		else
+			devices = self.devices.select {|v| v.a_t == self.lp_a_t}  
+			if devices.count == 0  
+				devices[0]
+			else
+				nil
+			end
+		end
+	end
 	
 	def generate_password
 		self.password = ('a'..'z').to_a.shuffle[0,8].join

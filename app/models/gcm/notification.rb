@@ -4,13 +4,14 @@ class Gcm::Notification
 	set_collection_name "gcm_notifications"
   #self.table_name = "gcm_notifications"
 
+   belongs_to :player
    key :device_id, Integer, :null => false
    key :collapse_key, String
    key :data, String #text???
    key :delay_while_idle, Boolean
    key :sent_at, Time
    key :time_to_live, Integer
-   
+   key :st, int
    timestamps!
   
   include ::ActionView::Helpers::TextHelper
@@ -76,32 +77,35 @@ class Gcm::Notification
               case error
                 when "MissingRegistration"
                   ex = Gcm::Errors::MissingRegistration.new(response[:message])
-                  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-                  notification.device.destroy
+                  logger.warn("GCM MissingRegistration Error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
+                 # notification.device.destroy
                 when "InvalidRegistration"
                   ex = Gcm::Errors::InvalidRegistration.new(response[:message])
-                  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-                  notification.device.destroy
+                  logger.warn("GCM InvalidRegistration Error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
+                 # notification.device.destroy
                 when "MismatchedSenderId"
                   ex = Gcm::Errors::MismatchSenderId.new(response[:message])
-                  logger.warn(ex.message)
+                  logger.warn("GCM MismatchSenderId Error=#{ex.message}")
                 when "NotRegistered"
                   ex = Gcm::Errors::NotRegistered.new(response[:message])
-                  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
-                  notification.device.destroy
+                  logger.warn("GCM NotRegistered error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
+                  #notification.device.destroy
                 when "MessageTooBig"
                   ex = Gcm::Errors::MessageTooBig.new(response[:message])
-                  logger.warn(ex.message)
+                  logger.warn("GCM MessageTooBig Error=#{ex.message}")
                 else
                   notification.sent_at = Time.now
                   notification.save!
               end
             elsif response[:code] == 401
-              raise Gcm::Errors::InvalidAuthToken.new(message_data)
+			logger.warn("GCM InvalidAuthToken error")
+              #raise Gcm::Errors::InvalidAuthToken.new(message_data)
             elsif response[:code] == 503
-              raise Gcm::Errors::ServiceUnavailable.new(message_data)
+				logger.warn("GCM ServiceUnavailable error")
+              #raise Gcm::Errors::ServiceUnavailable.new(message_data)
             elsif response[:code] == 500
-              raise Gcm::Errors::InternalServerError.new(message_data)
+				logger.warn("GCM InternalServerError error")
+              #raise Gcm::Errors::InternalServerError.new(message_data)
             end
 
           end
@@ -117,10 +121,10 @@ class Gcm::Notification
         format = "json"
       end
 
-		api_key = Gcm::Connection.open
+		api_key = GoogleNotifierService.open #Gcm::Connection.open
 
 		logger.info "notification = #{notification.inspect}"
-		response = Gcm::Connection.send_notification(notification, api_key, format)
+		response = GoogleNotifierService.send_notification(notification, api_key, format)
 		logger.info "response = #{response.inspect}"
 
 		if response[:code] == 200
@@ -142,7 +146,7 @@ class Gcm::Notification
 		  case error
 			when "MissingRegistration"
 			  ex = Gcm::Errors::MissingRegistration.new(response[:message])
-			  logger.warn("#{ex.message}, destroying gcm_device with id #{notification.device.id}")
+			  logger.warn("GCM error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
 			  notification.device.destroy
 			when "InvalidRegistration"
 			  ex = Gcm::Errors::InvalidRegistration.new(response[:message])

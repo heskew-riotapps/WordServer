@@ -621,9 +621,22 @@ def self.decline(current_player, game)
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
 			
+			#get registration ID associated with last auth toekn
+			#data = { 'photoid' => 123, 'photoname' => "asdasd", 'creator_id' => "asdasd" }
+			active_players = @game.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
+			#loop through active players sending
 			
-			
-			
+			self.player_games.each  do |value|
+				if v.i_a && !v.r_id.empty?			
+					notification = GCMNotification.new
+					notification.player = v.player
+					notification.collapse_key = "updates_available"
+					notification.delay_while_idle = true
+					notification.data = {:registration_ids => [v.r_id], :data => {:id => @game.id,:message_text => "x skipped a turn"}}
+					notification.save
+					GoogleNotifierService.send_notification(notification)	
+				end
+			end					
 		end
 		
 		#Rails.logger.info("game before status set #{@game.inspect}")
