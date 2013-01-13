@@ -1,10 +1,9 @@
 require 'net/https'
 require 'uri'
 
-module GoogleNotifierService
- 
-    class << self
-		def send_notification(notification)
+class GoogleNotifierService
+  
+		def self.send_notification(notification)
 
 		  if configatron.gcm_on_rails.delivery_format and configatron.gcm_on_rails.delivery_format == 'plain_text'
 			format = "plain_text"
@@ -71,7 +70,7 @@ module GoogleNotifierService
 
 		end
 	
-      def send_notification_to_gcm(notification, api_key, format)
+      def self.send_notification_to_gcm(notification, api_key, format)
         if format == 'json'
           headers = {"Content-Type" => "application/json",
                      "Authorization" => "key=#{api_key}"}
@@ -106,6 +105,6 @@ module GoogleNotifierService
         configatron.gcm_on_rails.api_key
       end
     end
-  end
+  
  
 end
