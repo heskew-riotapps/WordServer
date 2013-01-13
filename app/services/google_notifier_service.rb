@@ -23,7 +23,7 @@ class GoogleNotifierService
 				# if Gcm servers returned nil for the message
 				error = "success"
 			  #elsif format == "json"
-				error = ""
+				#error = ""
 				message_data = JSON.parse response[:message]
 				success = message_data['success']
 				error = message_data['results'][0]['error']  if success == 0
@@ -101,10 +101,4 @@ class GoogleNotifierService
         return {:code => resp.code.to_i, :message => dat }
       end
 
-      def open
-        configatron.gcm_on_rails.api_key
-      end
-    end
-  
- 
 end
