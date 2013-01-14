@@ -31,7 +31,7 @@ class GoogleNotifierService
 			#	message_data = response[:message]
 			#	error = response[:message].split('=')[1]
 			  end
-
+			end
 
 			   case error
                 when "MissingRegistration"
