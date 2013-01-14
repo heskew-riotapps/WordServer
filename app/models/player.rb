@@ -298,16 +298,16 @@ class Player
 	#end
 	
 	def get_last_device
-		if self.lp_d_id.nil?
-			nil	
-		else
-			devices = self.devices.select {|v| v.id == self.lp_d_id}  
+		device = nil
+	Rails.logger.info( "player.get_last_device self.lp_d_id= #{self.lp_d_id}")	
+		if !self.lp_d_id.nil?
+			devices = self.devices.select {|v| v.id == self.lp_d_id} 
+Rails.logger.info( "player.get_last_device devices= #{devices.inspect}")		
 			if devices.count > 0  
-				devices[0]
-			else
-				nil
+				device = devices[0]
 			end
 		end
+		device
 	end
 	
 	def generate_password
