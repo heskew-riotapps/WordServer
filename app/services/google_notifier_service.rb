@@ -65,7 +65,7 @@ class GoogleNotifierService
         #data = data.merge({:delay_while_idle => notification.delay_while_idle}) unless notification.delay_while_idle.nil?
         #data = data.merge({:time_to_live => notification.time_to_live}) unless notification.time_to_live.nil?
         #data = data.to_json
-		data = { :delay_while_idle => notification.delay_while_idle, :collapse_key => notification.collapse_key,
+		data = { :registration_ids => [notification.r_id], :delay_while_idle => notification.delay_while_idle, :collapse_key => notification.collapse_key,
 				:time_to_live => notification.time_to_live, data => notification.data}.to_json
 Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
 		url_string = configatron.gcm_on_rails.api_url
