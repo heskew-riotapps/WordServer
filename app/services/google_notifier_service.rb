@@ -6,9 +6,9 @@ class GoogleNotifierService
 	def self.send_notification(notification)
 		api_key = configatron.gcm_on_rails.api_key #GoogleNotifierService.open #Gcm::Connection.open
 
-		Rails.Rails.logger.info "GoogleNotifierService.send_notification notification = #{notification.inspect}"
+		Rails.logger.info "GoogleNotifierService.send_notification notification = #{notification.inspect}"
 		response = GoogleNotifierService.send_notification_to_gcm(notification, api_key)
-		Rails.Rails.logger.info "GoogleNotifierService.send_notification response = #{response.inspect}"
+		Rails.logger.info "GoogleNotifierService.send_notification response = #{response.inspect}"
 
 		if response[:code] == 200
 			if response[:message].nil?
