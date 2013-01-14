@@ -1,7 +1,7 @@
 require 'net/https'
 require 'uri'
 
-class GoogleNotifierService
+class GoogleNotifierServicerr
   
 	def self.send_notification(notification)
 		api_key = configatron.gcm_on_rails.api_key #GoogleNotifierService.open #Gcm::Connection.open
@@ -58,7 +58,7 @@ class GoogleNotifierService
 
 	end
 	
-    def self.send_notification_to_gcm(notification, api_key, format)
+    def self.send_notification_to_gcm(notification, api_key)
         headers = {"Content-Type" => "application/json", "Authorization" => "key=#{api_key}"}
 
         data = notification.data.merge({:collapse_key => notification.collapse_key}) unless notification.collapse_key.nil?
