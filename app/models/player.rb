@@ -298,7 +298,7 @@ class Player
 	#end
 	
 	def get_last_device
-		if self.lp_a_t.nil?
+		if self.lp_d_id.nil?
 			nil	
 		else
 			devices = self.devices.select {|v| v.id == self.lp_d_id}  
