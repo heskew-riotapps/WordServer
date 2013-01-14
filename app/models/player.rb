@@ -301,7 +301,7 @@ class Player
 		device = nil
 	Rails.logger.info( "player.get_last_device self.lp_d_id= #{self.lp_d_id}")	
 		if !self.lp_d_id.nil?
-			devices = self.devices.select {|v| v.id == self.lp_d_id} 
+			devices = self.devices.select {|v| v.id == BSON::ObjectId(self.lp_d_id)} 
 Rails.logger.info( "player.get_last_device devices= #{devices.inspect}")		
 			if devices.count > 0  
 				device = devices[0]
