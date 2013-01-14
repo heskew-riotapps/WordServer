@@ -641,7 +641,7 @@ def self.decline(current_player, game)
 					if !device.r_id.empty?  && !device.i_ur			
 						notification = GcmNotification.new
 						notification.player = value.player
-						notiification.r_id = device.r_id
+						notification.r_id = device.r_id
 						notification.collapse_key = "updates_available"
 						notification.delay_while_idle = true
 						notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id,:message_text => "x skipped a turn"}}
