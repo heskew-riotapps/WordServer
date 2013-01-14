@@ -626,7 +626,7 @@ def self.decline(current_player, game)
 			active_players = @game.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
 			#loop through active players sending
 			
-			self.player_games.each  do |value|
+			active_players.each  do |value|
 				#get player's last device used to send to that particular device
 				device = v.player.get_last_device
 
