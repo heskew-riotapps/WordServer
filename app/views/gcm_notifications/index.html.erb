@@ -1,0 +1,24 @@
+<h1>Listing gcm notifications</h1>
+  
+<table>
+  <tr>
+	<th>Id</th>
+	<th>RegistrationId</th>
+	<th>PlayerId</th>
+	<th>Status</th>
+    <th>Data</th>
+ 
+  </tr>
+
+<% @notifications.each do |gcm_notification| %>
+  <tr>
+    <td><%= gcm_notification.id %></td> 
+    <td><%= gcm_notification.r_id %></td>
+	<td><%= gcm_notification.player.id %></td>
+	<td><%= gcm_notification.st %></td>
+    <td><%= gcm_notification.data %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />

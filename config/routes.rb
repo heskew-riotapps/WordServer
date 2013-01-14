@@ -44,7 +44,7 @@ Word::Application.routes.draw do
 		match "/players/get_via_token/" => "players#get_via_token"
 		match "/players/log_out/" => "players#log_out"
 		
-		resources :players, :games, :home, :rest
+		resources :players, :games, :home, :rest, :gcm_notifications
 	end
 	
 	

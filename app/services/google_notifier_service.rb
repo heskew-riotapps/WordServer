@@ -16,16 +16,15 @@ class GoogleNotifierService
                 # TODO - Making this assumption might not be right. HTTP status code 200 does not really signify success
                 # if Gcm servers returned nil for the message
                 error = "success"
-              elsif format == "json"
-                error = ""
-                message_data = JSON.parse response[:message]
-                success = message_data['success']
-                error = message_data['results'][0]['error']  if success == 0
-              elsif format == "plain_text"   #format is plain text
-                message_data = response[:message]
-                error = response[:message].split('=')[1]
-              end
-		
+			elsif format == "json"
+				error = ""
+				message_data = JSON.parse response[:message]
+				success = message_data['success']
+				error = message_data['results'][0]['error']  if success == 0
+			elsif format == "plain_text"   #format is plain text
+				message_data = response[:message]
+				error = response[:message].split('=')[1]
+			end
 
 			case error
 				when "MissingRegistration"
