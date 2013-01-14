@@ -1,7 +1,7 @@
-require 'net/https'
-require 'uri'
+#require 'net/https'
+#require 'uri'
 
-class GoogleNotifierServicerr
+class GoogleNotifierService
   
 	def self.send_notification(notification)
 		api_key = configatron.gcm_on_rails.api_key #GoogleNotifierService.open #Gcm::Connection.open
