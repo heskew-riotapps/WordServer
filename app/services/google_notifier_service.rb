@@ -76,6 +76,7 @@ Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
 
         resp, dat = http.post(url.path, data, headers)
 
+		Rails.logger.warn("GCM send_notification_to_gcm resp=#{resp.inspect}")
         return {:code => resp.code.to_i, :message => dat }
     end
 
