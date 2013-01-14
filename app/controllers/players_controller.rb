@@ -180,7 +180,7 @@ class PlayersController < ApplicationController
 			end
 			
 			#update last device used
-			self.update_last_device_id(params[:a_t])
+			@player.update_last_device_id(params[:a_t])
 			
 			if !@player.fb.blank?
 				@player.save(:validate => false)
