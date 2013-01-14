@@ -1,5 +1,5 @@
-#require 'net/https'
-#require 'uri'
+require 'net/https'
+require 'uri'
 
 class GoogleNotifierService
   
