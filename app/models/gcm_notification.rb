@@ -6,7 +6,7 @@ class GcmNotification
    key :r_id, String, :null => false #
    key :collapse_key, String
    key :data, String #text???
-   key :delay_while_idle, Boolean
+   key :delay_while_idle, Boolean, :default => true
    key :sent_at, Time
    key :time_to_live, Integer, :default => 345600 #4 days
    key :st, Integer #status

@@ -61,10 +61,12 @@ class GoogleNotifierService
     def self.send_notification_to_gcm(notification, api_key)
         headers = {"Content-Type" => "application/json", "Authorization" => "key=#{api_key}"}
 
-        data = notification.data.merge({:collapse_key => notification.collapse_key}) unless notification.collapse_key.nil?
-        data = data.merge({:delay_while_idle => notification.delay_while_idle}) unless notification.delay_while_idle.nil?
-        data = data.merge({:time_to_live => notification.time_to_live}) unless notification.time_to_live.nil?
-        data = data.to_json
+        #data = notification.data.merge({:collapse_key => notification.collapse_key}) unless notification.collapse_key.nil?
+        #data = data.merge({:delay_while_idle => notification.delay_while_idle}) unless notification.delay_while_idle.nil?
+        #data = data.merge({:time_to_live => notification.time_to_live}) unless notification.time_to_live.nil?
+        #data = data.to_json
+		data = { :delay_while_idle => notification.delay_while_idle, :collapse_key => notification.collapse_key,
+				:time_to_live => notification.time_to_live, data => notification.data}.to_json
 
 		url_string = configatron.gcm_on_rails.api_url
         url = URI.parse url_string
