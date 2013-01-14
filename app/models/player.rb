@@ -143,7 +143,7 @@ class Player
   end
   
 	def update_last_device_id(token)
-		devices = self.devices.select {|v| v.a_t == token_to_replace} 
+		devices = self.devices.select {|v| v.a_t == token} 
 		if devices.count > 0  
 			self.lp_d_id = devices[0].id #last played device
 		end
