@@ -637,7 +637,8 @@ def self.decline(current_player, game)
 					#is this an android device? (i_a = isAndroid)
 					#is registrationID populated? (!device.r_id.empty?)
 					#make sure device has not been unregistered with gcm (!device.i_ur)
-					if device.i_a && !device.r_id.empty?  && !device.i_ur			
+					#if device.i_a && !device.r_id.empty?  && !device.i_ur	
+					if !device.r_id.empty?  && !device.i_ur			
 						notification = GCMNotification.new
 						notification.player = v.player
 						notification.collapse_key = "updates_available"
