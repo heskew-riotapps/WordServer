@@ -302,7 +302,7 @@ class Player
 			nil	
 		else
 			devices = self.devices.select {|v| v.id == self.lp_d_id}  
-			if devices.count == 0  
+			if devices.count > 0  
 				devices[0]
 			else
 				nil
