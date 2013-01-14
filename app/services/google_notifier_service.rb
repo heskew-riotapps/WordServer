@@ -5,20 +5,26 @@ class GoogleNotifierService
   
 	def self.send_notification(notification)
 		api_key = configatron.gcm_on_rails.api_key #GoogleNotifierService.open #Gcm::Connection.open
-
+		format = "json"
+		
 		Rails.logger.info "GoogleNotifierService.send_notification notification = #{notification.inspect}"
 		response = GoogleNotifierService.send_notification_to_gcm(notification, api_key)
 		Rails.logger.info "GoogleNotifierService.send_notification response = #{response.inspect}"
 
 		if response[:code] == 200
 			if response[:message].nil?
-			# TODO - Making this assumption might not be right. HTTP status code 200 does not really signify success
-			# if Gcm servers returned nil for the message
-				error = "success"
-				message_data = JSON.parse response[:message]
-				success = message_data['success']
-				error = message_data['results'][0]['error']  if success == 0
-			end
+                # TODO - Making this assumption might not be right. HTTP status code 200 does not really signify success
+                # if Gcm servers returned nil for the message
+                error = "success"
+              elsif format == "json"
+                error = ""
+                message_data = JSON.parse response[:message]
+                success = message_data['success']
+                error = message_data['results'][0]['error']  if success == 0
+              elsif format == "plain_text"   #format is plain text
+                message_data = response[:message]
+                error = response[:message].split('=')[1]
+              end
 		
 
 			case error
