@@ -13,8 +13,8 @@ class GcmNotification
    
    timestamps!
   
-  include ::ActionView::Helpers::TextHelper
-  extend ::ActionView::Helpers::TextHelper
+  #include ::ActionView::Helpers::TextHelper
+  #extend ::ActionView::Helpers::TextHelper
   #serialize :data
 
   belongs_to :device, :class_name => 'Gcm::Device'
