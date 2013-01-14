@@ -640,7 +640,7 @@ def self.decline(current_player, game)
 					#if device.i_a && !device.r_id.empty?  && !device.i_ur	
 					if !device.r_id.empty?  && !device.i_ur			
 						notification = GcmNotification.new
-						notification.player = v.player
+						notification.player = value.player
 						notiification.r_id = device.r_id
 						notification.collapse_key = "updates_available"
 						notification.delay_while_idle = true
