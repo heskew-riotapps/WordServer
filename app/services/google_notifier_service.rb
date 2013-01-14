@@ -70,6 +70,9 @@ class GoogleNotifierService
 Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
 		url_string = configatron.gcm_on_rails.api_url
         url = URI.parse url_string
+		
+		Rails.logger.warn("GCM send_notification_to_gcm url=#{url.inspect}")
+		
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
