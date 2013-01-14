@@ -67,7 +67,7 @@ class GoogleNotifierService
         #data = data.to_json
 		data = { :delay_while_idle => notification.delay_while_idle, :collapse_key => notification.collapse_key,
 				:time_to_live => notification.time_to_live, data => notification.data}.to_json
-
+Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
 		url_string = configatron.gcm_on_rails.api_url
         url = URI.parse url_string
         http = Net::HTTP.new(url.host, url.port)
