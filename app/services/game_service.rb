@@ -629,7 +629,7 @@ def self.decline(current_player, game)
 			active_players.each  do |value|
 				#get player's last device used to send to that particular device
 				device = value.player.get_last_device
-				Rails.Rails.logger.info "get_last_device = #{device.inspect}"
+				Rails.logger.info( "get_last_device = #{device.inspect}")
 				if !device.nil?
 					#is this an android device? (i_a = isAndroid)
 					#is registrationID populated? (!device.r_id.empty?)
