@@ -628,7 +628,7 @@ def self.decline(current_player, game)
 			
 			active_players.each  do |value|
 				#get player's last device used to send to that particular device
-				device = v.player.get_last_device
+				device = value.player.get_last_device
 
 				if !device.nil?
 					#is this an android device? (i_a = isAndroid)
