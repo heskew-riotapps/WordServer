@@ -9,7 +9,7 @@ class GcmNotification
    key :delay_while_idle, Boolean, :default => true
    key :sent_at, Time
    key :time_to_live, Integer, :default => 345600 #4 days
-   key :st, Integer #status
+   key :st, Integer, :default => 1 #status
 
    
    timestamps!
