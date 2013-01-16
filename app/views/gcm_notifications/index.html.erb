@@ -6,6 +6,7 @@
 	<th>RegistrationId</th>
 	<th>PlayerId</th>
 	<th>Status</th>
+	<th>Error</th>
     <th>Data</th>
  
   </tr>
@@ -16,6 +17,7 @@
     <td><%= gcm_notification.r_id %></td>
 	<td><%= gcm_notification.player.id %></td>
 	<td><%= gcm_notification.st %></td>
+		<td><%= gcm_notification.e %></td>
     <td><%= gcm_notification.data %></td>
   </tr>
 <% end %>
