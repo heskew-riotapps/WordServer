@@ -31,33 +31,61 @@ class GoogleNotifierService
 					ex = Gcm::Errors::MissingRegistration.new(response[:message])
 					Rails.logger.warn("GCM MissingRegistration Error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
 					# notification.device.destroy
+					notification.sent_at = Time.now
+					notification.st = 3 #error
+					notification.e = ex.message
+					notification.save! ####probably 
 				when "InvalidRegistration"
 					ex = Gcm::Errors::InvalidRegistration.new(response[:message])
 					Rails.logger.warn("GCM InvalidRegistration Error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
+					notification.sent_at = Time.now
+					notification.st = 3 #error
+					notification.e = ex.message
+					notification.save!
 					# notification.device.destroy
 				when "MismatchedSenderId"
 					ex = Gcm::Errors::MismatchSenderId.new(response[:message])
 					Rails.logger.warn("GCM MismatchSenderId Error=#{ex.message}")
+					notification.sent_at = Time.now
+					notification.st = 3 #error
+					notification.e = ex.message
+					notification.save!
 				when "NotRegistered"
 					ex = Gcm::Errors::NotRegistered.new(response[:message])
 					Rails.logger.warn("GCM NotRegistered error=#{ex.message}, destroying gcm_device with id #{notification.device.id}")
 					#notification.device.destroy
+					notification.sent_at = Time.now
+					notification.st = 3 #error
+					notification.e = ex.message
+					notification.save!
 				when "MessageTooBig"
 					ex = Gcm::Errors::MessageTooBig.new(response[:message])
 					Rails.logger.warn("GCM MessageTooBig Error=#{ex.message}")
 				else
-					notification.sent_at = Time.now
-					notification.st = 2 #sent
-					notification.save!
+					#notification.sent_at = Time.now
+					#notification.st = 2 #sent
+					notification.delete ####probably 
 			end
 		elsif response[:code] == 401
 			Rails.logger.warn("GCM InvalidAuthToken error")
+			notification.sent_at = Time.now
+			notification.st = 3 #error
+			notification.e = "GCM InvalidAuthToken error"
+			notification.save!
 			#raise Gcm::Errors::InvalidAuthToken.new(message_data)
 		elsif response[:code] == 503
 			Rails.logger.warn("GCM ServiceUnavailable error")
+			notification.sent_at = Time.now
+			notification.st = 3 #error
+			notification.e = "GCM ServiceUnavailable error"
+			notification.save!
 			#raise Gcm::Errors::ServiceUnavailable.new(message_data)
 		elsif response[:code] == 500
 			Rails.logger.warn("GCM InternalServerError error")
+			notification.sent_at = Time.now
+			notification.st = 3 #error
+			notification.e = "GCM InternalServerError error"
+			notification.save!
 			#raise Gcm::Errors::InternalServerError.new(message_data)
 		end
 

@@ -10,6 +10,7 @@ class GcmNotification
    key :sent_at, Time
    key :time_to_live, Integer, :default => 345600 #4 days
    key :st, Integer, :default => 1 #status
+   key :e, String #error
 
    
    timestamps!
