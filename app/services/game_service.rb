@@ -644,7 +644,7 @@ def self.decline(current_player, game)
 						notification.r_id = device.r_id
 						notification.collapse_key = "updates_available"
 						notification.delay_while_idle = true
-						notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id.to_s(),:message_text => "x skipped a turn"}}
+						notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id.to_s(),:msg => "x skipped a turn"}}
 						notification.save
 						GoogleNotifierService.send_notification(notification)
 					end			

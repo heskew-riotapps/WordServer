@@ -39,7 +39,8 @@ class Player
   key :n_c_g, Integer, :default => 0 #num_completed_games
   key :n_v, Integer, :default => 0  #num_visits
   key :st, Integer, :default => 0  #1 = active, 2 = invited
-
+  key :r_g_n, Boolean, :default => true  #receive game notifications
+  
   #this should record the words (turn number)
   key :h_s_t_s, Integer, :default => 0 #highest_single_turn_score
   key :h_s_t_s_turn_num, Integer, :default => 0 #highest_single_turn_score_turn_num
