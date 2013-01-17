@@ -380,7 +380,7 @@ class Game
 			#Rails.logger.info( "skip - player = #{value.player.inspect}")
 			#Rails.logger.info( "skip - get_last_device = #{device.inspect}")
 			if !device.nil?
-				#is this an android device? (i_a = isAndroid)
+				#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)
 				#is registrationID populated? (!device.r_id.empty?)
 				#make sure device has not been unregistered with gcm (!device.i_ur)
 				#if device.i_a && !device.r_id.empty?  && !device.i_ur	
@@ -388,7 +388,7 @@ class Game
 					notification = GcmNotification.new
 					notification.player = value.player
 					notification.r_id = device.r_id
-					notification.data = {:id => @game.id.to_s(),:msg => msg_notification} 
+					notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
 					#notification.save
 					GoogleNotifierService.send_notification(notification)
 				end			
