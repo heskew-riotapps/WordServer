@@ -18,4 +18,6 @@ en:
   error_game_play_hopper_is_empty: "There are no letters to swap.  The hopper is empty."
   error_game_play_too_few_letters_in_hopper: "There are too few letters in the hopper to swap the requested letters."
   notification_your_turn: "your turn with x player"
+  notification_x_skipped_turn: "%{player} skipped a turn."
+  notification_x_swapped_letters: "%{player} swapped %{number} letters."
   

@@ -627,6 +627,10 @@ def self.decline(current_player, game)
 			#loop through active players sending
 			
 			#Rails.logger.info( "skip - active_players = #{active_players.inspect}")
+			
+			#format message and send to opponents' devices
+			msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
+			
 			active_players.each  do |value|
 				#get player's last device used to send to that particular device
 				device = value.player.get_last_device
@@ -638,15 +642,12 @@ def self.decline(current_player, game)
 					#is registrationID populated? (!device.r_id.empty?)
 					#make sure device has not been unregistered with gcm (!device.i_ur)
 					#if device.i_a && !device.r_id.empty?  && !device.i_ur	
-					if !device.r_id.empty?  && !device.i_ur			
+					if device.is_android !device.r_id.empty?  && !device.i_ur			
 						notification = GcmNotification.new
 						notification.player = value.player
 						notification.r_id = device.r_id
-						notification.collapse_key = "updates_available"
-						#notification.delay_while_idle = true
-						#notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id.to_s(),:msg => "x skipped a turn"}}
-						notification.data = {:id => @game.id.to_s(),:msg => "x skipped a turn"} 
-						notification.save
+						notification.data = {:id => @game.id.to_s(),:msg => msg_notification} 
+						#notification.save
 						GoogleNotifierService.send_notification(notification)
 					end			
 				end
@@ -795,9 +796,30 @@ def self.swap(current_player, game, params)
 		@game.update_players_last_refresh_date  
 		@game.save
 		
-		if @game.st == 3
-			#send notifications as needed
-		end
+		#format message and send to opponents' devices
+		msg_notification = I18n.t(:notification_x_swapped_letters) % { :player => current_player.get_name, :number => swapped_letters_count}  
+		
+		active_players.each  do |value|
+			#get player's last device used to send to that particular device
+			device = value.player.get_last_device
+			
+			#Rails.logger.info( "skip - player = #{value.player.inspect}")
+			#Rails.logger.info( "skip - get_last_device = #{device.inspect}")
+			if !device.nil?
+				#is this an android device? (i_a = isAndroid)
+				#is registrationID populated? (!device.r_id.empty?)
+				#make sure device has not been unregistered with gcm (!device.i_ur)
+				#if device.i_a && !device.r_id.empty?  && !device.i_ur	
+				if device.is_android !device.r_id.empty?  && !device.i_ur			
+					notification = GcmNotification.new
+					notification.player = value.player
+					notification.r_id = device.r_id
+					notification.data = {:id => @game.id.to_s(),:msg => msg_notification} 
+					#notification.save
+					GoogleNotifierService.send_notification(notification)
+				end			
+			end
+		end	
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
 	

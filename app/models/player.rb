@@ -83,7 +83,17 @@ class Player
 #		self.n_d += 1
 #	end
 # end
-  
+
+	def get_name
+		name = "player x" 
+		if !self.f_n.empty?
+			name = self.f_n
+		elsif !self.n_n.empty?
+			name = self.n_n
+		end
+		name
+	end
+	
   def update_opponent(opponent_id, is_win, is_loss, is_draw)
 	    opponent = self.opponents.select {|v| v.player_id == opponent_id}  
 
@@ -268,11 +278,11 @@ class Player
 			device = Device.new	
 			device.a_t = token
 			device.l_r_d = Time.now.utc
-			device.i_a = true
+			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
 			self.devices << device
 		else
-			device.i_a = true
+			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
 			devide.l_r_d = Time.now.utc
 		end
@@ -284,7 +294,7 @@ class Player
 			device = Device.new	
 			device.a_t = token
 			device.l_r_d = Time.now.utc
-			device.i_a = true
+			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
 			self.devices << device
 			
