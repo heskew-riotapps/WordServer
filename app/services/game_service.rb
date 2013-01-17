@@ -626,7 +626,7 @@ def self.decline(current_player, game)
 			active_players = @game.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
 			#loop through active players sending
 			
-			Rails.logger.info( "skip - active_players = #{active_players.inspect}")
+			#Rails.logger.info( "skip - active_players = #{active_players.inspect}")
 			active_players.each  do |value|
 				#get player's last device used to send to that particular device
 				device = value.player.get_last_device
@@ -644,7 +644,8 @@ def self.decline(current_player, game)
 						notification.r_id = device.r_id
 						notification.collapse_key = "updates_available"
 						notification.delay_while_idle = true
-						notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id.to_s(),:msg => "x skipped a turn"}}
+						#notification.data = {:registration_ids => [device.r_id], :data => {:id => @game.id.to_s(),:msg => "x skipped a turn"}}
+						notification.data = {:id => @game.id.to_s(),:msg => "x skipped a turn"} 
 						notification.save
 						GoogleNotifierService.send_notification(notification)
 					end			
