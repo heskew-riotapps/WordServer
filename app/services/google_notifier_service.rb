@@ -64,6 +64,8 @@ class GoogleNotifierService
 				else
 					#notification.sent_at = Time.now
 					#notification.st = 2 #sent
+					
+					Rails.logger.warn("GCM MessageTooBig Error=#{error} notification will be deleted")
 					notification.delete ####probably 
 			end
 		elsif response[:code] == 401
