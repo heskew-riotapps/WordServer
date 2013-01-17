@@ -525,6 +525,11 @@ def self.decline(current_player, game)
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
 			
+			#format message and send to opponents' devices  %{word} for %{points} points."
+			msg_notification = I18n.t(:notification_x_played_a_turn) % { :player => current_player.get_name, :word => params[:played_words][0], :points => params[:p] }  
+			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+		
+			
 		end
 		
 		#Rails.logger.info("game before status set #{@game.inspect}")
@@ -611,6 +616,9 @@ def self.decline(current_player, game)
 			@game.update_players_after_completion
 			@game.st = 3  # completed
 			@game.co_d = nowDate
+			
+			msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
+			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper
@@ -630,7 +638,7 @@ def self.decline(current_player, game)
 			
 			#format message and send to opponents' devices
 			msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
-			@game.send_notification(current_player.id, msg_notification)
+			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
 			 		
 		end
 		
@@ -779,7 +787,7 @@ def self.swap(current_player, game, params)
  
 		#format message and send to opponents' devices
 		msg_notification = I18n.t(:notification_x_swapped_letters) % { :player => current_player.get_name, :number => swapped_letters_count}  
-		@game.send_notification(current_player.id, msg_notification)
+		@game.send_notification_to_active_opponents(current_player.id, msg_notification)
 	 
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end

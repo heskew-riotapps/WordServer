@@ -370,7 +370,7 @@ class Game
 		i
 	end
 	
-	def send_notification(current_player_id, msg_notification)
+	def send_notification_to_active_opponents(current_player_id, msg_notification)
 		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id}
 
 		active_players.each  do |value|
@@ -397,6 +397,29 @@ class Game
 	
 	end
 	
+	
+	def send_notification_to_opponent(player_game, msg_notification)
+
+		#get player's last device used to send to that particular device
+		device = player_game.player.get_last_device
+		
+		#Rails.logger.info( "skip - player = #{value.player.inspect}")
+		#Rails.logger.info( "skip - get_last_device = #{device.inspect}")
+		if !device.nil?
+			#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)
+			#is registrationID populated? (!device.r_id.empty?)
+			#make sure device has not been unregistered with gcm (!device.i_ur)
+			#if device.i_a && !device.r_id.empty?  && !device.i_ur	
+			if device.is_android && !device.r_id.empty?  && !device.i_ur			
+				notification = GcmNotification.new
+				notification.player = player_game.player
+				notification.r_id = device.r_id
+				notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
+				#notification.save
+				GoogleNotifierService.send_notification(notification)
+			end			
+		end	
+	end
   # Validations.
 #  validates_presence_of :first_name, :last_name, :email 
 
