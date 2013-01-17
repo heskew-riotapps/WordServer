@@ -24,7 +24,7 @@ en:
   notification_x_won: "%{player} won!"
   notification_you_won_1_opponent: "You won the game with %{player}!"
   notification_you_won_2_opponents: "You won the game with %{player1} and %{player2}!"
-  notification_you_won_3_opponents: "You won the game with %{player1}, %{player2} and %{player3}!" notification_you_won_1_opponent: "You won the game with %{player}!"
+  notification_you_won_3_opponents: "You won the game with %{player1}, %{player2} and %{player3}!" 
   notification_draw_1_opponent: "It's a draw with %{player}!"
   notification_draw_2_opponents: "It's a draw with %{player1} and %{player2}!"
   notification_draw_3_opponents: "It's a draw with %{player1}, %{player2} and %{player3}!"
