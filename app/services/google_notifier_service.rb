@@ -68,6 +68,12 @@ class GoogleNotifierService
 					Rails.logger.warn("GoogleNotifierService Error=#{error} notification will be deleted")
 					notification.delete ####probably 
 			end
+		elsif response[:code] == 400
+			Rails.logger.warn("GCM Invalid Json error")
+			notification.sent_at = Time.now
+			notification.st = 3 #error
+			notification.e = "GCM Invalid json error"
+			notification.save!
 		elsif response[:code] == 401
 			Rails.logger.warn("GCM InvalidAuthToken error")
 			notification.sent_at = Time.now
@@ -102,11 +108,13 @@ class GoogleNotifierService
         #data = data.to_json
 		data = { :registration_ids => [notification.r_id], :delay_while_idle => notification.delay_while_idle, :collapse_key => notification.collapse_key,
 				:time_to_live => notification.time_to_live, :data => notification.data}.to_json
-Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
+
+		Rails.logger.warn("GCM send_notification_to_gcm json data=#{data.inspect}")
+		
 		url_string = configatron.gcm_on_rails.api_url
         url = URI.parse url_string
 		
-		Rails.logger.warn("GCM send_notification_to_gcm url=#{url.inspect}")
+		#Rails.logger.warn("GCM send_notification_to_gcm url=#{url.inspect}")
 		
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
@@ -115,7 +123,7 @@ Rails.logger.warn("GCM send_notification_to_gcm data=#{data.inspect}")
         resp, dat = http.post(url.path, data, headers)
 
 		Rails.logger.warn("GCM send_notification_to_gcm resp=#{resp.inspect}")
-		Rails.logger.warn("GCM send_notification_to_gcm dat=#{dat.inspect}")
+		#Rails.logger.warn("GCM send_notification_to_gcm dat=#{dat.inspect}")
         return {:code => resp.code.to_i, :message => dat }
     end
 
