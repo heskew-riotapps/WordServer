@@ -4,7 +4,7 @@ class GcmNotification
  
 	belongs_to :player
    key :r_id, String, :null => false #
-   key :collapse_key, String, default => "updates_available"
+   key :collapse_key, String, :default => "updates_available"
    key :data, Object #text???
    key :delay_while_idle, Boolean, :default => false
    key :sent_at, Time
