@@ -642,7 +642,7 @@ def self.decline(current_player, game)
 					#is registrationID populated? (!device.r_id.empty?)
 					#make sure device has not been unregistered with gcm (!device.i_ur)
 					#if device.i_a && !device.r_id.empty?  && !device.i_ur	
-					if device.is_android !device.r_id.empty?  && !device.i_ur			
+					if device.is_android && !device.r_id.empty?  && !device.i_ur			
 						notification = GcmNotification.new
 						notification.player = value.player
 						notification.r_id = device.r_id
@@ -810,7 +810,7 @@ def self.swap(current_player, game, params)
 				#is registrationID populated? (!device.r_id.empty?)
 				#make sure device has not been unregistered with gcm (!device.i_ur)
 				#if device.i_a && !device.r_id.empty?  && !device.i_ur	
-				if device.is_android !device.r_id.empty?  && !device.i_ur			
+				if device.is_android && !device.r_id.empty?  && !device.i_ur			
 					notification = GcmNotification.new
 					notification.player = value.player
 					notification.r_id = device.r_id
