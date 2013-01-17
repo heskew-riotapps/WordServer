@@ -86,9 +86,9 @@ class Player
 
 	def get_name
 		name = "player x" 
-		if !self.f_n.empty?
+		if !self.f_n.nil? && !self.f_n.empty?
 			name = self.f_n
-		elsif !self.n_n.empty?
+		elsif !self.n_n.nil? && !self.n_n.empty?
 			name = self.n_n
 		end
 		name
