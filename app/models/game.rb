@@ -371,7 +371,7 @@ class Game
 	end
 	
 	def send_notification(current_player_id, msg_notification)
-		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
+		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id}
 
 		active_players.each  do |value|
 			#get player's last device used to send to that particular device
