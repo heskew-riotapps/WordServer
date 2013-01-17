@@ -796,6 +796,8 @@ def self.swap(current_player, game, params)
 		@game.update_players_last_refresh_date  
 		@game.save
 		
+		active_players = @game.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
+
 		#format message and send to opponents' devices
 		msg_notification = I18n.t(:notification_x_swapped_letters) % { :player => current_player.get_name, :number => swapped_letters_count}  
 		
