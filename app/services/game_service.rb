@@ -426,6 +426,7 @@ def self.decline(current_player, game)
 		#	return @game
 		@unauthorized = true
 	else
+		
 		#add a new PlayedWord for each incoming word...at some point add a server side word validation check
 		params[:played_words].each  do |value|
 			played_word = PlayedWord.new
@@ -526,7 +527,7 @@ def self.decline(current_player, game)
 			@game.assignNextPlayerToTurn(current_player.id)
 			
 			#format message and send to opponents' devices  %{word} for %{points} points."
-			msg_notification = I18n.t(:notification_x_played_a_turn) % { :player => current_player.get_name, :word => params[:played_words][0], :points => params[:p] }  
+			msg_notification = I18n.t(:notification_x_played_a_turn) % { :player => current_player.get_name, :word => params[:played_words][0]['w'], :points => params[:p] }  
 			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
 		
 			
