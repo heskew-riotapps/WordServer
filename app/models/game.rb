@@ -261,7 +261,7 @@ class Game
 			#LOST(5),
 			#DRAW(6),
 			#RESIGNED(7)
-			 Rails.logger.info("update_players_after_completion main loop #{value.player.id} - #{value.st}")
+			# Rails.logger.info("update_players_after_completion main loop #{value.player.id} - #{value.st}")
 			 
 			 #value.player.n_w += 1
 			value.player.n_c_g += 1
@@ -371,53 +371,144 @@ class Game
 	end
 	
 	def send_notification_to_active_opponents(current_player_id, msg_notification)
-		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id}
+		#get active players (not current player)  
+		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id }
 
 		active_players.each  do |value|
 			#get player's last device used to send to that particular device
-			device = value.player.get_last_device
-			
-			#Rails.logger.info( "skip - player = #{value.player.inspect}")
-			#Rails.logger.info( "skip - get_last_device = #{device.inspect}")
-			if !device.nil?
-				#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)
-				#is registrationID populated? (!device.r_id.empty?)
-				#make sure device has not been unregistered with gcm (!device.i_ur)
-				#if device.i_a && !device.r_id.empty?  && !device.i_ur	
-				if device.is_android && !device.r_id.empty?  && !device.i_ur			
-					notification = GcmNotification.new
-					notification.player = value.player
-					notification.r_id = device.r_id
-					notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
-					#notification.save
-					GoogleNotifierService.send_notification(notification)
-				end			
-			end
+			self.send_to_cloud_notifiers(value.player, msg_notification)	
 		end	
-	
 	end
 	
-	
-	def send_notification_to_opponent(player_game, msg_notification)
+	def send_notification_to_all_opponents(current_player_id, msg_notification)
+		#get active players (not current player)  
+		players = self.player_games.select {|v| (v.st == 4 ||  v.st == 5 || v.st == 6 || v.st == 7) && v.player.id != current_player_id }
 
-		#get player's last device used to send to that particular device
-		device = player_game.player.get_last_device
+		players.each  do |value|
+			#get player's last device used to send to that particular device
+			self.send_to_cloud_notifiers(value.player, msg_notification)	
+		end	
+	end
+
+	def send_to_cloud_notifiers(player, msg_notification)
+		device = value.player.get_last_device
+		#only send if player is active and has not turned off notifications
+		if player.st == 1 && player.r_g_n #receive_game_notifications
+			#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)	
+			if !device.nil? && device.is_android
+				self.send_gcm_notification(value.player, device, msg_notification)			
+			end
+			#iOS, windows phone call will be here
+		end
+	end
+	
+	def send_gcm_notification(player, device, msg_notification)
+		#is registrationID populated? (!device.r_id.empty?)
+		#make sure device has not been unregistered with gcm (!device.i_ur)
+		if !device.r_id.empty?  && !device.i_ur			
+			notification = GcmNotification.new
+			notification.player = value.player
+			notification.r_id = device.r_id
+			notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
+			#notification.save
+			GoogleNotifierService.send_notification(notification)
+		end	
+	end	
+	
+	def send_end_game_notification_to_opponents(current_player)
+		winner = self.player_games.select {|v| v.st == 4}
+		draws = self.player_games.select {|v| v.st == 6}
 		
-		#Rails.logger.info( "skip - player = #{value.player.inspect}")
-		#Rails.logger.info( "skip - get_last_device = #{device.inspect}")
-		if !device.nil?
-			#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)
-			#is registrationID populated? (!device.r_id.empty?)
-			#make sure device has not been unregistered with gcm (!device.i_ur)
-			#if device.i_a && !device.r_id.empty?  && !device.i_ur	
-			if device.is_android && !device.r_id.empty?  && !device.i_ur			
-				notification = GcmNotification.new
-				notification.player = player_game.player
-				notification.r_id = device.r_id
-				notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
-				#notification.save
-				GoogleNotifierService.send_notification(notification)
-			end			
+		is_winner = winner.count > 0
+		
+		non_declined_players = self.player_games.select {|v| v.st == 4 ||  v.st == 5 || v.st == 6 || v.st == 7}
+
+		#WON(4),
+		#LOST(5),
+		#DRAW(6),
+		#RESIGNED(7)
+		
+		#never send to current_player
+		
+		if is_winner #as opposed to a draw
+			if non_declined_players.count == 2
+				if winner[0].player.id == current_player_id
+					#current player was the winner in a 2 player game,
+					#so send out message like this to other player:
+					# "Jimmy won!"
+					msg_notification = I18n.t(:notification_x_won) % { :player => current_player.get_name }  
+					self.send_notification_to_all_opponents(current_player.id, msg_notification)
+				else
+					#send out notification like this:
+					#"You won the game with Sally!"
+					msg_notification = I18n.t(:notification_you_won_1_opponent) % { :player => current_player.get_name }  
+					self.send_notification_to_all_opponents(current_player.id, msg_notification)	
+				end
+			else
+				#more than 2 players
+				if winner[0].player.id == current_player_id
+					#current player was the winner in a 3+ player game, all non-current players are the losers
+					#and can get the same message
+					msg_notification = I18n.t(:notification_x_won) % { :player => current_player.get_name }  
+					self.send_notification_to_all_opponents(current_player.id, msg_notification)
+				else
+					non_declined_players.each  do |value|
+						#tell the losers (except current player) that the winner won
+						if value.player_id != winner[0].player.id && value.player_id != current_player.id  
+							msg_notification = I18n.t(:notification_x_won) % { :player => current_player.get_name }
+							self.send_to_cloud_notifiers(value.player, msg_notification)
+						end
+					end
+					
+					#tell winner that she won 
+					self.send_to_cloud_notifiers(winner[0], I18n.t(:notification_you_won))		
+				end
+			end		
+		elsif draws.count > 1
+			#it was a draw
+			if non_declined_players.count == 2 #2 player game
+				msg_notification = I18n.t(:notification_draw_1_opponent) % { :player => current_player.get_name }
+				self.send_notification_to_all_opponents(current_player.id, msg_notification)
+			else
+				#more than 2 players
+				if draws.count == 2
+					msg_notification = I18n.t(:notification_draw_2_players)  
+				elsif draws.count == 3
+					msg_notification = I18n.t(:notification_draw_3_players) 
+				else
+					msg_notification = I18n.t(:notification_draw_4_players) 
+				end
+				self.send_notification_to_all_opponents(current_player.id, msg_notification)
+			end
+			
+		end	
+	end
+	
+	def send_create_game_notification_to_opponents(current_player)
+		#should only be sent after the starting player takes his first turn, to ensure game does
+		#not get cancelled after this notification goes out
+		opponents = self.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
+	
+		if opponents.count == 1 
+			msg_notification = I18n.t(:notification_created_game_1_opponent) % { :player => current_player.get_name }
+			self.send_to_cloud_notifiers(opponents[0].player, msg_notification)
+		elsif opponents.count == 2 
+			#send first opponent her notification
+			msg_notification = I18n.t(:notification_created_game_2_opponents) % { :player1 => current_player.get_name, :player2 => opponents[1].player.get_name }
+			self.send_to_cloud_notifiers(opponents[0].player, msg_notification)
+			#send second opponent his notification
+			msg_notification = I18n.t(:notification_created_game_2_opponents) % { :player1 => current_player.get_name, :player2 => opponents[0].player.get_name }
+			self.send_to_cloud_notifiers(opponents[1].player, msg_notification)
+		elsif opponents.count == 3	
+			#send first opponent her notification
+			msg_notification = I18n.t(:notification_created_game_3_opponents) % { :player1 => current_player.get_name, :player2 => opponents[1].player.get_name, :player3 => opponents[2].player.get_name }
+			self.send_to_cloud_notifiers(opponents[0].player, msg_notification)
+			#send second opponent her notification
+			msg_notification = I18n.t(:notification_created_game_3_opponents) % { :player1 => current_player.get_name, :player2 => opponents[0].player.get_name, :player3 => opponents[2].player.get_name }
+			self.send_to_cloud_notifiers(opponents[1].player, msg_notification)
+			#send third opponent her notification
+			msg_notification = I18n.t(:notification_created_game_3_opponents) % { :player1 => current_player.get_name, :player2 => opponents[0].player.get_name, :player3 => opponents[1].player.get_name }
+			self.send_to_cloud_notifiers(opponents[2].player, msg_notification)
 		end	
 	end
   # Validations.

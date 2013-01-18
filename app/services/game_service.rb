@@ -384,6 +384,10 @@ def self.decline(current_player, game)
 			player_game[0].st =  7 #RESIGNED(7)
 			@game.st = 3 
 			@game.co_d = nowDate
+			
+			@game.save
+			
+			@game.send_end_game_notification_to_opponents(current_player)
 		else
 			player_game[0].st =  7 #RESIGNED(7)
 			@game.st = 1  # active --just to be sure 
@@ -391,12 +395,15 @@ def self.decline(current_player, game)
 			#increment the official turn counter
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
-		
-		end 	
-		
+			
+			@game.save
+			
+			msg_notification = I18n.t(:notification_x_resigned) % { :player => current_player.get_name }  
+			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+		end 		
  
 		#Rails.logger.info("game after status set #{@game.inspect}")
-		@game.save
+		#@game.save
 		#Rails.logger.info("game after save #{@game.inspect}")
 	end
 
@@ -516,6 +523,9 @@ def self.decline(current_player, game)
 			@game.st = 3  # completed
 			@game.co_d = nowDate
 			#player_game[0].cpa_d = nowDate #completion alert date
+			@game.save
+			
+			@game.send_end_game_notification_to_opponents(current_player)
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper
@@ -526,26 +536,22 @@ def self.decline(current_player, game)
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
 			
-			#format message and send to opponents' devices  %{word} for %{points} points."
-			msg_notification = I18n.t(:notification_x_played_a_turn) % { :player => current_player.get_name, :word => params[:played_words][0]['w'], :points => params[:p] }  
-			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
-		
+			@game.save
+			
+			#send the create game notification to other players after the starting player
+			#takes the first turn to ensure that the game is not cancelled first
+			if @game.t == 2
+				@game.send_create_game_notification_to_opponents(current_player)
+			else
+				#format message and send to opponents' devices  %{word} for %{points} points."
+				msg_notification = I18n.t(:notification_x_played_a_turn) % { :player => current_player.get_name, :word => params[:played_words][0]['w'], :points => params[:p] }  
+				@game.send_notification_to_active_opponents(current_player.id, msg_notification)	
+			end
+			
 			
 		end
-		
-		#Rails.logger.info("game before status set #{@game.inspect}")
-		
-		#Rails.logger.info("game after status set #{@game.inspect}")
-		@game.save
-		
-		if @game.st == 3
-			#send notifications as needed
-		end
-		#Rails.logger.info("game after save #{@game.inspect}")
 	end
-	
-	
-	
+
 	return @game, @unauthorized 
   end
   
@@ -618,8 +624,9 @@ def self.decline(current_player, game)
 			@game.st = 3  # completed
 			@game.co_d = nowDate
 			
-			msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
-			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+			@game.save
+			
+			@game.send_end_game_notification_to_opponents(current_player)
 		else
 			#game is still in progress
 			#remove the letters that were just played and replace them with letters from the hopper
@@ -634,25 +641,20 @@ def self.decline(current_player, game)
 			#data = { 'photoid' => 123, 'photoname' => "asdasd", 'creator_id' => "asdasd" }
 			active_players = @game.player_games.select {|v| v.st == 1 && v.player.id != current_player.id}
 			#loop through active players sending
-			
+			@game.save
 			#Rails.logger.info( "skip - active_players = #{active_players.inspect}")
 			
-			#format message and send to opponents' devices
-			msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
-			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
-			 		
+			#send the create game notification to other players after the starting player
+			#takes the first turn to ensure that the game is not cancelled first
+			if @game.t == 2
+				@game.send_create_game_notification_to_opponents(current_player)
+			else
+				#format message and send to opponents' devices
+				msg_notification = I18n.t(:notification_x_skipped_turn) % { :player => current_player.get_name }  
+				@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+			end				
 		end
-		
-		#Rails.logger.info("game before status set #{@game.inspect}")
-		
-		#Rails.logger.info("game after status set #{@game.inspect}")
-		@game.save
-		
-		if @game.st == 3
-			#send notifications as needed
-		end
-		
-		#Rails.logger.info("game after save #{@game.inspect}")
+
 	end
 	
 	return @game, @unauthorized 
@@ -786,11 +788,16 @@ def self.swap(current_player, game, params)
 		@game.save
 		
  
-		#format message and send to opponents' devices
-		msg_notification = I18n.t(:notification_x_swapped_letters) % { :player => current_player.get_name, :number => swapped_letters_count}  
-		@game.send_notification_to_active_opponents(current_player.id, msg_notification)
-	 
-		#Rails.logger.info("game after save #{@game.inspect}")
+		#send the create game notification to other players after the starting player
+		#takes the first turn to ensure that the game is not cancelled first
+		if @game.t == 2
+			@game.send_create_game_notification_to_opponents(current_player)
+		else
+			#format message and send to opponents' devices
+			msg_notification = I18n.t(:notification_x_swapped_letters) % { :player => current_player.get_name, :number => swapped_letters_count}  
+			@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+		end
+
 	end
 	
 	return @game, @unauthorized 
