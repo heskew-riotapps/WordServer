@@ -391,12 +391,12 @@ class Game
 	end
 
 	def send_to_cloud_notifiers(player, msg_notification)
-		device = value.player.get_last_device
+		device = player.get_last_device
 		#only send if player is active and has not turned off notifications
 		if player.st == 1 && player.r_g_n #receive_game_notifications
 			#is this an android device? (i_a = isAndroid) (this method will eventually route to iOS as well)	
 			if !device.nil? && device.is_android
-				self.send_gcm_notification(value.player, device, msg_notification)			
+				self.send_gcm_notification(player, device, msg_notification)			
 			end
 			#iOS, windows phone call will be here
 		end
@@ -407,7 +407,7 @@ class Game
 		#make sure device has not been unregistered with gcm (!device.i_ur)
 		if !device.r_id.empty?  && !device.i_ur			
 			notification = GcmNotification.new
-			notification.player = value.player
+			notification.player = player
 			notification.r_id = device.r_id
 			notification.data = {:id => self.id.to_s(),:msg => msg_notification} 
 			#notification.save
