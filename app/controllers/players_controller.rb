@@ -194,10 +194,10 @@ class PlayersController < ApplicationController
 			 
 			else
 				#make sure requesting user is part of the game
-				if !@game.is_player_part_of_game? player.id 
+				if !@game.is_player_part_of_game? @player.id 
 					unauthorized = true		
 				else
-					@game.strip_tray_tiles_from_non_context_user player.id
+					@game.strip_tray_tiles_from_non_context_user @player.id
 					@game.a_t = params[:a_t]
 					 
 				end	
