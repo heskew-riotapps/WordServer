@@ -154,6 +154,65 @@ class PlayersController < ApplicationController
 		end
 	end
 	
+	def auth_via_token_with_game
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
+			
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
+			#reset user's token, remove current token
+			#send the new token back to the client
+			@player.n_v = @player.n_v + 1
+			
+			@player.generate_token(params[:a_t], @gcm_reg_id)
+			
+			if !@player.fb.blank?
+			 	@player.save(:validate => false)
+			else
+			 	@player.save 
+			end
+			
+			#this method will return a single game along with the game lists
+			@game = Game.find(params[:id])
+			 
+			if @game.nil?
+				#Rails.logger.info("cannot find game")	
+				#not_found = true		
+			 
+			else
+				#make sure requesting user is part of the game
+				if !@game.is_player_part_of_game? player.id 
+					unauthorized = true		
+				else
+					@game.strip_tray_tiles_from_non_context_user player.id
+					@game.a_t = params[:a_t]
+					 
+				end	
+			end
+			@player.game_ = @game
+		end
+	
+		
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			respond_with @player
+		end
+	end
+	
 	def get_via_token
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	

@@ -58,6 +58,7 @@ class Player
   timestamps!
   attr_accessor :completed_games_from_date  
   attr_accessor :a_t 
+  attr_accessor :game_
   #key :completed_games_from_date 
   
    #many :games do
