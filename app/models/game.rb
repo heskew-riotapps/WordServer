@@ -266,6 +266,16 @@ class Game
 			 #value.player.n_w += 1
 			value.player.n_c_g += 1
 			value.player.l_rf_d = nowDate
+			if value.st == 4
+				value.player.n_w += 1
+			end					
+			if inner.st == 5 || inner.st == 7
+				value.player.n_l += 1
+			end
+			if value.st == 6
+				value.player.n_d += 1
+			end	
+			
 			#this player won
 			#update opponent record for each opponent that did not decline
 			self.player_games.each  do |inner|
