@@ -269,7 +269,7 @@ class Game
 			if value.st == 4
 				value.player.n_w += 1
 			end					
-			if inner.st == 5 || inner.st == 7
+			if value.st == 5 || value.st == 7
 				value.player.n_l += 1
 			end
 			if value.st == 6
@@ -279,21 +279,39 @@ class Game
 			#this player won
 			#update opponent record for each opponent that did not decline
 			self.player_games.each  do |inner|
-			 Rails.logger.info("update_players_after_completion inner loop #{inner.player.id} - #{inner.st}")
+			# Rails.logger.info("update_players_after_completion inner loop #{inner.player.id} - #{inner.st}")
 			
 				if inner.player_id != value.player_id
-					is_win = false # this will stay false since the player won
+					#this inner loop has to take into account some derived logic since there can be more than 2 players
+					is_win = false  
 					is_loss = false
-					is_draw = false #this will stay false since the player won
-					if value.st == 4
+					is_draw = false  
+					#if the outer player won or the outer player drew and the inner player lost or conceded,
+					#the outer player is winner against inner player
+					if value.st == 4 || (value.st == 6 && (value.st == 5 || value.st == 7))
 						is_win = true
-					end					
-					if inner.st == 5 || inner.st == 7
+					end	
+					#this is the scenario that the outer player lost and the inner player won or drew
+					#this counts as a lost for outer player
+					if (value.st == 5 || value.st == 7) && (inner.st == 4 || inner.st == 6)
 						is_loss = true
 					end
-					if value.st == 6
+					#if both player drew, count as a draw
+					if value.st == 6 && inner.st == 6
 						is_draw = true
 					end	
+					#if both players lost, determine who had the most points, count as win for highest points, 
+					#count as loss for player with fewer points, if they tied, its a draw 
+					#since this is a multi-player game
+					if (value.st == 5 || value.st == 7) && (inner.st == 5 || inner.st == 7)
+						if value.sc > inner.sc
+							is_win = true
+						elsif value.sc < inner.sc
+							is_loss = true
+						else
+							is_draw = true
+						end
+					end
 					 Rails.logger.info("update_players_after_completion inner loop #{inner.player.id} - isWin=#{is_win} - isLoss=#{is_loss} - isDraw=#{is_draw}")
 					value.player.update_opponent(inner.player_id, is_win, is_loss, is_draw)
 					
