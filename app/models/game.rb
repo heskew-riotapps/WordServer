@@ -432,7 +432,7 @@ class Game
 		
 		if is_winner #as opposed to a draw
 			if non_declined_players.count == 2
-				if winner[0].player.id == current_player_id
+				if winner[0].player.id == current_player.id
 					#current player was the winner in a 2 player game,
 					#so send out message like this to other player:
 					# "Jimmy won!"
@@ -446,7 +446,7 @@ class Game
 				end
 			else
 				#more than 2 players
-				if winner[0].player.id == current_player_id
+				if winner[0].player.id == current_player.id
 					#current player was the winner in a 3+ player game, all non-current players are the losers
 					#and can get the same message
 					msg_notification = I18n.t(:notification_x_won) % { :player => current_player.get_name }  
