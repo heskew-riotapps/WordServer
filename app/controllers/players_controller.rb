@@ -48,7 +48,7 @@ class PlayersController < ApplicationController
   end
   
   def find_all_by_fb
-   logger.debug("pg inspect #{:params.inspect}")
+   logger.debug("find_all_by_fb inspect #{:params.inspect}")
    #pass big fat array of fb's into mongo
    @players = Player.all(:conditions => {'st' => 1, 'fb' => params[:fb]})    
     #@players = Player.find_all_by_fb(params[:fb])
