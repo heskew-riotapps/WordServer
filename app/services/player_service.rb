@@ -185,6 +185,12 @@ class PlayerService
 		else		
 			@email = params[:e_m].downcase
 			@player.a_t = params[:a_t]
+			
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
 			#check for duplicate nickname
 			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
@@ -199,7 +205,7 @@ class PlayerService
 			else
 				@player.n_n = params[:n_n] #nickname
 				@player.e_m = @email #email
-				@player.generate_token(params[:a_t])
+				@player.generate_token(params[:a_t], @gcm_reg_id)
 				#@ok = @player.save
 				if !@player.fb.blank?
 					@ok = @player.save(:validate => false)
@@ -228,6 +234,12 @@ class PlayerService
 			@unauthorized = true 
 		else	
 			@player.a_t = params[:a_t]
+			
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
 			#check for duplicate nickname
 			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
@@ -236,7 +248,7 @@ class PlayerService
  				@unauthorized = true
 			else
 				@player.n_n = params[:n_n] #nickname
-				@player.generate_token(params[:a_t])
+				@player.generate_token(params[:a_t], @gcm_reg_id)
 				#@ok = @player.save
 				if !@player.fb.blank?
 					@ok = @player.save(:validate => false)

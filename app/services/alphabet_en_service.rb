@@ -36,7 +36,7 @@ class AlphabetENService
 		#X = 1
 		#Y = 2
 		#Z = 1
-	
+
 	end
 	
 	def self.get_letter_value(letter)
@@ -60,7 +60,7 @@ class AlphabetENService
 		when "H"
 			value = 2
 		when "I"
-			value = 5
+			value = 1
 		when "J"
 			value = 10
 		when "K"
