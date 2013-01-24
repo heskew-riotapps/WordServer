@@ -1,5 +1,6 @@
 class Opponent
   include MongoMapper::EmbeddedDocument
+  plugin MongoMapper::Plugins::IdentityMap
  
   belongs_to :player #this represents the opponent
   key :n_g,     Integer, :default => 0 #num_games

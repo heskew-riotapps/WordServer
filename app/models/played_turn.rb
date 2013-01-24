@@ -1,5 +1,6 @@
  class PlayedTurn
   include MongoMapper::EmbeddedDocument
+  plugin MongoMapper::Plugins::IdentityMap
  
 	key :player_id , ObjectId
 	key :t, Integer #turn

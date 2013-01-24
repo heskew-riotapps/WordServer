@@ -1,5 +1,6 @@
 class PlayerGame
   include MongoMapper::EmbeddedDocument
+  plugin MongoMapper::Plugins::IdentityMap
  
   #player_id
 #  key :player_id , ObjectId

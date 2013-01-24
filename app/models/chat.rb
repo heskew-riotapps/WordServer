@@ -1,5 +1,6 @@
 class Chat
   include MongoMapper::EmbeddedDocument
+  plugin MongoMapper::Plugins::IdentityMap
 
   belongs_to :game
   key :t,     String  #text

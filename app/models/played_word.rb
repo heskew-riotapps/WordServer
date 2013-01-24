@@ -1,5 +1,6 @@
 class PlayedWord
   include MongoMapper::EmbeddedDocument
+  plugin MongoMapper::Plugins::IdentityMap
 
   key :w,     String #word
   key :player_id , ObjectId

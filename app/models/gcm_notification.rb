@@ -1,5 +1,6 @@
 class GcmNotification
 	include MongoMapper::Document
+
 	safe # for mongo saves
  
 	belongs_to :player

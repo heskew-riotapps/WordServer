@@ -1,5 +1,6 @@
 class Player
   include MongoMapper::Document
+  plugin MongoMapper::Plugins::IdentityMap
   include ActiveModel::SecurePassword 
   #include ActiveModel::Serialization
   has_secure_password
