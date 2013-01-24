@@ -17,8 +17,15 @@ child :a_games => :a_games do
 		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end
   end
-  child :played_words do
-	attribute :w, :t, :player_id, :p_s, :p_d 
+ 
+end
+
+child :c_games => :c_games do
+  attribute :id, :cr_d, :co_d, :ch_d, :t, :st, :l_t_a,:l_t, :l_t_p, :l_t_d, :l_t_pl, :r_v, :r_c
+  child :player_games do
+    attribute :sc, :st 
+		child :player do
+		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
+	end
   end
 end
- 
