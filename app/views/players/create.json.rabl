@@ -2,7 +2,7 @@ object @player
 
 attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t, :o_n_i_a, :l_rf_d
 
-child :opponents do
+child :opponents => :opps do
 	attribute :n_g 
 	child :player do
 		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
@@ -17,7 +17,7 @@ child :a_games => :a_games do
 		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
 	end
   end
-  child :played_words do
+   child :l_t_w => :played_words do
 	attribute :w, :t, :player_id, :p_s, :p_d 
   end
 end
