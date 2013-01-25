@@ -128,6 +128,22 @@ class Player
 		end	
   end
  
+ def add_opponent(opponent_id)
+		opponent = self.opponents.select {|v| v.player_id == opponent_id}  
+
+		#only add opponent if he does not exist
+		if opponent[0].nil?
+			o = Opponent.new
+			o.player_id = opponent_id
+			o.n_g = 1
+			o.st = 1
+			self.opponents << o
+			
+			true
+		end	
+		
+		false
+  end
   
   def a_games #active games method
   #Rails.logger.debug("player class, entering a_game")

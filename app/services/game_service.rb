@@ -164,6 +164,8 @@ class GameService
 		@game.save
 		@game.strip_tray_tiles_from_non_context_user current_player.id
 		
+		@game.add_opponents
+		
 		
 		#Rails.logger.debug("random vowels #{@game.r_v.inspect}")
 		#Rails.logger.debug("random rconsonants #{@game.r_c.inspect}")

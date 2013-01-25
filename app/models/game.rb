@@ -56,6 +56,10 @@ class Game
 	return self.r_l.count
   end
   
+  def l_t_w #last turn words
+	 self.played_words.select {|v| v.t == (self.t - 1)}
+  end
+  
   def generate_hopper_letters(culture_code)
 		if self.authenticate(password)
 			self.generate_token(:auth_token)
@@ -166,7 +170,7 @@ class Game
   	def assignNextPlayerToTurn(context_player_id)
 		order = self.getContextPlayerGame(context_player_id).o
 		
-		Rails.logger.info("assignNextPlayerToTurn order #{order}")
+		#Rails.logger.info("assignNextPlayerToTurn order #{order}")
 		
 		player_game = nil
 		
@@ -216,7 +220,7 @@ class Game
 
 		player_game.i_t = true #is_turn
 		
-		Rails.logger.info("assignNextPlayerToTurn playerId#{player_game.player_id}")
+		#Rails.logger.info("assignNextPlayerToTurn playerId#{player_game.player_id}")
 		
 	end
 	
@@ -325,6 +329,40 @@ class Game
 			 	value.player.save 
 			end
 			#value.player.save
+		end	
+	
+	end
+	
+	def add_opponents
+		#loop through each player_game and add the opponent
+		#this will allow client side "join" for opponent players
+		
+		nowDate = Time.now.utc
+		
+		self.player_games.each  do |value|
+			#this player won
+			#update opponent record for each opponent that did not decline
+			update = false
+			
+			self.player_games.each  do |inner|
+			
+				if inner.player_id != value.player_id
+ 
+		 			Rails.logger.info("add_opponents inner loop #{inner.player.id}")
+					if value.player.add_opponent(inner.player_id)
+						update = true
+					end
+				end
+			end
+
+			#only save if at least one opponent is new	
+			if update 
+				if !value.player.fb.blank?
+					value.player.save(:validate => false)
+				else
+					value.player.save 
+				end
+			end
 		end	
 	
 	end

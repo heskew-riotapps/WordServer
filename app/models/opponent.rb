@@ -14,6 +14,7 @@ class Opponent
   key :h_s_g_s_game_id , ObjectId 	#highest_single_game_score_game_id
   key :l_w_m, Integer, :default => 0 # largest_win_margin
   key :l_w_m_game_id , ObjectId  #largest_win_margin_game_id
+  key :st, Integer :default = 1 #status, 1 = opponent but not completed game yet, 2 = opponent with completed game
   
   #keep top ten (or top 5) of these stats
   
