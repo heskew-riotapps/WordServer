@@ -148,7 +148,7 @@ class Player
   def a_games #active games method
   #Rails.logger.debug("player class, entering a_game")
 
-    return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc)  
+    return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).limit(1)   
  
   end
  
