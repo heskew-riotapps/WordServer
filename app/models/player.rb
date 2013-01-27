@@ -133,6 +133,7 @@ class Player
 
 		#only add opponent if he does not exist
 		if opponent[0].nil?
+			Rails.logger.info("add_opponent inner loop playerid=#{self.id} opponent=#{opponent_id}")
 			o = Opponent.new
 			o.player_id = opponent_id
 			o.n_g = 1
@@ -140,9 +141,10 @@ class Player
 			self.opponents << o
 			
 			true
+		else
+			false
 		end	
-		
-		false
+
   end
   
   def a_games #active games method

@@ -60,6 +60,13 @@ class Game
 	 self.played_words.select {|v| v.t == (self.t - 1)}
   end
   
+   #opponents for this game, only needed to return to client for game creation
+  attr_accessor :opponents 
+  
+  #def opponents #opponents for this game, only needed to return to client for game creation
+ #	 self.current_player.opponents.select {|v| v.player.id == (self.t - 1)}
+ # end
+  
   def generate_hopper_letters(culture_code)
 		if self.authenticate(password)
 			self.generate_token(:auth_token)
@@ -350,6 +357,7 @@ class Game
  
 		 			Rails.logger.info("add_opponents inner loop #{inner.player.id}")
 					if value.player.add_opponent(inner.player_id)
+						Rails.logger.info("add_opponents inner loop opponent added")
 						update = true
 					end
 				end
@@ -357,6 +365,7 @@ class Game
 
 			#only save if at least one opponent is new	
 			if update 
+			Rails.logger.info("add_opponents update coming")
 				if !value.player.fb.blank?
 					value.player.save(:validate => false)
 				else
