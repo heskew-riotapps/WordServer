@@ -12,10 +12,7 @@ end
 child :a_games => :a_games do
   attribute :id, :cr_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p, :l_t_pl
   child :player_games do
-    attribute :sc, :i_t, :st   
-		child :player do
-		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
-	end
+    attribute :sc, :i_t, :st, :player_id   
   end
   child :played_words do
 	attribute :w, :t, :player_id, :p_s, :p_d 
@@ -25,20 +22,14 @@ end
 child :c_games => :c_games do
   attribute :id, :cr_d, :co_d, :ch_d, :t, :st, :l_t_a,:l_t, :l_t_p, :l_t_d, :l_t_pl, :r_v, :r_c
   child :player_games do
-    attribute :sc, :st 
-		child :player do
-		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
-	end
+    attribute :sc, :st, :player_id    
   end
 end
 
 child :game_ => :game_ do
 	attributes :id, :cr_d, :ch_d, :t, :a_t, :left, :st, :l_t_a, :l_t_d, :l_t_p, :l_t_pl, :r_v, :r_c 
 	  child :player_games do
-		attributes :o, :i_t, :sc, :id, :t_l, :st, :t_v 
-			child :player do
-			attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
-		end
+		attributes :o, :i_t, :sc, :id, :t_l, :st, :t_v, :player_id    
 	  end
 	  child :played_words do
 		attribute :w, :t, :player_id, :p, :p_d 
