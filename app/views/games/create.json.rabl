@@ -4,4 +4,10 @@ object @game
   child :player_games do
     attributes :o, :i_t, :sc, :id, :t_l, :t_v, :st, :player_id
   end
+  child :opponents => :opps do
+	attribute :n_g, :st 
+	child :player do
+		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
+	end
+end
  

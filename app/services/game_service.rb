@@ -64,6 +64,9 @@ class GameService
 	
 		currentPlayerIsInGame = false
 		
+		#this is only needed to pass back to client, not saved
+		@game.opponents = []
+		
 		params[:player_games].each  do |value|
 			#if index > 3 throw error
 			#Rails.logger.debug("value inspect #{value.inspect}")
@@ -112,6 +115,11 @@ class GameService
 				#pg.player_id = value['player_id']
 				pg.player = player
 				pg.t_l = @game.r_l.slice!(0,7) #tray_letters
+				
+				o = Opponent.new
+				o.player = player
+				o.st = 1
+				@game.opponents << o
 				
 				#make sure that at least one player is the curent user (auth_token)
 				if current_player.id == player.id
@@ -164,8 +172,8 @@ class GameService
 		@game.save
 		@game.strip_tray_tiles_from_non_context_user current_player.id
 		
-		@game.add_opponents
-		
+		@game.add_opponents #this adds opponents to the players
+  
 		
 		#Rails.logger.debug("random vowels #{@game.r_v.inspect}")
 		#Rails.logger.debug("random rconsonants #{@game.r_c.inspect}")
