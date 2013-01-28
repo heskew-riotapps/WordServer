@@ -116,10 +116,12 @@ class GameService
 				pg.player = player
 				pg.t_l = @game.r_l.slice!(0,7) #tray_letters
 				
-				o = Opponent.new
-				o.player = player
-				o.st = 1
-				@game.opponents << o
+				if player.id != current_player.id
+					o = Opponent.new
+					o.player = player
+					o.st = 1
+					@game.opponents << o
+				end
 				
 				#make sure that at least one player is the curent user (auth_token)
 				if current_player.id == player.id
