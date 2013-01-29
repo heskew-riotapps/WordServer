@@ -143,7 +143,7 @@ class PlayersController < ApplicationController
 			else
 			 	@player.save 
 			end
-			
+			Rails.logger.info("auth_via_token @player.completed_games_from_date =#{@player.completed_games_from_date }")
 		end
 	
 		
@@ -246,6 +246,8 @@ class PlayersController < ApplicationController
 			else
 				@player.save 
 			end
+			
+			Rails.logger.info("get_via_token @player.completed_games_from_date =#{@player.completed_games_from_date }")
 		end
 	
 		
@@ -266,6 +268,11 @@ class PlayersController < ApplicationController
 			Rails.logger.info("authorization failed #{params[:a_t]}")		
 		else
 			@player.a_t = params[:a_t]
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
 			if @player.l_rf_d.nil?
 				datePassed = true
 			elsif  params.has_key?(:l_rf_d) && !params[:l_rf_d].blank? && !params[:l_rf_d].nil?
@@ -277,7 +284,7 @@ class PlayersController < ApplicationController
 			end
 		
 		end
-	Rails.logger.info("datePassed=#{datePassed}")
+	
 		
 		
 		if not_found 

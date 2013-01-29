@@ -163,6 +163,11 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.cancel(@player, @game)
 				@player.a_t = params[:a_t]
+				if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+					@player.completed_games_from_date = params[:c_g_d]
+				else
+					@player.completed_games_from_date = "10/6/2012"
+				end
 				#Rails.logger.info("game post  #{@game.inspect}")
 				if @game.errors.empty?
 					#reset user's token

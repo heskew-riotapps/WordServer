@@ -155,10 +155,11 @@ class Player
   end
  
  def c_games  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works
+	Rails.logger.debug("player c_games completed_games_from_date=#{self.completed_games_from_date}")
 	if self.completed_games_from_date.nil?
 		self.completed_games_from_date	= "10/06/2012"
 	end
-	 
+	 Rails.logger.debug("player c_games completed_games_from_date=#{self.completed_games_from_date}")
 	 return Game.where( 
 	 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}},
 			"co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}

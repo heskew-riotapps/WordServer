@@ -10,9 +10,6 @@ child :a_games => :a_games do
    child :l_t_w => :played_words do
 	attribute :w, :t, :player_id, :p_s, :p_d 
   end
-  child :l_t_w => :played_words do
-	attribute :w, :t, :player_id, :p_s, :p_d 
-  end
 end
 
 child :c_games => :c_games do
