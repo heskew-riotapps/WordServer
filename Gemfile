@@ -24,11 +24,11 @@ gem 'yajl-ruby'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-group :test do
-  gem 'cucumber-rails', :require => false
-  # database_cleaner is not required, but highly recommended
-  gem 'database_cleaner'
-end
+#group :test do
+#  gem 'cucumber-rails', :require => false
+#  # database_cleaner is not required, but highly recommended
+#  gem 'database_cleaner'
+#end
 
 group  :development, :test do
   gem 'rspec-rails',      '>= 2.0.0'
