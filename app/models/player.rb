@@ -164,8 +164,7 @@ class Player
 	 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}},
 			"co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}
 			).sort(:'co_d'.desc).limit(10)   
-	
-	 
+
   end
  
   def gravatar 

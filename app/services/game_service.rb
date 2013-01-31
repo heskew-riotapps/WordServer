@@ -213,7 +213,7 @@ class GameService
 	
 	#Rails.logger.info("game cancel start #{game.inspect}")
 	@game = game
-	
+	nowDate = Time.now.utc
 	#Rails.logger.info("game cancel assignment #{@game.inspect}")
 	@unauthorized = false
 	@ok = false
@@ -235,6 +235,7 @@ class GameService
 		end	
 		#Rails.logger.info("game before status set #{@game.inspect}")
 		@game.st = 2
+		@game.co_d = nowDate
 		#Rails.logger.info("game after status set #{@game.inspect}")
 		@game.update_players_last_refresh_date
 		@game.save
@@ -711,7 +712,7 @@ def self.swap(current_player, game, params)
 		Rails.logger.info("error_game_play_no_swapped_letters failed")
 		@game.errors.add(:t, I18n.t(:error_game_play_no_swapped_letters))
 		@unauthorized = true
-	elsif params[:s_l].count > @game.left  	
+	elsif @game.left == 0  	
 		Rails.logger.info("error_game_play_too_few_letters_in_hopper failed")
 		@game.errors.add(:t, I18n.t(:error_game_play_too_few_letters_in_hopper))
 		@unauthorized = true
