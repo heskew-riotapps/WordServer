@@ -30,12 +30,12 @@ gem 'yajl-ruby'
 #  gem 'database_cleaner'
 #end
 
-group  :development, :test do
-  gem 'rspec-rails',      '>= 2.0.0'
-  gem 'autotest'
-  gem 'autotest-rails'
-  #gem 'ruby-debug'
-end
+#group  :development, :test do
+#  gem 'rspec-rails',      '>= 2.0.0'
+#  gem 'autotest'
+#  gem 'autotest-rails'
+#  #gem 'ruby-debug'
+#end
 
 # Gems used only for assets and not required
 # in production environments by default.
