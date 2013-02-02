@@ -6,6 +6,7 @@ class Device
 	key :i_ur, Boolean, :default => false #is_unregistered
 	key :l_r_d, Time #last_registration_date 
 	key :a_t, String #auth_token 
+	key :a_t_d, Time #auth_token_date, only reset auth_token about once a week, use this data as a guide 
 	
 	timestamps!
 
