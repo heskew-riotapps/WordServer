@@ -105,18 +105,18 @@ class GamesController < ApplicationController
   
   def refresh
 		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
-		logger.debug("game before create #{params.inspect}")
+		logger.debug("game before refresh #{params.inspect}")
 	   
 		no_changes = true
 		if player.nil?
-			Rails.logger.info("unauthorized request to get game")	
+			Rails.logger.info("refresh unauthorized request to get game")	
 		#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
 			unauthorized = true		
 		else
 			 @game = Game.find(params[:id])
 			 
 			if @game.nil?
-				Rails.logger.info("cannot find game")	
+				Rails.logger.info(" refresh cannot find game")	
 				not_found = true		
 			 
 			else

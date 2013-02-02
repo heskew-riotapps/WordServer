@@ -26,7 +26,7 @@ Word::Application.routes.draw do
 		match "/games/cancel/" => "games#cancel"
 		match "/games/clear_all/" => "games#clear_all"
 		match "/games/get/" => "games#get"
-		match "/games/refresh/" => "games#refresh"
+		match "/games/refresh/" => "games#refresh"  
 		match "/games/play/" => "games#play"
 		match "/games/swap/" => "games#swap"
 		match "/games/skip/" => "games#skip"
