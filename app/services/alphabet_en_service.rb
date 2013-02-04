@@ -1,10 +1,10 @@
 class AlphabetENService
 	def self.get_random_vowels
-		return ["A","E","I","O","U"].shuffle.first(2) 
+		return ["A","E","I","O","U"].shuffle.first(1) 
 	end
 
 	def self.get_random_consonants
-		return ["B","C","D","F","G","H","J","K","L","M","N","P","Q","R","S","T","V","W","X","Y","Z"].shuffle.first(3) 
+		return ["B","C","D","F","G","H","J","K","L","M","N","P","Q","R","S","T","V","W","X","Y","Z"].shuffle.first(4) 
 	end	
 	
 	def self.get_letter_distribution

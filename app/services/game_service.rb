@@ -259,6 +259,8 @@ def self.decline(current_player, game)
 	@unauthorized = false
 	@ok = false
 	nowDate = Time.now.utc
+	player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
+
 	
 	if @game.isPlayerStarter?(current_player.id)
 		#Rails.logger.info("isPlayerStarter failed")
@@ -311,6 +313,13 @@ def self.decline(current_player, game)
 		else
 			@game.st = 1  # active --just to be sure 
 			
+			#add this players letters back to the hopper
+			player_game[0].t_l.each  do |value|
+				@game.r_l << value 
+			end	
+
+			#shuffle letters 
+			@game.r_l.shuffle! #remaining_letters
 			#increment the official turn counter
 			@game.t = @game.t + 1
 			@game.assignNextPlayerToTurn(current_player.id)
@@ -404,6 +413,15 @@ def self.decline(current_player, game)
 		else
 			player_game[0].st =  7 #RESIGNED(7)
 			@game.st = 1  # active --just to be sure 
+			
+			#add this players letters back to the hopper
+			player_game[0].t_l.each  do |value|
+				@game.r_l << value 
+			end	
+
+			#shuffle letters 
+			@game.r_l.shuffle! #remaining_letters
+
 			
 			#increment the official turn counter
 			@game.t = @game.t + 1
