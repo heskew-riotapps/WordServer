@@ -228,6 +228,9 @@ class Player
 			if (devices[0].a_t_d.nil? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
 				devices[0].a_t = token
 				device.a_t_d = nowDate
+			else
+				#dont change token
+				token = devices[0].a_t 
 			end
 			devices[0].r_id = gcm_registration_id
 			self.lp_d_id = devices[0].id #last played device
