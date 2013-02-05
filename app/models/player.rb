@@ -187,7 +187,6 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
-	
 		devices = self.devices.select {|v| v.a_t == token_to_replace} 
 		if devices.count == 0  
 			device = Device.new	
@@ -195,7 +194,7 @@ class Player
 			self.devices << device
 			self.lp_d_id = device.id #last played device
 		else
-			devices[0].a_t = 
+			devices[0].a_t = token
 			self.lp_d_id = devices[0].id #last played device
 		end
 		
@@ -208,6 +207,8 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
+		nowDate = Time.now.utc
+		
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
 			#find by registrationId
@@ -218,11 +219,16 @@ class Player
 		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
+			device.a_t_d = nowDate
 			device.r_id = gcm_registration_id
 			self.devices << device
 			self.lp_d_id = device.id #last played device
 		else
-			devices[0].a_t = token
+		#only update token if it is at least a week old
+			if (devices[0].a_t_d.nil? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
+				devices[0].a_t = token
+				device.a_t_d = nowDate
+			end
 			devices[0].r_id = gcm_registration_id
 			self.lp_d_id = devices[0].id #last played device
 		end
@@ -237,10 +243,13 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
-		self.devices.clear
+		self.devices.
+		
+		nowDate = Time.now.utc
 		
 		device = Device.new	
 		device.a_t = token
+		device.a_t_d = nowDate
 		device.r_id = gcm_registration_id
 		self.devices << device 
 		self.lp_d_id = device.id #last played device
