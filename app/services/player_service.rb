@@ -36,6 +36,7 @@ class PlayerService
 		@gcm_reg_id = params[:r_id] 
 		#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 	end
+	nowDate = Time.now.utc
 	@error = Error.new
 	@unauthorized = false
 		if !params.has_key?(:e_m) || params[:e_m].blank?

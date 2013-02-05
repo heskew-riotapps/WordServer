@@ -254,6 +254,7 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
+		nowDate = Time.now.utc
 		#find by registrationId
 		#this might need to be refactored to better handle multi-device
 		#especially if one device has a blank reg id
@@ -262,10 +263,13 @@ class Player
 			device = Device.new	
 			device.a_t = token
 			device.r_id = gcm_registration_id
+			device.a_t_d = nowDate
+			device.l_r_d = nowDate
 			self.devices << device
 			self.lp_d_id = device.id #last played device
 		else
 			devices[0].a_t = token
+			devices[0].a_t_d = nowDate
 			devices[0].r_id = gcm_registration_id
 			self.lp_d_id = devices[0].id #last played device
 		end
@@ -296,26 +300,31 @@ class Player
 	
 	def update_or_add_gcm_registration_id(token, gcm_registration_id)
 		devices = self.devices.select {|v| v.a_t == token} #getContextPlayerGame(current_player.id)
+		
+		nowDate = Time.now.utc
 		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
-			device.l_r_d = Time.now.utc
+			device.l_r_d = nowDate
+			device.a_t_d = nowDate
 			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
 			self.devices << device
 		else
 			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
-			devide.l_r_d = Time.now.utc
+			devide.l_r_d = nowDate
 		end
 	end
 	
 	def update_gcm_registration_id?(token, gcm_registration_id)
 		devices = self.devices.select {|v| v.a_t == token} #getContextPlayerGame(current_player.id)
+		nowDate = Time.now.utc
 		if devices.count == 0  
 			device = Device.new	
 			device.a_t = token
-			device.l_r_d = Time.now.utc
+			device.l_r_d = nowDate
+			device.a_t_d = nowDate
 			#device.i_a = true
 			devices[0].r_id = gcm_registration_id
 			self.devices << device
