@@ -125,7 +125,8 @@ class GamesController < ApplicationController
 					unauthorized = true		
 				else
 					#only send update if turn from client is less that turn from server
-					if @game.t > params[:t]
+					#or if game is over
+					if (@game.t > params[:t] || @game.st == 3)
 						no_changes = false
 
 						@game.strip_tray_tiles_from_non_context_user player.id
