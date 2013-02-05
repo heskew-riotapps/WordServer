@@ -224,8 +224,9 @@ class Player
 			self.devices << device
 			self.lp_d_id = device.id #last played device
 		else
-		#only update token if it is at least a week old
-			if (devices[0].a_t_d.nil? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
+		#only update token if it is at least a week old or empty
+			if (devices[0].a_t_d.nil? || devices[0].a_t.empty? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
+				 Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
 				devices[0].a_t = token
 				device.a_t_d = nowDate
 			else

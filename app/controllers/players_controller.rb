@@ -132,10 +132,11 @@ class PlayersController < ApplicationController
 				@gcm_reg_id = params[:r_id] 
 				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 			end
-			#reset user's token, remove current token
-			#send the new token back to the client
+			
 			@player.n_v = @player.n_v + 1
 			
+			#reset user's token, remove current token if token is over a week old
+			#send the new token back to the client
 			@player.generate_token(params[:a_t], @gcm_reg_id)
 			
 			if !@player.fb.blank?
