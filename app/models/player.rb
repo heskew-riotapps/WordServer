@@ -208,7 +208,7 @@ class Player
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
 		nowDate = Time.now.utc
-		 Rails.logger.info ("generate_token --- a_t=#{params[:a_t]} reg=#{@gcm_reg_id}")
+		 Rails.logger.info ("generate_token ---")
 
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
