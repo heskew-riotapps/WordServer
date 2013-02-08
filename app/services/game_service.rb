@@ -547,7 +547,7 @@ def self.decline(current_player, game)
 			#make sure last alert dates are set properly
 			#calculate bonuses for context player
 			player_game[0].sc = player_game[0].sc + @game.getBonusScore(current_player.id)
-			
+			@game.t = @game.t + 1
 			#determine winner
 			@game.assignWinner
 			@game.update_players_after_completion
