@@ -135,6 +135,7 @@ class PlayersController < ApplicationController
 			
 			@player.n_v = @player.n_v + 1
 			
+			Rails.logger.info ("generate_token a_t=#{params[:a_t]} reg=#{@gcm_reg_id}")
 			#reset user's token, remove current token if token is over a week old
 			#send the new token back to the client
 			@player.generate_token(params[:a_t], @gcm_reg_id)

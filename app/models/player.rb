@@ -208,7 +208,8 @@ class Player
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
 		nowDate = Time.now.utc
-		
+		 Rails.logger.info ("generate_token --- a_t=#{params[:a_t]} reg=#{@gcm_reg_id}")
+
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
 			#find by registrationId
@@ -223,6 +224,7 @@ class Player
 			device.r_id = gcm_registration_id
 			self.devices << device
 			self.lp_d_id = device.id #last played device
+			Rails.logger.info ("generate_token --- device not found")
 		else
 		#only update token if it is at least a week old or empty
 			if (devices[0].a_t_d.nil? || devices[0].a_t.empty? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
