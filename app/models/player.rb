@@ -230,7 +230,9 @@ class Player
 		#only update token if it is at least a week old or empty
 	 
 			if (devices[0].a_t_d.nil? or devices[0].a_t.empty? or ((nowDate - devices[0].a_t_d) / 3600).round > 144)
-				 Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
+				if !devices[0].a_t_d.nil? 		
+					Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
+				end
 				devices[0].a_t = token
 				device.a_t_d = nowDate
 			else
