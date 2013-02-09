@@ -232,6 +232,9 @@ class Player
 			if (devices[0].a_t_d.nil? or devices[0].a_t.empty? or ((nowDate - devices[0].a_t_d) / 3600).round > 144)
 				if !devices[0].a_t_d.nil? 		
 					Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
+				else
+					Rails.logger.debug("auth token date is nil")
+				
 				end
 				devices[0].a_t = token
 				devices[0].a_t_d = nowDate
