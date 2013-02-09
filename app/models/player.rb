@@ -213,8 +213,10 @@ class Player
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
 			#find by registrationId
-			Rails.logger.info ("generate_token --- !gcm_registration_id.empty?")
+			Rails.logger.info ("generate_token --- !gcm_registration_id.empty? count=#{self.devices.count}")
 			self.devices.delete_if {|v| v.a_t != token and v.r_id == gcm_registration_id}
+			Rails.logger.info ("generate_token --- after delete_if count=#{self.devices.count}")
+
 		end
 
 		devices = self.devices.select {|v| v.a_t == token_to_replace} 
