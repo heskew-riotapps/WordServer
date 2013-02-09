@@ -234,7 +234,7 @@ class Player
 					Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
 				end
 				devices[0].a_t = token
-				device[0].a_t_d = nowDate
+				devices[0].a_t_d = nowDate
 			else
 				#dont change token
 				token = devices[0].a_t 
