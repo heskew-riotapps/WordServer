@@ -213,7 +213,8 @@ class Player
 		#just check to see if another token is not already associated with this registration Id
 		if !gcm_registration_id.empty?
 			#find by registrationId
-			self.devices.delete_if {|v| v.a_t != token && v.r_id == gcm_registration_id}
+			Rails.logger.info ("generate_token --- !gcm_registration_id.empty?")
+			self.devices.delete_if {|v| v.a_t != token and v.r_id == gcm_registration_id}
 		end
 
 		devices = self.devices.select {|v| v.a_t == token_to_replace} 
@@ -227,7 +228,8 @@ class Player
 			Rails.logger.info ("generate_token --- device not found")
 		else
 		#only update token if it is at least a week old or empty
-			if (devices[0].a_t_d.nil? || devices[0].a_t.empty? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
+	 
+			if (devices[0].a_t_d.nil? or devices[0].a_t.empty? or ((nowDate - devices[0].a_t_d) / 3600).round > 144)
 				 Rails.logger.debug("auth token being updated for player=#{self.id} hours=#{((nowDate - devices[0].a_t_d) / 3600).round}")
 				devices[0].a_t = token
 				device.a_t_d = nowDate
