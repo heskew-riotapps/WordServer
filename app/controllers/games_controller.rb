@@ -392,7 +392,7 @@ class GamesController < ApplicationController
 			end	
 		end
 		
-		logger.debug("game play  #{@game.inspect}")
+		logger.info("game play  #{@game.inspect}")
 		if @unauthorized 
 			render json: "unauthorized", status: :unauthorized
 		elsif not_found 
