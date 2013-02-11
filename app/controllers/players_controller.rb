@@ -113,6 +113,10 @@ class PlayersController < ApplicationController
 			end
   end
   
+  def shuffle
+	render json: AlphabetService.get_letter_distribution.shuffle!.shuffle!.shuffle!.shuffle!.shuffle!.shuffle!, status: :ok
+  end
+  
 	def auth_via_token
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
