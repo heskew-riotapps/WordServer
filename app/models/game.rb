@@ -129,7 +129,16 @@ class Game
 		end
 	end 	
 
-
+	#is it this player's turn?
+	def isPlayerFirstTurn?(context_player_id)
+		first = false
+		turns = self.played_turns.select {|v| v.player_id == context_player_id}
+		if turns.count == 0
+			first = true
+		end
+		first
+	end
+	
 	#is it this player's turn?
 	def isPlayerCurrentTurn?(context_player_id)
 		ok = false
