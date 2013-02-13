@@ -1,27 +1,17 @@
 class PlayerService
 
   def self.findPlayer(auth_token)
-	#players = Player.where('devices.a_t' => auth_token ) 
-	#db.wrappers.find({"lastArray.url":{$regex:/\.com$/}});
-	#{:"devices.a_t"=>"1hvXSNwqnAO-s_EHgHI7aw"}
-	# players = Player.all('devices.a_t' => auth_token) 
-	# players = Player.find_by_devices('a_t' => auth_token) 
-	# players = Player.where('devices.a_t' => auth_token)
-	# players = Player.where('devices' => {'a_t' => auth_token})
+
 	 players = Player.all(:conditions => {'devices.a_t' => auth_token}) 
-	#User.where('alerts.name' => params[:name], :id => current_user.id).first
-	#:stories => {:posted_by => "Josh"}}
-	# return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc)  
-#:devices=>{"a_t"=>"1hvXSNwqnAO-s_EHgHI7aw"}
 	
-	Rails.logger.info ("findPlayer  players=#{players.inspect}")
+	#Rails.logger.info ("findPlayer  players=#{players.inspect}")
 	player = nil
 	if players.count > 0
 		player = players[0]
 	end
-	Rails.logger.info ("findPlayer  player=#{player.inspect}")
+
 	player
-	#Player.devices.where(:a_t => auth_token).first
+
   end	
 
   def self.create(params)
@@ -89,7 +79,7 @@ class PlayerService
 					@error.code = "4"
 					@unauthorized = true
 				else
-					@player = Player.find_by_n_n(params[:n_n])
+					@player = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
 					if @player.nil?
 						@player = Player.new
 						@player.password = params[:p_w]
@@ -141,8 +131,9 @@ class PlayerService
 					@player.n_v = @player.n_v + 1
 					@player.st = 1
 					
-					#check for duplicate nickname
-					if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
+					#check for duplicate nickname, regex for case insensitivity
+					if Player.where( :n_n => { :$regex => /^#{params[:n_n]}$/i}, :id.ne => @player.id ).count > 0
+					#if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
 						Rails.logger.info ("duplicate nickname #{params[:n_n].inspect}")
 					#if Player.exists?(:n_n => params[:n_n], !:id => @player.id )
 						#nickname is taken
@@ -193,14 +184,15 @@ class PlayerService
 				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 			end
 			#check for duplicate nickname
-			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
+			if Player.where( :n_n => { :$regex => /^#{params[:n_n]}$/i}, :id.ne => @player.id ).count > 0
+			#if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
  
 				@error.code = "3"
  				@unauthorized = true
 			#check for duplicate email
 			elsif Player.where( :e_m => @email, :id.ne => @player.id ).count > 0 
-				Rails.logger.debug("duplicate  email#{params[:n_n].inspect}")
+				Rails.logger.debug("duplicate  email#{params[:e_m].inspect}")
 				@error.code = "5"
  				@unauthorized = true
 			else
@@ -242,7 +234,8 @@ class PlayerService
 				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
 			end
 			#check for duplicate nickname
-			if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
+			if Player.where( :n_n => { :$regex => /^#{params[:n_n]}$/i}, :id.ne => @player.id ).count > 0
+			#if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0 
 				Rails.logger.debug("duplicate nickname #{params[:n_n].inspect}")
  
 				@error.code = "3"
