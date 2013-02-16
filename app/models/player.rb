@@ -178,8 +178,8 @@ class Player
 	 return Alert.where("st" => 1,
 			"a_d" => {"$lte" => nowDate},
 			"$or" => [{"e_d" => {"$gte" => nowDate}}, {"e_d" => nil}], 
-			"cr_d" => {"$gte" => Time.parse(self.last_alert_date)}
-			).sort(:'cr_d'.desc).limit(1)   
+			"a_d" => {"$gt" => Time.parse(self.last_alert_date)}
+			).sort(:'a_d'.desc).limit(1)   
 	 
   end
  

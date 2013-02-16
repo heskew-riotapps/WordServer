@@ -134,7 +134,11 @@ class PlayersController < ApplicationController
 			else
 				@player.completed_games_from_date = "6/10/2012"
 			end
-			
+			if !params.has_key?(:a_a_d) || params[:a_a_d].blank? #alert activation date
+				@player.last_alert_date = params[:a_a_d]
+			else
+				@player.last_alert_date = "6/10/2012"
+			end
 			@gcm_reg_id = ""
 			if params.has_key?(:r_id) && !params[:r_id].blank?
 				@gcm_reg_id = params[:r_id] 
@@ -172,6 +176,11 @@ class PlayersController < ApplicationController
 			not_found = true
 			Rails.logger.info("authorization failed #{params[:a_t]}")		
 		else
+			if !params.has_key?(:a_a_d) || params[:a_a_d].blank? #alert activation date
+				@player.last_alert_date = params[:a_a_d]
+			else
+				@player.last_alert_date = "6/10/2012"
+			end
 			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
 				@player.completed_games_from_date = params[:c_g_d]
 			else
