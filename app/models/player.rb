@@ -57,7 +57,8 @@ class Player
   key :o_n_i_a, Boolean, :default => false #option-no interstitial ads
   
   timestamps!
-  attr_accessor :completed_games_from_date  
+  attr_accessor :completed_games_from_date 
+  attr_accessor :last_alert_date    
   attr_accessor :a_t 
   attr_accessor :game_
   #key :completed_games_from_date 
@@ -166,6 +167,19 @@ class Player
 			).sort(:'co_d'.desc).limit(10)   
 
   end
+  
+   def alert  #alerts as of data X method, no parameter passed since this is needed in rabl. hacky but it works
+	Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
+	nowDate = Time.now.utc
+	if self.last_alert_date.nil?
+		self.last_alert_date	= "10/06/2012"
+	end
+	 Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
+	 return Alert.where("st" => 1, "a_d" => {"$lt" => nowDate},
+			"cr_d" => {"$gt" => Time.parse(self.last_alert_date)}
+			).sort(:'cr_d'.desc).limit(1)   
+
+  end
  
   def gravatar 
     if !self.fb.nil? && !self.fb.empty? 
@@ -231,7 +245,7 @@ class Player
 		else
 		#only update token if it is at least a week old or empty
 			if devices[0].a_t_d.nil?
-				devices[0].a_t_d = Date.new("10/06/2012") # hack, a better rails dev than me can fix this
+				devices[0].a_t_d = "10/06/2012" #Date.new("10/06/2012") # hack, a better rails dev than me can fix this
 			end
 			if (devices[0].a_t.empty? || ((nowDate - devices[0].a_t_d) / 3600).round > 144)
 				if !devices[0].a_t_d.nil? 		
