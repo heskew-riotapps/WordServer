@@ -132,7 +132,7 @@ class PlayersController < ApplicationController
 			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
 				@player.completed_games_from_date = params[:c_g_d]
 			else
-				@player.completed_games_from_date = "10/6/2012"
+				@player.completed_games_from_date = "6/10/2012"
 			end
 			
 			@gcm_reg_id = ""

@@ -9,12 +9,21 @@ def create
 	unauthorized = false
 	
 	nowDate = Time.now.utc
+
+	if params.has_key?(:e_d) && !params[:e_d].blank?
+		@alert.e_d = params[:e_d]
+	end
 	if params.has_key?(:a_d) && !params[:a_d].blank?
 		@alert.a_d = params[:a_d]
 	end
-	if !params.has_key?(:t) || params[:t].blank?
+	if !params.has_key?(:a_d) || params[:a_d].blank?
+		@alert.errors.add(:t, I18n.t(:error_alert_requires_activation_date))
+	elsif !params.has_key?(:t) || params[:t].blank?
 		@alert.errors.add(:t, I18n.t(:error_alert_requires_text))
+	elsif @alert.e_d < @alert.a_d
+		@alert.errors.add(:t, I18n.t(:error_alert_expiration_before_activation))
 	else
+		
 		@alert.t = params[:t]
 		@alert.st = 1
 		@alert.cr_d = nowDate

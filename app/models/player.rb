@@ -175,10 +175,12 @@ class Player
 		self.last_alert_date	= "10/06/2012"
 	end
 	 Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
-	 return Alert.where("st" => 1, "a_d" => {"$lt" => nowDate},
-			"cr_d" => {"$gt" => Time.parse(self.last_alert_date)}
+	 return Alert.where("st" => 1,
+			"a_d" => {"$lte" => nowDate},
+			"$or" => [{"e_d" => {"$gte" => nowDate}}, {"e_d" => nil}], 
+			"cr_d" => {"$gte" => Time.parse(self.last_alert_date)}
 			).sort(:'cr_d'.desc).limit(1)   
-
+	 
   end
  
   def gravatar 

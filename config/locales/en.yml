@@ -33,3 +33,5 @@ en:
   notification_created_game_2_opponents: "%{player1} started a game with you and %{player2}"
   notification_created_game_3_opponents: "%{player1} started a game with you, %{player2} and %{player3}"
   error_alert_requires_text: "Alert is missing text.  Text must be supplied."
+  error_alert_requires_activation_date: "Alert is missing an activation date."
+  error_alert_expiration_before_activation: "Expiration date must be after activation date."
