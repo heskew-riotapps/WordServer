@@ -23,7 +23,7 @@ def create
 		@alert.errors.add(:t, I18n.t(:error_alert_requires_activation_date))
 	elsif !params.has_key?(:t) || params[:t].blank?
 		@alert.errors.add(:t, I18n.t(:error_alert_requires_text))
-	elsif !@alert.e_d.nil && @alert.e_d < @alert.a_d
+	elsif !@alert.e_d.nil? && @alert.e_d < @alert.a_d
 		@alert.errors.add(:t, I18n.t(:error_alert_expiration_before_activation))
 	else
 		
