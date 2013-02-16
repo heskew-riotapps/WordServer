@@ -13,6 +13,9 @@ def create
 	if params.has_key?(:e_d) && !params[:e_d].blank?
 		@alert.e_d = params[:e_d]
 	end
+	if params.has_key?(:ti) && !params[:ti].blank?
+		@alert.ti = params[:ti]
+	end
 	if params.has_key?(:a_d) && !params[:a_d].blank?
 		@alert.a_d = params[:a_d]
 	end
