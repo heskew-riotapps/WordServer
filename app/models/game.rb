@@ -540,13 +540,13 @@ class Game
 					non_declined_players.each  do |value|
 						#tell the losers (except current player) that the winner won
 						if value.player_id != winner[0].player.id && value.player_id != current_player.id  
-							msg_notification = I18n.t(:notification_x_won) % { :player => current_player.get_name }
+							msg_notification = I18n.t(:notification_x_won) % { :player => winner[0].player.get_name }
 							self.send_to_cloud_notifiers(value.player, msg_notification)
 						end
 					end
 					
 					#tell winner that she won 
-					self.send_to_cloud_notifiers(winner[0], I18n.t(:notification_you_won))		
+					self.send_to_cloud_notifiers(winner[0].player, I18n.t(:notification_you_won))		
 				end
 			end		
 		elsif draws.count > 1
