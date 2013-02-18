@@ -616,6 +616,14 @@ def self.decline(current_player, game)
 		#	return @game
 		@unauthorized = true
 	else
+		player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
+		if player_game[0].st != 1 
+			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
+			return @game, @unauthorized 
+		end
+		
+		#add 1 to players tray version
+		player_game[0].t_v = player_game[0].t_v + 
 		
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
@@ -758,6 +766,10 @@ def self.swap(current_player, game, params)
 			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
 			return @game, @unauthorized 
 		end
+		
+		#add 1 to players tray version
+		player_game[0].t_v = player_game[0].t_v + 
+		
 		swapped_letters_count = params[:s_l].length
 		prev_tray_letter_count = player_game[0].t_l.length
 		#save played tiles and remove them from players tray letters

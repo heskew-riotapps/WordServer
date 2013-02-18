@@ -1,6 +1,6 @@
 object @game 
 
-  attributes :id, :cr_d, :lp_d, :ch_d, :t, :a_t, :left, :st, :l_t_a, :l_t_d, :l_t_p, :l_t_pl  
+  attributes :id, :cr_d, :ch_d, :t, :a_t, :left, :st, :l_t_a, :l_t_d, :l_t_p, :l_t_pl, :r_v, :r_c  
   child :player_games do
     attributes :o, :i_t, :sc, :id, :t_l, :st, :t_v, :player_id
   end
@@ -13,3 +13,4 @@ object @game
   child :chats do
 	attribute :t, :player_id, :ch_d 
   end 
+ 
