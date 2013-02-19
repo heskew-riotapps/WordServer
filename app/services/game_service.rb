@@ -896,4 +896,47 @@ def self.swap(current_player, game, params)
 	
 	return @game, @unauthorized 
 end	
+
+	def send_reminder(current_player, game)
+	
+		Rails.logger.info("game send_reminder #{game.inspect}")
+		@game = game
+		
+		#Rails.logger.info("game cancel assignment #{@game.inspect}")
+		@unauthorized = false
+		@ok = false
+		nowDate = Time.now.utc
+		
+		if !@game.is_player_part_of_game?(current_player.id)
+			Rails.logger.info("is_player_part_of_game failed")
+			@unauthorized = true
+		elsif @game.st == 2
+			Rails.logger.info("no reminder allowed in cancelled games")
+			@game.errors.add(:st, I18n.t(:error_game_play_game_over))
+			#	return @game
+			@unauthorized = true
+		
+		elsif @game.st == 3  #make sure game is active  
+			Rails.logger.info("game play is over for this game")
+			@game.errors.add(:st, I18n.t(:error_game_play_game_over))
+			#	return @game
+			@unauthorized = true
+		else
+ 
+			msg_notification = I18n.t(:notification_x_sending_reminder) % { :player => current_player.get_name }  
+			@game.send_to_cloud_notifiers(current_player.id, msg_notification)
+	  
+			####finish this!!!!
+			###add flags at player_game level keeping track of reminders sent by turn last_reminder_date, last_reminder_turn
+			
+			#Rails.logger.info("game after status set #{@game.inspect}")
+			@game.save
+
+			#Rails.logger.info("game after save #{@game.inspect}")
+		end
+		
+		return @game, @unauthorized 
+	
+	
+	end
 end

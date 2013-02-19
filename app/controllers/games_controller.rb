@@ -489,7 +489,7 @@ class GamesController < ApplicationController
 			end	
 		end
 		
-		logger.debug("game swap  #{@game.inspect}")
+		logger.debug("game info  #{@game.inspect}")
  
 		if @unauthorized 
 			render json: "unauthorized", status: :unauthorized

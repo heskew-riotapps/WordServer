@@ -2,6 +2,10 @@ object @player
 
 attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t, :o_n_i_a, :l_rf_d
 
+child :alert => :alerts do
+	attribute :ti, :t, :id 
+end
+
 child :opponents => :opps do
 	attribute :n_g, :st 
 	child :player do
