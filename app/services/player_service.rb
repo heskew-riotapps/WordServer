@@ -92,7 +92,7 @@ class PlayerService
 						@ok = @player.save
 					else
 						#validate password here
-						if @player.auth(params[:p_w])
+						if @player.authenticate(params[:p_w])
 							@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 							#@player.nickname = params[:nickname]
 							@player.e_m = @email #email
@@ -124,7 +124,7 @@ class PlayerService
 				#error codes via http or just error strings??
 				#if @player.authenticate_with_new_token(params[:password])
 				
-				if @player.auth(params[:p_w])
+				if @player.authenticate(params[:p_w])
 					Rails.logger.debug("player has been authorized with password #{params[:p_w].inspect}")
 					@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 					@player.n_n = params[:n_n]
