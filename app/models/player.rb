@@ -278,7 +278,7 @@ class Player
 			token = SecureRandom.urlsafe_base64
 		end while Player.exists?('devices.a_t' => token) #(:devices => {:a_t => token})
 	
-		self.devices.
+		#self.devices.
 		
 		nowDate = Time.now.utc
 		
