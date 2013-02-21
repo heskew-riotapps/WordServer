@@ -105,7 +105,7 @@ class PlayerService
 							Rails.logger.info("@player_authorized #{@player.n_n}")
 
 							@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
-							@player.nickname = params[:n_n]
+							@player.n_n = params[:n_n]
 							@player.e_m = @email #email
 							@player.n_v = @player.n_v + 1
 							
