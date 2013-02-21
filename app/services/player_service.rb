@@ -72,6 +72,7 @@ class PlayerService
 			
 		else		
 			#find player by email addy
+			Rails.logger.debug("player_service #find player by email addy #{@email}")
 			@player = Player.find_by_e_m(@email)
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
