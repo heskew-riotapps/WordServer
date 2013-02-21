@@ -72,7 +72,7 @@ class PlayerService
 			
 		else		
 			#find player by email addy
-			Rails.logger.debug("player_service #find player by email addy #{@email}")
+			Rails.logger.info("player_service #find player by email addy #{@email}")
 			@player = Player.find_by_e_m(@email)
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
@@ -82,7 +82,7 @@ class PlayerService
 				else
 					@player_by_nickname = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
 					
-					Rails.logger.debug("@player_by_nickname.count #{@player_by_nickname.count}")
+					Rails.logger.info("@player_by_nickname.count #{@player_by_nickname.count}")
 					if @player_by_nickname.count > 0
 						@player = @player_by_nickname[0]
 					end
