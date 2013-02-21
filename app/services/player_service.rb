@@ -30,7 +30,7 @@ class PlayerService
 	@error = Error.new
 	@unauthorized = false
 		if !params.has_key?(:e_m) || params[:e_m].blank?
-			Rails.logger.info ("email not supplied inspect #{params.inspect}")
+			#Rails.logger.info ("email not supplied inspect #{params.inspect}")
 			@error.code = "2"
 			@unauthorized = true
 		elsif !params[:fb].blank?
@@ -72,22 +72,22 @@ class PlayerService
 			
 		else		
 			#find player by email addy
-			Rails.logger.info("player_service #find player by email addy #{@email}")
+			#Rails.logger.info("player_service #find player by email addy #{@email}")
 			@player = Player.find_by_e_m(@email)
-			Rails.logger.info("is player nil? after find_by_e_m #{@player.nil?}")
+			#Rails.logger.info("is player nil? after find_by_e_m #{@player.nil?}")
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
-					Rails.logger.info ("nickname not supplied inspect #{params.inspect}")
+					#Rails.logger.info ("nickname not supplied inspect #{params.inspect}")
 					@error.code = "4"
 					@unauthorized = true
 				else
 					@player_by_nickname = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
 					
-					Rails.logger.info("@player_by_nickname.count #{@player_by_nickname.count}")
+					#Rails.logger.info("@player_by_nickname.count #{@player_by_nickname.count}")
 					if @player_by_nickname.count > 0
 						@player = @player_by_nickname.first
 					end
-					Rails.logger.info("is player nil? after player_by_nickname #{@player.nil?}")
+					#Rails.logger.info("is player nil? after player_by_nickname #{@player.nil?}")
 					if @player.nil?
 						@player = Player.new
 						@player.password = params[:p_w]
@@ -102,7 +102,7 @@ class PlayerService
 						#validate password here
 						if @player.auth(params[:p_w])
 						
-							Rails.logger.info("@player_authorized #{@player.n_n}")
+							#Rails.logger.info("@player_authorized #{@player.n_n}")
 
 							@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 							@player.n_n = params[:n_n]
@@ -129,7 +129,7 @@ class PlayerService
 					end
 				end
 			else
-				Rails.logger.info ("player has been found by email inspect #{@player.inspect}")
+				#Rails.logger.info ("player has been found by email inspect #{@player.inspect}")
 				#player has been found by email...check password and make sure nickname is not duplicated.
 				#if password fails, send login failed error to client
 				#error codes via http or just error strings??
@@ -145,7 +145,7 @@ class PlayerService
 					#check for duplicate nickname, regex for case insensitivity
 					if Player.where( :n_n => { :$regex => /^#{params[:n_n]}$/i}, :id.ne => @player.id ).count > 0
 					#if Player.where( :n_n => params[:n_n], :id.ne => @player.id ).count > 0
-						Rails.logger.info ("duplicate nickname #{params[:n_n].inspect}")
+						#Rails.logger.info ("duplicate nickname #{params[:n_n].inspect}")
 					#if Player.exists?(:n_n => params[:n_n], !:id => @player.id )
 						#nickname is taken
 						@error.code = "3"
@@ -156,7 +156,7 @@ class PlayerService
 					end
 					 
 				else
-					Rails.logger.info ("player has not been authorized with password #{params[:p_w].inspect}")
+					#Rails.logger.info ("player has not been authorized with password #{params[:p_w].inspect}")
 					@error.code = "1"
 					#@unauthorized_reason = "1" 
 					@unauthorized = true
