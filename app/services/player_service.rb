@@ -79,7 +79,10 @@ class PlayerService
 					@error.code = "4"
 					@unauthorized = true
 				else
-					@player = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
+					@player_by_nickname = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
+					if @player_by_nickname.count > 0
+						@player = @player_by_nickname[0]
+					end
 					if @player.nil?
 						@player = Player.new
 						@player.password = params[:p_w]
