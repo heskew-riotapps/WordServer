@@ -80,6 +80,8 @@ class PlayerService
 					@unauthorized = true
 				else
 					@player_by_nickname = Player.where(:n_n => { :$regex => /^#{params[:n_n]}$/i} ) #Player.find_by_n_n(params[:n_n])
+					
+					Rails.logger.debug("@player_by_nickname.count #{@player_by_nickname.count}")
 					if @player_by_nickname.count > 0
 						@player = @player_by_nickname[0]
 					end
