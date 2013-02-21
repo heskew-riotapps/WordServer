@@ -74,6 +74,7 @@ class PlayerService
 			#find player by email addy
 			Rails.logger.info("player_service #find player by email addy #{@email}")
 			@player = Player.find_by_e_m(@email)
+			Rails.logger.info("is player nil? after find_by_e_m #{@player.nil?}")
 			if @player.nil?
 				if !params.has_key?(:n_n) || params[:n_n].blank?
 					Rails.logger.info ("nickname not supplied inspect #{params.inspect}")
@@ -84,8 +85,9 @@ class PlayerService
 					
 					Rails.logger.info("@player_by_nickname.count #{@player_by_nickname.count}")
 					if @player_by_nickname.count > 0
-						@player = @player_by_nickname[0]
+						@player = @player_by_nickname.first
 					end
+					Rails.logger.info("is player nil? after player_by_nickname #{@player.nil?}")
 					if @player.nil?
 						@player = Player.new
 						@player.password = params[:p_w]
@@ -99,6 +101,9 @@ class PlayerService
 					else
 						#validate password here
 						if @player.auth(params[:p_w])
+						
+							Rails.logger.info("@player_authorized #{@player.n_n}")
+
 							@player.generate_token_for_gcm_registration_id(@gcm_reg_id) #do not delete existing tokens  
 							#@player.nickname = params[:nickname]
 							@player.e_m = @email #email
