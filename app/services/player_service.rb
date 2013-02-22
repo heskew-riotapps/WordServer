@@ -134,6 +134,10 @@ class PlayerService
 				#if password fails, send login failed error to client
 				#error codes via http or just error strings??
 				#if @player.authenticate_with_new_token(params[:password])
+				if !@player.fb.nil? 
+					@player.fb = ""
+				end
+				
 				if !@player.fb.empty? 
 					@error.code = "7"
 					#@unauthorized_reason = "1" 
