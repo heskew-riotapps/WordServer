@@ -478,6 +478,7 @@ def self.decline(current_player, game)
 		
 		player_game = @game.player_games.select {|v| v.player.id == current_player.id} #getContextPlayerGame(current_player.id)
 		if player_game[0].st != 1 
+			Rails.logger.info("error_game_play_player_not_active_in_game failed")
 			@game.errors.add(:t, I18n.t(:error_game_play_player_not_active_in_game))
 			return @game, @unauthorized 
 		end
@@ -495,6 +496,7 @@ def self.decline(current_player, game)
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
 		if prev_tray_letter_count - played_tiles_count != player_game[0].t_l.length
+			Rails.logger.info("error_game_play_tray_tiles_out_of_sync failed")
 			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
 			return @game, @unauthorized 
 		end

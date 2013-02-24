@@ -391,9 +391,10 @@ class GamesController < ApplicationController
 				@game.strip_tray_tiles_from_non_context_user player.id
 			end	
 		end
-		
-		logger.info("game play  #{@game.inspect}")
-				logger.info("game errors  #{@game.errors}")
+		if !@game.errors.empty?
+			logger.info("game play  #{@game.inspect}")
+			logger.info("game errors  #{@game.errors}")
+		end		
 		if @unauthorized 
 			render json: "unauthorized", status: :unauthorized
 		elsif not_found 
