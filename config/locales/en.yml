@@ -21,6 +21,7 @@ en:
   notification_x_resigned_game_over: "%{player} resigned.  You win!"
   notification_x_skipped_turn: "%{player} skipped a turn"
   notification_x_swapped_letters: "%{player} swapped %{number} letters"
+  notification_x_sent_chat_message: "%{player} sent a chat message"
   notification_x_played_a_turn: "%{player} played %{word} for %{points} points"
   notification_x_won: "%{player} won!"
   notification_you_won: "You won!"

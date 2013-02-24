@@ -902,6 +902,12 @@ def self.swap(current_player, game, params)
 		@game.save
 
 		#Rails.logger.info("game after save #{@game.inspect}")
+		
+					#format message and send to opponents' devices
+		msg_notification = I18n.t(:notification_x_sent_chat_message) % { :player => current_player.get_name}  
+		@game.send_notification_to_active_opponents(current_player.id, msg_notification)
+
+		
 	end
 	
 	return @game, @unauthorized 
