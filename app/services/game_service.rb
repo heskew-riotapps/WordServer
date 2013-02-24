@@ -483,6 +483,10 @@ def self.decline(current_player, game)
 			return @game, @unauthorized 
 		end
 		played_tiles_count = params[:played_tiles].length
+		
+		Rails.logger.info("params[:played_tiles]=#{params[:played_tiles].inspect}")
+		Rails.logger.info("player_game[0].t_l=#{player_game[0].t_l.inspect}")
+		
 		prev_tray_letter_count = player_game[0].t_l.length
 		#save played tiles and remove them from players tray letters
 		params[:played_tiles].each  do |value|
@@ -496,6 +500,8 @@ def self.decline(current_player, game)
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
 		if prev_tray_letter_count - played_tiles_count != player_game[0].t_l.length
+			Rails.logger.info("tiles after prev_tray_letter_count=#{prev_tray_letter_count} played_tiles_count=#{played_tiles_count} player_game[0].t_l.length=#{player_game[0].t_l.length}")
+
 			Rails.logger.info("error_game_play_tray_tiles_out_of_sync failed")
 			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
 			return @game, @unauthorized 
