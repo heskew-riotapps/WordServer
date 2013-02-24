@@ -496,6 +496,8 @@ def self.decline(current_player, game)
 			#magic to delete first letter that matches
 			#http://stackoverflow.com/questions/4595305/delete-first-instance-of-matching-element-from-array
 			player_game[0].t_l.delete_at(player_game[0].t_l.index(value['l']) || player_game[0].t_l.length)
+			
+			Rails.logger.info("player_game[0].t_l #{value['l']}=#{player_game[0].t_l.inspect}")
 		end	
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
