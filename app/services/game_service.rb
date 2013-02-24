@@ -633,7 +633,7 @@ def self.decline(current_player, game)
 		end
 		
 		#add 1 to players tray version
-		player_game[0].t_v = player_game[0].t_v + 
+		player_game[0].t_v = player_game[0].t_v + 1
 		
 		#add a PlayedTurn record
 		played_turn = PlayedTurn.new
