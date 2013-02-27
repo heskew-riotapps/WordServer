@@ -148,11 +148,76 @@ class Player
 
   end
   
+  def a_games2 #active games method
+  s = "[
+'5126d153ac1e360002001d3a',
+'5126d522ac1e360002001dab',
+'511f9ef4f31f9e000200006b',
+'5126dc26ac1e360002001e63',
+'5126b4caac1e360002001bb5',
+'511d1ef70b642200020001f5',
+'5126aec3ac1e360002001b71',
+'512453133f22c500020002ff',
+'51074af3d178fc00020000f6',
+'50dd9cb83045310002000009',
+'512bd09734f54f0002000149',
+'5120e269b7a0ea0002000037',
+'5126c6b3ac1e360002001c85',
+'512b6a4b5e0af600020000c1',
+'512b69d95e0af600020000ad',
+'50f4598835fc6c0002000014',
+'50f853df408061000200000f',
+'512a6150da3b1e00020000d9',
+'51276a1274bdc300020000c3',
+'511d1ee40b642200020001de',
+'511d1eae0b642200020001c5',
+'50fb76eb865f540002000107',
+'50fd7299b6221900020002d0',
+'51184aa42334330002000dbb',
+'50f4ce837769d60002000169',
+'510fc102c73d3a00020000be',
+'510f14b8a07a6c000200007f',
+'50ed80236f1381000200004a',
+'50f0160948f4b70002000029',
+'50e8cf365d2a2a000200001c',
+'50e7bbf48eed9f0002000096',
+'50e7a1ef8eed9f0002000013',
+'50e7a2658eed9f000200001b',
+'50e3b166faa9780002000006',
+'50df99f408f8070002000024',
+'50df337e7c6cd10002000018']"
+	arr = eval(s)
+	
+	return Game.all(:conditions => {'id' => arr})
+  end
+  
   def a_games #active games method
   #Rails.logger.debug("player class, entering a_game")
 
     return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc)    
  
+  end
+ 
+  def c_games2  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works
+	s = "[
+'50f462be3768fd0002000005',
+'50f4448bda4c25000200009a',
+'512a64f0da3b1e0002000168',
+'511c6efb8b9dd3000200031f',
+'5126cfbfac1e360002001cf0',
+'5126c340ac1e360002001c2b',
+'512451203f22c500020001c8',
+'5124501e3f22c50002000115',
+'51244eef3f22c500020000c2',
+'51230a88d712a7000200012f']"
+	arr = eval(s)
+	
+	return Game.all(:conditions => {'id' => arr}) 
+	# return Game.where( 
+	# 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}},
+#			"co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}
+#			).sort(:'co_d'.desc).limit(10)   
+
   end
  
  def c_games  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works

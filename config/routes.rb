@@ -42,6 +42,7 @@ Word::Application.routes.draw do
 		match "/games/destroy" => "games#destroy"
 		match "/games/destroy_all____" => "games#destroy_all"
 		match "/players/find/" => "players#find"
+		match "/players/auth_via_token2/" => "players#auth_via_token2"
 		match "/players/auth_via_token/" => "players#auth_via_token"
 		match "/players/auth_via_token_with_game/" => "players#auth_via_token_with_game"
 		match "/players/get_via_token/" => "players#get_via_token"
