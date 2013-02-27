@@ -19,7 +19,8 @@ gem 'bcrypt-ruby', :require => 'bcrypt'
 gem 'thin'
 gem 'rabl'
 # Also add either `json` or `yajl-ruby` as the JSON parser
-gem 'yajl-ruby'
+#gem 'yajl-ruby'
+gem 'yajl-ruby', :require => "yajl"
  
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
