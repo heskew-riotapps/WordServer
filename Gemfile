@@ -20,7 +20,7 @@ gem 'thin'
 gem 'rabl'
 # Also add either `json` or `yajl-ruby` as the JSON parser
 #gem 'yajl-ruby'
-gem 'yajl-ruby', :require => "yajl"
+gem 'oj'
  
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
