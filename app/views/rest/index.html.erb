@@ -20,6 +20,9 @@ Post Data:<br />
 <br />
 <br />
 
+Time to respond:&nbsp;<span id="sTD"></span>
+<br />
+
 Return Status Code:&nbsp;<span id="sRC"></span>
 <br />
 Return Data:<br />
@@ -28,6 +31,7 @@ Return Data:<br />
  
 
 <script>
+var start = new Date();
 $(document).ready(function() {
   $('#bGo').click(function() {
 	$('#tReturn').text(""); 
@@ -87,6 +91,8 @@ $(document).ready(function() {
 			success: function (data, textStatus, xhr) {
 				$('#tReturn').text(JSON.stringify(data, null, "\t"));
 				$("#sRC").text(xhr.status);
+				var d = new Date();
+				$("#sTD").text(d.getTime() - start.getTime());
 			},
 			error:function (xhr, ajaxOptions, thrownError){
 				$("#sRC").text(xhr.status); 
