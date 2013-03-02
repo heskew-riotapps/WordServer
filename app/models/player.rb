@@ -183,50 +183,119 @@ class Player
 	
 	data_opponents = { :opps => opps }
 	data = data.merge(data_opponents)
+	 
+	active_games = [] 
+	a_games = Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all    
+	#active_games = self.get_active_games
 	
-=begin
-   	"opps": [
-		{
-			"n_g": 2,
-			"st": 1,
-			"player": {
-				"id": "506f0e9b0f3c4610780005fe",
-				"fb": null,
-				"f_n": null,
-				"l_n": null,
-				"n_n": "jingle",
-				"gravatar": "d8f05a5cfdda925ccccef55caa22dfea",
-				"n_w": 1
-			}
-		},
-=end 
- Rails.logger.debug("data=#{data.inspect}")
+	#i = 1
+	#count = a_games.count
+	#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
+	a_games.each  do |value|
+		#Rails.logger.debug("active game=#{i} #{value.inspect}")
+		#create a game hash
+		game = { :id => value.id, :cr_d => value.cr_d, :ch_d => value.ch_d, :t => value.t,
+				 :l_t_a => value.l_t_a, :l_t_d => value.l_t_d, :l_t_p => value.l_t_p, :l_t_pl => value.l_t_pl  
+				}
+				
+		#create an array to hold the player game hashes		
+		player_games = []		
+		
+		#load the player game hashes into the array
+		value.player_games.each do |pg|
+			player_game = { :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
+			player_games << player_game 
+		end	
+		
+		#pull the array of player game hashes into an outer hash
+		data_player_games = { :player_games => player_games }
+		
+		#merge this newly created hash into the game hash
+		game = game.merge(data_player_games)
+		
+		#create array of hashes for played words
+		played_words = []
+		last_turn_words = value.l_t_w
+		#load the array with played word hashes
+		last_turn_words.each do |pw|
+			played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
+			played_words << played_word
+		end	
+		
+		#pull the array of played word hashes into an outer hash
+		data_played_words = { :played_words => played_words }
+		
+		#merge this newly created hash into the game hash
+		game = game.merge(data_played_words)
+		
+		#add this game hash to the game array 
+		active_games << game	
+	 
+	end
+	 
+	#pull the array of game hashes into an outer hash
+	data_active_games = { :a_games => active_games }
+	
+	#add the active games hash to the main hash
+	data = data.merge(data_active_games)
+
+	
+	completed_games = [] 
+	c_games = self.get_completed_games    
+	#active_games = self.get_active_games
+	
+	#i = 1
+	#count = a_games.count
+	#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
+	c_games.each  do |value|
+		#Rails.logger.debug("active game=#{i} #{value.inspect}")
+		#create a game hash
+		game = { :id => value.id, 
+				:cr_d => value.cr_d, 
+				:ch_d => value.ch_d,
+				:co_d => value.co_d,
+				:lp_d => value.lp_d,				 
+				:t => value.t,
+				:st => value.st,
+				:l_t_a => value.l_t_a, 
+				:l_t_d => value.l_t_d, 
+				:l_t_p => value.l_t_p, 
+				:l_t_pl => value.l_t_pl,
+				:r_v => value.r_v,
+				:r_c => value.r_c
+				}
+		
+		#create an array to hold the player game hashes		
+		player_games = []		
+		
+		#load the player game hashes into the array
+		value.player_games.each do |pg|
+			player_game = { :sc => pg.sc, :st => pg.st, :player_id => pg.player_id }
+			player_games << player_game 
+		end	
+
+		#pull the array of player game hashes into an outer hash
+		data_player_games = { :player_games => player_games }
+		
+		#merge this newly created hash into the game hash
+		game = game.merge(data_player_games)
+		
+		#add this game hash to the game array 
+		completed_games << game	
+	 
+	end
+	 
+	#pull the array of game hashes into an outer hash
+	data_completed_games = { :c_games => completed_games }
+	
+	#add the active games hash to the main hash
+	data = data.merge(data_completed_games)
+	 Rails.logger.debug("data=#{data.inspect}")
    
    return data
   
 =begin
- --- attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t, :o_n_i_a, :l_rf_d
 
----child :alert => :alerts do
----	attribute :ti, :t, :id 
----end
-
-child :opponents => :opps do
-	attribute :n_g, :st 
-	child :player do
-		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
-	end
-end
-
-child :a_games => :a_games do
-  attribute :id, :cr_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p, :l_t_pl 
-  child :player_games do
-    attribute :sc, :i_t, :st, :player_id   
-  end   
-  child :l_t_w => :played_words do
-	attribute :w, :t, :player_id, :p_s, :p_d 
-  end
-end
 
  child :c_games => :c_games do
   attribute :id, :cr_d, :co_d, :lp_d, :ch_d, :t, :st, :l_t_a,:l_t, :l_t_p, :l_t_d, :l_t_pl, :r_v, :r_c
@@ -239,47 +308,13 @@ end
 =end
   end
   
-  def a_games2 #active games method
-  s = "[
-'5126d153ac1e360002001d3a',
-'5126d522ac1e360002001dab',
-'511f9ef4f31f9e000200006b',
-'5126dc26ac1e360002001e63',
-'5126b4caac1e360002001bb5',
-'511d1ef70b642200020001f5',
-'5126aec3ac1e360002001b71',
-'512453133f22c500020002ff',
-'51074af3d178fc00020000f6',
-'50dd9cb83045310002000009',
-'512bd09734f54f0002000149',
-'5120e269b7a0ea0002000037',
-'5126c6b3ac1e360002001c85',
-'512b6a4b5e0af600020000c1',
-'512b69d95e0af600020000ad',
-'50f4598835fc6c0002000014',
-'50f853df408061000200000f',
-'512a6150da3b1e00020000d9',
-'51276a1274bdc300020000c3',
-'511d1ee40b642200020001de',
-'511d1eae0b642200020001c5',
-'50fb76eb865f540002000107',
-'50fd7299b6221900020002d0',
-'51184aa42334330002000dbb',
-'50f4ce837769d60002000169',
-'510fc102c73d3a00020000be',
-'510f14b8a07a6c000200007f',
-'50ed80236f1381000200004a',
-'50f0160948f4b70002000029',
-'50e8cf365d2a2a000200001c',
-'50e7bbf48eed9f0002000096',
-'50e7a1ef8eed9f0002000013',
-'50e7a2658eed9f000200001b',
-'50e3b166faa9780002000006',
-'50df99f408f8070002000024',
-'50df337e7c6cd10002000018']"
-	arr = eval(s)
-	
-	return Game.all(:conditions => {'id' => arr})
+ 
+  
+  def get_active_games #active games method
+  #Rails.logger.debug("player class, entering a_game")
+
+    return Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all  
+ 
   end
   
   def a_games #active games method
@@ -308,6 +343,19 @@ end
 	# 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}},
 #			"co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}
 #			).sort(:'co_d'.desc).limit(10)   
+
+  end
+ 
+  def get_completed_games  #completed games as of data X method, no parameter passed since this is needed in to_json. hacky but it works
+	Rails.logger.debug("player c_games completed_games_from_date=#{self.completed_games_from_date}")
+	if self.completed_games_from_date.nil?
+		self.completed_games_from_date	= "10/06/2012"
+	end
+	# Rails.logger.debug("player c_games completed_games_from_date=#{self.completed_games_from_date}")
+	 return Game.where( 
+	 		'player_games' => { '$elemMatch' => {'st' => {'$in' => [ 4 , 5, 6, 7, 8]}, 'player_id' => self.id}},
+			"co_d" => {"$gt" => Time.parse(self.completed_games_from_date)}
+			).sort(:'co_d'.desc).limit(10).all   
 
   end
  
@@ -596,7 +644,48 @@ Rails.logger.info( "player.get_last_device devices= #{devices.inspect}")
 			return self.n_n
 		end
 	end
- 
+  def a_games2 #active games method
+  s = "[
+'5126d153ac1e360002001d3a',
+'5126d522ac1e360002001dab',
+'511f9ef4f31f9e000200006b',
+'5126dc26ac1e360002001e63',
+'5126b4caac1e360002001bb5',
+'511d1ef70b642200020001f5',
+'5126aec3ac1e360002001b71',
+'512453133f22c500020002ff',
+'51074af3d178fc00020000f6',
+'50dd9cb83045310002000009',
+'512bd09734f54f0002000149',
+'5120e269b7a0ea0002000037',
+'5126c6b3ac1e360002001c85',
+'512b6a4b5e0af600020000c1',
+'512b69d95e0af600020000ad',
+'50f4598835fc6c0002000014',
+'50f853df408061000200000f',
+'512a6150da3b1e00020000d9',
+'51276a1274bdc300020000c3',
+'511d1ee40b642200020001de',
+'511d1eae0b642200020001c5',
+'50fb76eb865f540002000107',
+'50fd7299b6221900020002d0',
+'51184aa42334330002000dbb',
+'50f4ce837769d60002000169',
+'510fc102c73d3a00020000be',
+'510f14b8a07a6c000200007f',
+'50ed80236f1381000200004a',
+'50f0160948f4b70002000029',
+'50e8cf365d2a2a000200001c',
+'50e7bbf48eed9f0002000096',
+'50e7a1ef8eed9f0002000013',
+'50e7a2658eed9f000200001b',
+'50e3b166faa9780002000006',
+'50df99f408f8070002000024',
+'50df337e7c6cd10002000018']"
+	arr = eval(s)
+	
+	return Game.all(:conditions => {'id' => arr})
+  end
   # Validations.
   validates_presence_of  :e_m 
 end

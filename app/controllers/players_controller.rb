@@ -315,7 +315,7 @@ class PlayersController < ApplicationController
 	end
 
 
- def auth_via_token2 
+ def auth  
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		Rails.logger.info("params #{params}")
