@@ -31,9 +31,10 @@ Return Data:<br />
  
 
 <script>
-var start = new Date();
+var start;
 $(document).ready(function() {
   $('#bGo').click(function() {
+    start = new Date()
 	$('#tReturn').text(""); 
 	var url = $("#tUrl").val() + ".json"
 	switch ($("#ddVerb").val())
