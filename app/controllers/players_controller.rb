@@ -107,7 +107,7 @@ class PlayersController < ApplicationController
 
 	end
   
- def auth_via_token2
+ def auth_via_token3____
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		Rails.logger.info("params #{params}")
@@ -313,6 +313,62 @@ class PlayersController < ApplicationController
 			respond_with @player
 		end
 	end
+
+
+ def auth_via_token2 
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "6/10/2012"
+			end
+			if !params.has_key?(:a_a_d) || params[:a_a_d].blank? #alert activation date
+				@player.last_alert_date = params[:a_a_d]
+			else
+				@player.last_alert_date = "6/10/2012"
+			end
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
+			
+			@player.n_v = @player.n_v + 1
+			
+			Rails.logger.info ("generate_token a_t=#{params[:a_t]} reg=#{@gcm_reg_id}")
+			#reset user's token, remove current token if token is over a week old
+			#send the new token back to the client
+			@player.generate_token(params[:a_t], @gcm_reg_id)
+			
+			if !@player.fb.blank?
+			 	@player.save(:validate => false)
+			else
+			 	@player.save 
+			end
+			
+			data_ = @player.generate_auth_json
+			Rails.logger.info("player =#{@player.inspect }")
+		end
+	
+		#format.json  { render :json => player.to_json( 
+		#					:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
+		#					:methods => [:gravatar, :a_t]),status: :ok}
+		respond_to do |format|
+			if not_found 
+				render json: "unauthorized", status: :unauthorized
+			else
+				format.json  { render :json => data_,status: :ok}
+			end
+		end
+	end
+
+
 	
 	def game_list_check
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?

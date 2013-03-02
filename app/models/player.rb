@@ -61,6 +61,7 @@ class Player
   attr_accessor :last_alert_date    
   attr_accessor :a_t 
   attr_accessor :game_
+  attr_accessor :data_
   #key :completed_games_from_date 
   
    #many :games do
@@ -146,6 +147,96 @@ class Player
 			false
 		end	
 
+  end
+  
+  def generate_auth_json
+  data = { :id => self.id, :fb => self.fb, :f_n => self.f_n, :l_n => self.l_n,
+		 :n_n => self.n_n, :n_w => self.n_w, :e_m => self.e_m, :gravatar => self.gravatar,
+		 :a_t => self.a_t, :o_n_i_a => self.o_n_i_a, :l_rf_d => self.l_rf_d}
+  Rails.logger.debug("data=#{data.inspect}")
+   #self.data_ = data
+   
+   alerts = self.alert_latest
+	if alerts != nil
+		#Rails.logger.debug("alerts=#{alerts.inspect}")
+
+		 data_alert = { :alerts => [{ :ti => alerts.ti, :t => alerts.t, :id => alerts.id }] }
+		#Rails.logger.debug("data_alert=#{data_alert.inspect}")
+		 data = data.merge(data_alert)
+	end
+   
+    opps = []
+   	self.opponents.each  do |value|
+		o = { :n_g => value.n_g, :st => value.st, 
+				:player => {
+					:id => value.player.id,
+					:fb => value.player.fb,
+					:f_n => value.player.f_n,
+					:l_n => value.player.l_n,
+					:n_n => value.player.n_n,
+					:gravatar => value.player.gravatar,
+					:n_w => value.player.n_w
+				}
+			}
+		opps << o	
+	end
+	
+	data_opponents = { :opps => opps }
+	data = data.merge(data_opponents)
+	
+=begin
+   	"opps": [
+		{
+			"n_g": 2,
+			"st": 1,
+			"player": {
+				"id": "506f0e9b0f3c4610780005fe",
+				"fb": null,
+				"f_n": null,
+				"l_n": null,
+				"n_n": "jingle",
+				"gravatar": "d8f05a5cfdda925ccccef55caa22dfea",
+				"n_w": 1
+			}
+		},
+=end 
+ Rails.logger.debug("data=#{data.inspect}")
+   
+   return data
+  
+=begin
+ --- attributes :id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m, :gravatar, :a_t, :o_n_i_a, :l_rf_d
+
+---child :alert => :alerts do
+---	attribute :ti, :t, :id 
+---end
+
+child :opponents => :opps do
+	attribute :n_g, :st 
+	child :player do
+		attribute :id, :fb, :f_n, :l_n, :n_n, :gravatar, :n_w
+	end
+end
+
+child :a_games => :a_games do
+  attribute :id, :cr_d, :ch_d, :t, :l_t_a, :l_t_d, :l_t_p, :l_t_pl 
+  child :player_games do
+    attribute :sc, :i_t, :st, :player_id   
+  end   
+  child :l_t_w => :played_words do
+	attribute :w, :t, :player_id, :p_s, :p_d 
+  end
+end
+
+ child :c_games => :c_games do
+  attribute :id, :cr_d, :co_d, :lp_d, :ch_d, :t, :st, :l_t_a,:l_t, :l_t_p, :l_t_d, :l_t_pl, :r_v, :r_c
+  child :player_games do
+    attribute :sc, :st, :player_id  
+  end
+  
+end
+
+=end
   end
   
   def a_games2 #active games method
@@ -240,14 +331,29 @@ class Player
 		self.last_alert_date	= "10/06/2012"
 	end
 	 Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
-	 return Alert.where("st" => 1,
+	 return  Alert.where("st" => 1,
 			"a_d" => {"$lte" => nowDate},
 			"$or" => [{"e_d" => {"$gte" => nowDate}}, {"e_d" => nil}], 
 			"a_d" => {"$gt" => Time.parse(self.last_alert_date)}
-			).sort(:'a_d'.desc).limit(1)   
+			).sort(:'a_d'.desc).limit(1)
 	 
   end
- 
+
+   def alert_latest  #alerts as of data X method, no parameter passed since this is needed in rabl. hacky but it works
+	Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
+	nowDate = Time.now.utc
+	if self.last_alert_date.nil?
+		self.last_alert_date	= "10/06/2012"
+	end
+	 Rails.logger.debug("player alerts last_alert_date=#{self.last_alert_date}")
+	 return  Alert.where("st" => 1,
+			"a_d" => {"$lte" => nowDate},
+			"$or" => [{"e_d" => {"$gte" => nowDate}}, {"e_d" => nil}], 
+			"a_d" => {"$gt" => Time.parse(self.last_alert_date)}
+			).sort(:'a_d'.desc).limit(1).first   
+	 
+  end
+  
   def gravatar 
     if !self.fb.nil? && !self.fb.empty? 
 		return ""
