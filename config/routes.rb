@@ -30,6 +30,7 @@ Word::Application.routes.draw do
 		match "/games/get/" => "games#get"
 		match "/games/get_/" => "games#get_"
 		match "/games/refresh/" => "games#refresh"  
+		match "/games/refresh_/" => "games#refresh_" 
 		match "/games/play/" => "games#play"
 		match "/games/swap/" => "games#swap"
 		match "/games/skip/" => "games#skip"
