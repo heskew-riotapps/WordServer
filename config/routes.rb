@@ -23,6 +23,7 @@ Word::Application.routes.draw do
 		match "/players/clear_tokens/" => "players#clear_tokens"
 		match "/players/find_all_by_fb/" => "players#find_all_by_fb" 
 		match "/players/game_list_check/" => "players#game_list_check"
+		match "/players/game_list_refresh/" => "players#game_list_refresh"
 		match "/players/get_games/" => "players#get_games"
 		match "/games/cancel/" => "games#cancel"
 		match "/games/clear_all/" => "games#clear_all"

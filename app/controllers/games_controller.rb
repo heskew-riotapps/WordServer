@@ -210,7 +210,64 @@ class GamesController < ApplicationController
 			render json: @player.errors, status: :unprocessable_entity
 		end
   end
-  
+  def refresh_
+		player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
+		logger.debug("game before refresh #{params.inspect}")
+	   
+		no_changes = true
+		if player.nil?
+			Rails.logger.info("refresh unauthorized request to get game")	
+		#	@game.errors.add(value['player_id'], "invalid user being requested" + value['player_id'])
+			unauthorized = true		
+		else
+			 @game = Game.find(params[:id])
+			 
+			if @game.nil?
+				Rails.logger.info(" refresh cannot find game")	
+				not_found = true		
+			 
+			else
+				#make sure requesting user is part of the game
+				if !@game.is_player_part_of_game? player.id 
+					unauthorized = true		
+				else
+					#only send update if turn from client is less that turn from server
+					#or if game is over
+					if (@game.t > params[:t] || @game.st == 3)
+						no_changes = false
+
+						@game.strip_tray_tiles_from_non_context_user player.id
+
+						#reset user's token
+						#player.generate_token(:a_t)
+						#send the new token back to the client
+						
+						@game.a_t = params[:a_t]
+						#@game.a_t = player.generate_token(params[:a_t])
+						#logger.debug("game after create #{@game.inspect}")
+						data_ = @game.serialize_game
+						#if !player.fb.blank?
+						#	player.save(:validate => false)
+						#else
+						#	player.save 
+						#end
+					end
+				end	
+			end
+		end
+		logger.debug("game  #{@game.inspect}")
+		if unauthorized 
+			render json: "unauthorized", status: :unauthorized
+		elsif no_changes
+			render json: "no_change", status: :accepted
+		elsif not_found 
+			render json: "not_found", status: :not_found 
+		elsif @game.errors.empty?
+			render json: data_, status: :ok
+		else
+			render json: @player.errors, status: :unprocessable_entity
+		end
+  end
   def create
 	#authenticate requesting player
 	player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token
