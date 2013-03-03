@@ -417,6 +417,75 @@ class Game
 		score
 	end
 	
+	def serialize_game
+		#create a hash to hold the game
+		data = { :id => self.id, :cr_d => self.cr_d, :ch_d => self.ch_d, :t => self.t,
+		 :a_t => self.a_t, :left => self.left, :st => self.st, :l_t_a => self.l_t_a,
+		 :l_t_d => self.l_t_d, :l_t_p => self.l_t_p, :l_t_pl => self.l_t_pl, :r_v => self.r_v, :r_c => self.r_c}
+		 
+		 player_games = []		
+		
+		#load the player game hashes into the array
+		self.player_games.each do |pg|
+			player_game = { :t_v => pg.t_v, :t_l => pg.t_l, :o => pg.o, :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
+			player_games << player_game 
+		end	
+		
+		#pull the array of player game hashes into an outer hash
+		data_player_games = { :player_games => player_games }
+		
+		#merge this newly created hash into the game hash
+		data = data.merge(data_player_games)
+		
+		#create array of hashes for played words
+		played_words = []
+		 
+		#load the array with played word hashes
+		self.played_words.each do |pw|
+			played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
+			played_words << played_word
+		end	
+		
+		#pull the array of played word hashes into an outer hash
+		data_played_words = { :played_words => played_words }
+		
+		#merge this newly created hash into the game hash
+		data = data.merge(data_played_words)
+		
+		#create array of hashes for played tiles
+		played_tiles = []
+		 
+		#load the array with played word hashes
+		self.played_tiles.each do |pt|
+			played_tile = { :p => pt.p, :t_ => pt.t_, :l_ => pt.l_ }
+			played_tiles << played_tile
+		end	
+		
+		#pull the array of played tile hashes into an outer hash
+		data_played_tiles = { :played_tiles => played_tiles }
+		
+		#merge this newly created hash into the game hash
+		data = data.merge(data_played_tiles)
+		
+		#create array of hashes for chats
+		chats = []
+		 
+		#load the array with chat hashes
+		self.chats.each do |c|
+			chat = { :t => c.t, :player_id => c.player_id, :ch_d => c.ch_d }
+			chats << chat
+		end	
+		
+		#pull the array of played tile hashes into an outer hash
+		data_chats = { :chats => chats }
+		
+		#merge this newly created hash into the game hash
+		data = data.merge(data_chats)
+ 
+		return data
+	end
+	
+	
 	def getBonusScore(context_player_id) 
 		bonus = 0
 		#only calculate bonus from active players, not resigns or declines

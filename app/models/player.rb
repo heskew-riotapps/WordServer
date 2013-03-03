@@ -149,41 +149,44 @@ class Player
 
   end
   
-  def generate_auth_json
+  def serialize_player(include_alert, include_opponents, include_game)
   data = { :id => self.id, :fb => self.fb, :f_n => self.f_n, :l_n => self.l_n,
 		 :n_n => self.n_n, :n_w => self.n_w, :e_m => self.e_m, :gravatar => self.gravatar,
 		 :a_t => self.a_t, :o_n_i_a => self.o_n_i_a, :l_rf_d => self.l_rf_d}
   Rails.logger.debug("data=#{data.inspect}")
    #self.data_ = data
    
-   alerts = self.alert_latest
-	if alerts != nil
-		#Rails.logger.debug("alerts=#{alerts.inspect}")
+   if include_alert == true
+	   alerts = self.alert_latest
+		if alerts != nil
+			#Rails.logger.debug("alerts=#{alerts.inspect}")
 
-		 data_alert = { :alerts => [{ :ti => alerts.ti, :t => alerts.t, :id => alerts.id }] }
-		#Rails.logger.debug("data_alert=#{data_alert.inspect}")
-		 data = data.merge(data_alert)
-	end
-   
-    opps = []
-   	self.opponents.each  do |value|
-		o = { :n_g => value.n_g, :st => value.st, 
-				:player => {
-					:id => value.player.id,
-					:fb => value.player.fb,
-					:f_n => value.player.f_n,
-					:l_n => value.player.l_n,
-					:n_n => value.player.n_n,
-					:gravatar => value.player.gravatar,
-					:n_w => value.player.n_w
-				}
-			}
-		opps << o	
-	end
+			 data_alert = { :alerts => [{ :ti => alerts.ti, :t => alerts.t, :id => alerts.id }] }
+			#Rails.logger.debug("data_alert=#{data_alert.inspect}")
+			 data = data.merge(data_alert)
+		end
+    end
 	
-	data_opponents = { :opps => opps }
-	data = data.merge(data_opponents)
-	 
+	if include_opponents == true
+		opps = []
+		self.opponents.each  do |value|
+			o = { :n_g => value.n_g, :st => value.st, 
+					:player => {
+						:id => value.player.id,
+						:fb => value.player.fb,
+						:f_n => value.player.f_n,
+						:l_n => value.player.l_n,
+						:n_n => value.player.n_n,
+						:gravatar => value.player.gravatar,
+						:n_w => value.player.n_w
+					}
+				}
+			opps << o	
+		end
+		
+		data_opponents = { :opps => opps }
+		data = data.merge(data_opponents)
+	end 
 	active_games = [] 
 	a_games = Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all    
 	#active_games = self.get_active_games
@@ -292,18 +295,30 @@ class Player
 	data = data.merge(data_completed_games)
 	 Rails.logger.debug("data=#{data.inspect}")
    
+	if include_game
+		data_game = { :game_ => self.game_.serialize_game }
+		data = data.merge(data_game)
+	end		
+   
    return data
   
 =begin
 
-
- child :c_games => :c_games do
-  attribute :id, :cr_d, :co_d, :lp_d, :ch_d, :t, :st, :l_t_a,:l_t, :l_t_p, :l_t_d, :l_t_pl, :r_v, :r_c
-  child :player_games do
-    attribute :sc, :st, :player_id  
-  end
-  
-end
+child :game_ => :game_ do
+	attributes :id, :cr_d, :ch_d, :t, :a_t, :left, :st, :l_t_a, :l_t_d, :l_t_p, :l_t_pl, :r_v, :r_c 
+	  child :player_games do
+		attributes :o, :i_t, :sc, :id, :t_l, :st, :t_v, :player_id    
+	  end
+	  child :played_words do
+		attribute :w, :t, :player_id, :p, :p_d 
+	  end
+	  child :played_tiles do
+		attribute :p, :l_, :t_ 
+	  end 
+	child :chats do
+		attribute :t, :player_id, :ch_d 
+	  end
+end  
 
 =end
   end

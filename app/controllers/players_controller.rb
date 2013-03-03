@@ -315,7 +315,7 @@ class PlayersController < ApplicationController
 	end
 
 
- def auth  
+ def auth_with_payload  
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
 		Rails.logger.info("params #{params}")
@@ -352,8 +352,8 @@ class PlayersController < ApplicationController
 			 	@player.save 
 			end
 			
-			data_ = @player.generate_auth_json
-			Rails.logger.info("player =#{@player.inspect }")
+			data_ = @player.serialize_player(true, true, false)
+			#Rails.logger.info("player =#{@player.inspect }")
 		end
 	
 		#format.json  { render :json => player.to_json( 
@@ -368,8 +368,111 @@ class PlayersController < ApplicationController
 		end
 	end
 
-
+	def auth_with_game
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			if !params.has_key?(:a_a_d) || params[:a_a_d].blank? #alert activation date
+				@player.last_alert_date = params[:a_a_d]
+			else
+				@player.last_alert_date = "6/10/2012"
+			end
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
+			
+			@gcm_reg_id = ""
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+			end
+			#reset user's token, remove current token
+			#send the new token back to the client
+			@player.n_v = @player.n_v + 1
+			
+			@player.generate_token(params[:a_t], @gcm_reg_id)
+			
+			if !@player.fb.blank?
+			 	@player.save(:validate => false)
+			else
+			 	@player.save 
+			end
+			
+			#this method will return a single game along with the game lists
+			@game = Game.find(params[:id])
+			 
+			if @game.nil?
+				#Rails.logger.info("cannot find game")	
+				#not_found = true		
+			 
+			else
+				#make sure requesting user is part of the game
+				if !@game.is_player_part_of_game? @player.id 
+					unauthorized = true		
+				else
+					@game.strip_tray_tiles_from_non_context_user @player.id
+					@game.a_t = params[:a_t]
+					 
+				end	
+			end
+			@player.game_ = @game
+			
+			data_ = @player.serialize_player(true, true, true)
+		end
+	
+		respond_to do |format|
+			if not_found 
+				render json: "unauthorized", status: :unauthorized
+			else
+				format.json  { render :json => data_,status: :ok}
+			end
+		end
+	end
+	
+	def game_list_refresh
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		datePassed = false
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			@player.a_t = params[:a_t]
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
+			if @player.l_rf_d.nil?
+				datePassed = true
+			elsif  params.has_key?(:l_rf_d) && !params[:l_rf_d].blank? && !params[:l_rf_d].nil?
+				
+				if @player.l_rf_d > Date.parse(params[:l_rf_d])
+					datePassed = true
+				end
+			
+			end
+			data_ = @player.serialize_player(false, false, false)
+		end	
+
+		respond_to do |format|
+			if not_found 
+				render json: "unauthorized", status: :unauthorized
+			elsif !datePassed
+				render json: "not_found", status: :not_found 
+			else
+				format.json  { render :json => data_,status: :ok}
+			end
+		end
+		
+	end
 	def game_list_check
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
 	

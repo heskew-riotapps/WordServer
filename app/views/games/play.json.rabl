@@ -13,3 +13,5 @@ object @game
  child :chats do
 	attribute :t, :player_id, :ch_d 
   end
+  
+ 
