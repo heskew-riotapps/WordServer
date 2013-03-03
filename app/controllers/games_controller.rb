@@ -132,7 +132,7 @@ class GamesController < ApplicationController
 					@game.a_t = params[:a_t]
 					#@game.a_t = player.generate_token(params[:a_t])
 					logger.debug("game after create #{@game.inspect}")
-					data = @game.serialize_game 
+					data_ = @game.serialize_game 
 					#if !player.fb.blank?
 					#	player.save(:validate => false)
 					#else
@@ -262,7 +262,7 @@ class GamesController < ApplicationController
 		unauthorized = true		
 	else
 		@game = GameService.create(player, params[:game])
-		data = @game.serialize_game
+		data_ = @game.serialize_game
 		#if @game.errors.empty?
 			#reset user's token
 			#player.generate_token(:a_t)
@@ -509,7 +509,7 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.play(player, @game, params)
 				@game.strip_tray_tiles_from_non_context_user player.id
-				data = @game.serialize_game
+				data_ = @game.serialize_game
 			end	
 
 		end
@@ -573,7 +573,7 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.skip(player, @game, params)
 				@game.strip_tray_tiles_from_non_context_user player.id
-				data = @game.serialize_game
+				data_ = @game.serialize_game
 			end	
 			
 		end
@@ -637,7 +637,7 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.swap(player, @game, params)
 				@game.strip_tray_tiles_from_non_context_user player.id
-				data = @game.serialize_game
+				data_ = @game.serialize_game
 			end	
 		end
 		
@@ -702,7 +702,7 @@ class GamesController < ApplicationController
 			else
 				@game, @unauthorized = GameService.chat(player, @game, params)
 				@game.strip_tray_tiles_from_non_context_user player.id
-				data = @game.serialize_game
+				data_ = @game.serialize_game
 			end	
 		end
 		
