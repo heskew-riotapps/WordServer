@@ -359,13 +359,13 @@ class PlayersController < ApplicationController
 		#format.json  { render :json => player.to_json( 
 		#					:only => [:id, :fb, :f_n, :l_n, :n_n, :n_w, :e_m],
 		#					:methods => [:gravatar, :a_t]),status: :ok}
-		respond_to do |format|
-			if not_found 
-				render json: "unauthorized", status: :unauthorized
-			else
-				format.json  { render :json => data_,status: :ok}
-			end
+		 
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			render json: data_, status: :ok
 		end
+		 
 	end
 
 	def auth_with_game
@@ -426,13 +426,13 @@ class PlayersController < ApplicationController
 			data_ = @player.serialize_player(true, true, true)
 		end
 	
-		respond_to do |format|
-			if not_found 
-				render json: "unauthorized", status: :unauthorized
-			else
-				format.json  { render :json => data_,status: :ok}
-			end
+		 
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			render json: data_, status: :ok
 		end
+		 
 	end
 	
 	def game_list_refresh
@@ -462,15 +462,15 @@ class PlayersController < ApplicationController
 			data_ = @player.serialize_player(false, false, false)
 		end	
 
-		respond_to do |format|
-			if not_found 
-				render json: "unauthorized", status: :unauthorized
-			elsif !datePassed
-				render json: "not_found", status: :not_found 
-			else
-				format.json  { render :json => data_,status: :ok}
-			end
+		 
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		elsif !datePassed
+			render json: "not_found", status: :not_found 
+		else
+			render json: data_, status: :ok
 		end
+		 
 		
 	end
 	def game_list_check
