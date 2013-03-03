@@ -147,7 +147,7 @@ class GamesController < ApplicationController
 		elsif not_found 
 			render json: "not_found", status: :not_found 
 		elsif @game.errors.empty?
-			format.json { render :json => data_,status: :ok} 
+			render json: data_, status: :ok 
 		else
 			render json: @player.errors, status: :unprocessable_entity
 		end
@@ -283,7 +283,7 @@ class GamesController < ApplicationController
 	if unauthorized 
 		render json: "unauthorized", status: :unauthorized
 	elsif @game.errors.empty?
-		format.json { render :json => data_,status: :ok} 
+		render json: data_, status: :ok 
 	else
 		render json: @player.errors, status: :unprocessable_entity
 	end
@@ -522,7 +522,7 @@ class GamesController < ApplicationController
 		elsif not_found 
 			render json: "not_found", status: :not_found 
 		elsif @game.errors.empty?
-			format.json { render :json => data_,status: :ok}  ###return differently if game is this turn completed the game??
+			render json: data_, status: :ok  ###return differently if game is this turn completed the game??
 		else
 			render json: "error", status: :unprocessable_entity
 		end
@@ -584,7 +584,7 @@ class GamesController < ApplicationController
 		elsif not_found 
 			render json: "not_found", status: :not_found 
 		elsif @game.errors.empty?
-			format.json { render :json => data_,status: :ok}  ###return differently if game is this turn completed the game??
+			render json: data_, status: :ok  ###return differently if game is this turn completed the game??
 		else
 			render json: "error", status: :unprocessable_entity
 		end
@@ -648,7 +648,7 @@ class GamesController < ApplicationController
 		elsif not_found 
 			render json: "not_found", status: :not_found 
 		elsif @game.errors.empty?
-			format.json { render :json => data_,status: :ok}   ###return differently if game is this turn completed the game??
+			render json: data_, status: :ok   ###return differently if game is this turn completed the game??
 		else
 			render json: "error", status: :unprocessable_entity
 		end
@@ -713,7 +713,7 @@ class GamesController < ApplicationController
 		elsif not_found 
 			render json: "not_found", status: :not_found 
 		elsif @game.errors.empty?
-			format.json { render :json => data_,status: :ok}  ###return differently if game is this turn completed the game??
+			render json: data_, status: :ok  ###return differently if game is this turn completed the game??
 		else
 			render json: "error", status: :unprocessable_entity
 		end
