@@ -313,7 +313,50 @@ class PlayersController < ApplicationController
 			respond_with @player
 		end
 	end
-
+	def get_with_payload
+		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?
+	
+		Rails.logger.info("params #{params}")
+		if @player.nil?
+			not_found = true
+			Rails.logger.info("authorization failed #{params[:a_t]}")		
+		else
+			@player.a_t = params[:a_t]
+			if !params.has_key?(:c_g_d) || params[:c_g_d].blank?
+				@player.completed_games_from_date = params[:c_g_d]
+			else
+				@player.completed_games_from_date = "10/6/2012"
+			end
+			#if registration id is passed in, check to see if it has changed, if so update it
+			#this can happen because the client side does not send registration id right away
+			#it might happen the next call to get the player's games
+			if params.has_key?(:r_id) && !params[:r_id].blank?
+				@gcm_reg_id = params[:r_id] 
+				#Rails.logger.info ("email before #{params[:e_m]} after #{@email.inspect}")
+				if @player.update_gcm_registration_id?(params[:a_t], params[:r_id])
+					#player will be updated, boolean return not really needed for this method
+				end
+			end
+			
+			#update last device used
+			@player.update_last_device_id(params[:a_t])
+			
+			if !@player.fb.blank?
+				@player.save(:validate => false)
+			else
+				@player.save 
+			end
+			data_ = @player.serialize_player(true, true, false)
+			Rails.logger.info("get_with_payload @player.completed_games_from_date =#{@player.completed_games_from_date }")
+		end
+	
+		
+		if not_found 
+			render json: "unauthorized", status: :unauthorized
+		else
+			render json: data_, status: :ok
+		end
+	end
 
  def auth_with_payload  
 		@player = PlayerService.findPlayer(params[:a_t]) #Player.find_by_a_t_(params[:a_t]) #auth_token    #@player.valid?

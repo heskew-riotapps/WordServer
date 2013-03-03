@@ -54,7 +54,8 @@ Word::Application.routes.draw do
 		match "/players/auth_with_game/" => "players#auth_with_game"
 		match "/players/auth_via_token/" => "players#auth_via_token"
 		match "/players/auth_via_token_with_game/" => "players#auth_via_token_with_game"
-		match "/players/get_via_token/" => "players#get_via_token"
+		match "/players/get_via_token/" => "players#get_via_token" 
+		match "/players/get_with_payload/" => "players#get_with_payload"
 		match "/players/log_out/" => "players#log_out"
 		
 		resources :players, :games, :home, :rest, :gcm_notifications, :alerts
