@@ -442,7 +442,7 @@ class Game
 		 
 		#load the array with played word hashes
 		self.played_words.each do |pw|
-			played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
+			played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d, :p => pw.p }
 			played_words << played_word
 		end	
 		
