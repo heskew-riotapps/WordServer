@@ -149,7 +149,9 @@ class Player
 
   end
   
-  def serialize_player(include_alert, include_opponents, include_game)
+  
+  
+  def serialize_player(include_alert, include_opponents, include_game, include_games)
   data = { :id => self.id, :fb => self.fb, :f_n => self.f_n, :l_n => self.l_n,
 		 :n_n => self.n_n, :n_w => self.n_w, :e_m => self.e_m, :gravatar => self.gravatar,
 		 :a_t => self.a_t, :o_n_i_a => self.o_n_i_a, :l_rf_d => self.l_rf_d}
@@ -187,114 +189,117 @@ class Player
 		data_opponents = { :opps => opps }
 		data = data.merge(data_opponents)
 	end 
-	active_games = [] 
-	a_games = Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all    
-	#active_games = self.get_active_games
 	
-	#i = 1
-	#count = a_games.count
-	#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
-	a_games.each  do |value|
-		#Rails.logger.debug("active game=#{i} #{value.inspect}")
-		#create a game hash
-		game = { :id => value.id, :cr_d => value.cr_d, :ch_d => value.ch_d, :t => value.t,
-				 :l_t_a => value.l_t_a, :l_t_d => value.l_t_d, :l_t_p => value.l_t_p, :l_t_pl => value.l_t_pl  
-				}
-				
-		#create an array to hold the player game hashes		
-		player_games = []		
+	if include_games == true
+		active_games = [] 
+		a_games = Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all    
+		#active_games = self.get_active_games
 		
-		#load the player game hashes into the array
-		value.player_games.each do |pg|
-			player_game = { :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
-			player_games << player_game 
-		end	
+		#i = 1
+		#count = a_games.count
+		#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
+		a_games.each  do |value|
+			#Rails.logger.debug("active game=#{i} #{value.inspect}")
+			#create a game hash
+			game = { :id => value.id, :cr_d => value.cr_d, :ch_d => value.ch_d, :t => value.t,
+					 :l_t_a => value.l_t_a, :l_t_d => value.l_t_d, :l_t_p => value.l_t_p, :l_t_pl => value.l_t_pl  
+					}
+					
+			#create an array to hold the player game hashes		
+			player_games = []		
+			
+			#load the player game hashes into the array
+			value.player_games.each do |pg|
+				player_game = { :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
+				player_games << player_game 
+			end	
+			
+			#pull the array of player game hashes into an outer hash
+			data_player_games = { :player_games => player_games }
+			
+			#merge this newly created hash into the game hash
+			game = game.merge(data_player_games)
+			
+			#create array of hashes for played words
+			played_words = []
+			last_turn_words = value.l_t_w
+			#load the array with played word hashes
+			last_turn_words.each do |pw|
+				played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
+				played_words << played_word
+			end	
+			
+			#pull the array of played word hashes into an outer hash
+			data_played_words = { :played_words => played_words }
+			
+			#merge this newly created hash into the game hash
+			game = game.merge(data_played_words)
+			
+			#add this game hash to the game array 
+			active_games << game	
+		 
+		end
+		 
+		#pull the array of game hashes into an outer hash
+		data_active_games = { :a_games => active_games }
 		
-		#pull the array of player game hashes into an outer hash
-		data_player_games = { :player_games => player_games }
-		
-		#merge this newly created hash into the game hash
-		game = game.merge(data_player_games)
-		
-		#create array of hashes for played words
-		played_words = []
-		last_turn_words = value.l_t_w
-		#load the array with played word hashes
-		last_turn_words.each do |pw|
-			played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
-			played_words << played_word
-		end	
-		
-		#pull the array of played word hashes into an outer hash
-		data_played_words = { :played_words => played_words }
-		
-		#merge this newly created hash into the game hash
-		game = game.merge(data_played_words)
-		
-		#add this game hash to the game array 
-		active_games << game	
-	 
-	end
-	 
-	#pull the array of game hashes into an outer hash
-	data_active_games = { :a_games => active_games }
-	
-	#add the active games hash to the main hash
-	data = data.merge(data_active_games)
+		#add the active games hash to the main hash
+		data = data.merge(data_active_games)
 
-	
-	completed_games = [] 
-	c_games = self.get_completed_games    
-	#active_games = self.get_active_games
-	
-	#i = 1
-	#count = a_games.count
-	#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
-	c_games.each  do |value|
-		#Rails.logger.debug("active game=#{i} #{value.inspect}")
-		#create a game hash
-		game = { :id => value.id, 
-				:cr_d => value.cr_d, 
-				:ch_d => value.ch_d,
-				:co_d => value.co_d,
-				:lp_d => value.lp_d,				 
-				:t => value.t,
-				:st => value.st,
-				:l_t_a => value.l_t_a, 
-				:l_t_d => value.l_t_d, 
-				:l_t_p => value.l_t_p, 
-				:l_t_pl => value.l_t_pl,
-				:r_v => value.r_v,
-				:r_c => value.r_c
-				}
 		
-		#create an array to hold the player game hashes		
-		player_games = []		
+		completed_games = [] 
+		c_games = self.get_completed_games    
+		#active_games = self.get_active_games
 		
-		#load the player game hashes into the array
-		value.player_games.each do |pg|
-			player_game = { :sc => pg.sc, :st => pg.st, :player_id => pg.player_id }
-			player_games << player_game 
-		end	
+		#i = 1
+		#count = a_games.count
+		#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
+		c_games.each  do |value|
+			#Rails.logger.debug("active game=#{i} #{value.inspect}")
+			#create a game hash
+			game = { :id => value.id, 
+					:cr_d => value.cr_d, 
+					:ch_d => value.ch_d,
+					:co_d => value.co_d,
+					:lp_d => value.lp_d,				 
+					:t => value.t,
+					:st => value.st,
+					:l_t_a => value.l_t_a, 
+					:l_t_d => value.l_t_d, 
+					:l_t_p => value.l_t_p, 
+					:l_t_pl => value.l_t_pl,
+					:r_v => value.r_v,
+					:r_c => value.r_c
+					}
+			
+			#create an array to hold the player game hashes		
+			player_games = []		
+			
+			#load the player game hashes into the array
+			value.player_games.each do |pg|
+				player_game = { :sc => pg.sc, :st => pg.st, :player_id => pg.player_id }
+				player_games << player_game 
+			end	
 
-		#pull the array of player game hashes into an outer hash
-		data_player_games = { :player_games => player_games }
+			#pull the array of player game hashes into an outer hash
+			data_player_games = { :player_games => player_games }
+			
+			#merge this newly created hash into the game hash
+			game = game.merge(data_player_games)
+			
+			#add this game hash to the game array 
+			completed_games << game	
+		 
+		end
+		 
+		#pull the array of game hashes into an outer hash
+		data_completed_games = { :c_games => completed_games }
 		
-		#merge this newly created hash into the game hash
-		game = game.merge(data_player_games)
-		
-		#add this game hash to the game array 
-		completed_games << game	
-	 
-	end
-	 
-	#pull the array of game hashes into an outer hash
-	data_completed_games = { :c_games => completed_games }
+		#add the active games hash to the main hash
+		data = data.merge(data_completed_games)
+		 Rails.logger.debug("data=#{data.inspect}")
+    end
 	
-	#add the active games hash to the main hash
-	data = data.merge(data_completed_games)
-	 Rails.logger.debug("data=#{data.inspect}")
-   
 	if include_game
 		data_game = { :game_ => self.game_.serialize_game }
 		data = data.merge(data_game)
@@ -302,25 +307,6 @@ class Player
    
    return data
   
-=begin
-
-child :game_ => :game_ do
-	attributes :id, :cr_d, :ch_d, :t, :a_t, :left, :st, :l_t_a, :l_t_d, :l_t_p, :l_t_pl, :r_v, :r_c 
-	  child :player_games do
-		attributes :o, :i_t, :sc, :id, :t_l, :st, :t_v, :player_id    
-	  end
-	  child :played_words do
-		attribute :w, :t, :player_id, :p, :p_d 
-	  end
-	  child :played_tiles do
-		attribute :p, :l_, :t_ 
-	  end 
-	child :chats do
-		attribute :t, :player_id, :ch_d 
-	  end
-end  
-
-=end
   end
   
  

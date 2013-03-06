@@ -484,8 +484,8 @@ def self.decline(current_player, game)
 		end
 		played_tiles_count = params[:played_tiles].length
 		
-		Rails.logger.info("params[:played_tiles]=#{params[:played_tiles].inspect}")
-		Rails.logger.info("player_game[0].t_l=#{player_game[0].t_l.inspect}")
+#		Rails.logger.info("params[:played_tiles]=#{params[:played_tiles].inspect}")
+#		Rails.logger.info("player_game[0].t_l=#{player_game[0].t_l.inspect}")
 		
 		prev_tray_letter_count = player_game[0].t_l.length
 		#save played tiles and remove them from players tray letters
@@ -497,14 +497,14 @@ def self.decline(current_player, game)
 			#http://stackoverflow.com/questions/4595305/delete-first-instance-of-matching-element-from-array
 			player_game[0].t_l.delete_at(player_game[0].t_l.index(value['l']) || player_game[0].t_l.length)
 			
-			Rails.logger.info("player_game[0].t_l #{value['l']}=#{player_game[0].t_l.inspect}")
+		#	Rails.logger.info("player_game[0].t_l #{value['l']}=#{player_game[0].t_l.inspect}")
 		end	
 		
 		#make sure the proper number of letters were removed from the tray letters in the loop above
 		if prev_tray_letter_count - played_tiles_count != player_game[0].t_l.length
-			Rails.logger.info("tiles after prev_tray_letter_count=#{prev_tray_letter_count} played_tiles_count=#{played_tiles_count} player_game[0].t_l.length=#{player_game[0].t_l.length}")
+		#	Rails.logger.info("tiles after prev_tray_letter_count=#{prev_tray_letter_count} played_tiles_count=#{played_tiles_count} player_game[0].t_l.length=#{player_game[0].t_l.length}")
 
-			Rails.logger.info("error_game_play_tray_tiles_out_of_sync failed")
+		#	Rails.logger.info("error_game_play_tray_tiles_out_of_sync failed")
 			@game.errors.add(:t, I18n.t(:error_game_play_tray_tiles_out_of_sync))
 			return @game, @unauthorized 
 		end
