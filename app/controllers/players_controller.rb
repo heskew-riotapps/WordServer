@@ -597,15 +597,15 @@ class PlayersController < ApplicationController
 			end
 			
 			#what the hell is this date passed doing?  looks like nothing
-			if @player.l_rf_d.nil?
-				datePassed = true
-			elsif  params.has_key?(:l_rf_d) && !params[:l_rf_d].blank? && !params[:l_rf_d].nil?
-				
-				if @player.l_rf_d > Date.parse(params[:l_rf_d])
-					datePassed = true
-				end
-			
-			end
+			#if @player.l_rf_d.nil?
+			#	datePassed = true
+			#elsif  params.has_key?(:l_rf_d) && !params[:l_rf_d].blank? && !params[:l_rf_d].nil?
+			#	
+			#	if @player.l_rf_d > Date.parse(params[:l_rf_d])
+			#		datePassed = true
+			#	end
+			#
+			#end
 			data_ = @player.serialize_player(false, false, false, true)
 		end	
 
