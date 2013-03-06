@@ -612,8 +612,8 @@ class PlayersController < ApplicationController
 		 
 		if not_found 
 			render json: "unauthorized", status: :unauthorized
-		elsif !datePassed
-			render json: "not_found", status: :not_found 
+		#elsif !datePassed
+		#	render json: "not_found", status: :not_found 
 		else
 			render json: data_, status: :ok
 		end
