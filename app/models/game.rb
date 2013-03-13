@@ -428,7 +428,7 @@ class Game
 		
 		#load the player game hashes into the array
 		self.player_games.each do |pg|
-			player_game = { :t_v => pg.t_v, :t_l => pg.t_l, :o => pg.o, :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
+			player_game = { :t_v => pg.t_v, :t_l => pg.t_l, :o => pg.o, :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :w_n => pg.w_n, :player_id => pg.player_id }
 			player_games << player_game 
 		end	
 		
