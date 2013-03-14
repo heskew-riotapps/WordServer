@@ -289,7 +289,7 @@ class Game
 			value.player.l_rf_d = nowDate
 			if value.st == 4
 				value.player.n_w += 1
-				value.w_n += 1
+				value.w_n += value.player.n_w
 			end					
 			if value.st == 5 || value.st == 7
 				value.player.n_l += 1
