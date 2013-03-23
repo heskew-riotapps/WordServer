@@ -219,7 +219,7 @@ class Player
 				#if the player has not taken her turn within 10 days, concede for that player 
 				
 				if pg.i_t
-					Rails.logger.info("is turn hours ago=#{(nowDate - value.l_t_d) / 3600).round}")
+					Rails.logger.info("is turn hours ago=#{((nowDate - value.l_t_d) / 3600).round}")
 				end
 				if (pg.i_t && ((nowDate - value.l_t_d) / 3600).round > 240)
 					
