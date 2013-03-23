@@ -243,7 +243,7 @@ class Player
 			
 			#if the game is completed at this point, do not add it to 
 			#this active turn array
-			if game_.st != 3
+			if game_.st == 1  
 				#create a game hash
 				game = { :id => game_.id, :cr_d => game_.cr_d, :ch_d => game_.ch_d, :t => game_.t,
 						 :l_t_a => game_.l_t_a, :l_t_d => game_.l_t_d, :l_t_p => game_.l_t_p, :l_t_pl => game_.l_t_pl  
