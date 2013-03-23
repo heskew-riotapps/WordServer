@@ -158,6 +158,7 @@ class Player
   Rails.logger.debug("data=#{data.inspect}")
    #self.data_ = data
    
+   
    if include_alert == true
 	   alerts = self.alert_latest
 		if alerts != nil
@@ -190,6 +191,8 @@ class Player
 		data = data.merge(data_opponents)
 	end 
 	
+	nowDate = Time.now.utc
+	
 	if include_games == true
 		active_games = [] 
 		a_games = Game.where('player_games' => { '$elemMatch' => {'st' => 1, 'player_id' => self.id}}).sort(:'lp_d'.desc).all    
@@ -200,44 +203,75 @@ class Player
 		#Rails.logger.debug("get_active_games=#{a_games.count} #{a_games.inspect}")
 		a_games.each  do |value|
 			#Rails.logger.debug("active game=#{i} #{value.inspect}")
-			#create a game hash
-			game = { :id => value.id, :cr_d => value.cr_d, :ch_d => value.ch_d, :t => value.t,
-					 :l_t_a => value.l_t_a, :l_t_d => value.l_t_d, :l_t_p => value.l_t_p, :l_t_pl => value.l_t_pl  
-					}
+		#	#create a game hash
+		#	game = { :id => value.id, :cr_d => value.cr_d, :ch_d => value.ch_d, :t => value.t,
+		#			 :l_t_a => value.l_t_a, :l_t_d => value.l_t_d, :l_t_p => value.l_t_p, :l_t_pl => value.l_t_pl  
+		#			}
 					
 			#create an array to hold the player game hashes		
 			player_games = []		
 			
+			game_ = value
+			
 			#load the player game hashes into the array
 			value.player_games.each do |pg|
-				player_game = { :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
-				player_games << player_game 
+				#while we are in this loop, let's check for expired turns
+				#if the player has not taken her turn within 10 days, concede for that player 
+				if pg.i_t &&  ((nowDate - value.lp_d) / 3600).round > 240)
+					game_, unauthorized = GameService.resign(pg.player, value)
+					
+					#at this point the game has changed state 
+					#it might be completed if the only opponent just resigned
+					#or it be another player's turn, if it is a multi-player game
+					#if the game is completed at this point, do not add it to 
+					#this active turn array, it will be picked up in the next 
+					#query for completed games
+					#else if the game is still active, use this new game to create the
+					#game hash, as opposed to the value in the loop
+					
+				end
 			end	
-			
-			#pull the array of player game hashes into an outer hash
-			data_player_games = { :player_games => player_games }
-			
-			#merge this newly created hash into the game hash
-			game = game.merge(data_player_games)
-			
-			#create array of hashes for played words
-			played_words = []
-			last_turn_words = value.l_t_w
-			#load the array with played word hashes
-			last_turn_words.each do |pw|
-				played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
-				played_words << played_word
-			end	
-			
-			#pull the array of played word hashes into an outer hash
-			data_played_words = { :played_words => played_words }
-			
-			#merge this newly created hash into the game hash
-			game = game.merge(data_played_words)
-			
-			#add this game hash to the game array 
-			active_games << game	
-		 
+			#if the game is completed at this point, do not add it to 
+			#this active turn array
+			if game_.st != 3
+				#create a game hash
+				game = { :id => game_.id, :cr_d => game_.cr_d, :ch_d => game_.ch_d, :t => game_.t,
+						 :l_t_a => game_.l_t_a, :l_t_d => game_.l_t_d, :l_t_p => game_.l_t_p, :l_t_pl => game_.l_t_pl  
+						}
+						
+				#load the player game hashes into the array
+				game_.player_games.each do |pg|
+		
+					player_game = { :sc => pg.sc, :i_t => pg.i_t, :st => pg.st, :player_id => pg.player_id }
+					player_games << player_game 
+
+				end	
+				#pull the array of player game hashes into an outer hash
+				data_player_games = { :player_games => player_games }
+				
+				#merge this newly created hash into the game hash
+				game = game.merge(data_player_games)
+				
+				#create array of hashes for played words
+				played_words = []
+				last_turn_words = game_.l_t_w
+				#load the array with played word hashes
+				last_turn_words.each do |pw|
+					played_word = { :w => pw.w, :t => pw.t, :player_id => pw.player_id, :p_d => pw.p_d }
+					played_words << played_word
+				end	
+				
+				#pull the array of played word hashes into an outer hash
+				data_played_words = { :played_words => played_words }
+				
+				#merge this newly created hash into the game hash
+				game = game.merge(data_played_words)
+				
+				#add this game hash to the game array 
+				active_games << game	
+			else
+				Rails.logger.info("active game auto resigned=#{a_games.count} #{game_.id}")
+			end
 		end
 		 
 		#pull the array of game hashes into an outer hash

@@ -525,6 +525,18 @@ class Game
 		i
 	end
 	
+	def send_notification_to_starting_player(msg_notification)
+		#get active players (not current player)  
+		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id }
+
+		self.player_games.each  do |value|
+			#get player's last device used to send to that particular device
+			if isPlayerStarter?(value.player.id)
+				self.send_to_cloud_notifiers(value.player, msg_notification)	
+			end	
+		end	
+	end
+	
 	def send_notification_to_active_opponents(current_player_id, msg_notification)
 		#get active players (not current player)  
 		active_players = self.player_games.select {|v| v.st == 1 && v.player.id != current_player_id }
