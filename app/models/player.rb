@@ -217,7 +217,7 @@ class Player
 			value.player_games.each do |pg|
 				#while we are in this loop, let's check for expired turns
 				#if the player has not taken her turn within 10 days, concede for that player 
-				if (pg.i_t && ((nowDate - value.lp_d) / 3600).round > 240)
+				if (pg.i_t && ((nowDate - value.l_t_d) / 3600).round > 240)
 					
 					#check to see if the player is nil, if so it's likely an older game with a deleted player
 					#if so, just cancel the game
