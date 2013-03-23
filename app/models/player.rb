@@ -217,8 +217,19 @@ class Player
 			value.player_games.each do |pg|
 				#while we are in this loop, let's check for expired turns
 				#if the player has not taken her turn within 10 days, concede for that player 
-				if (pg.i_t && ((nowDate - value.lp_d) / 3600).round > 240) 
-					game_, unauthorized = GameService.resign(pg.player, value)
+				if (pg.i_t && ((nowDate - value.lp_d) / 3600).round > 240)
+					
+					#check to see if the player is nil, if so it's likely an older game with a deleted player
+					#if so, just cancel the game
+					if pg.player.nil?
+						game_.st = 2
+						game_.co_d = nowDate
+						#Rails.logger.info("game after status set #{@game.inspect}")
+						game_.update_players_last_refresh_date
+						game_.save
+					else
+						game_, unauthorized = GameService.resign(pg.player, value)
+					end
 					
 					#at this point the game has changed state 
 					#it might be completed if the only opponent just resigned
