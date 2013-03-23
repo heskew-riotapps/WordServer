@@ -224,8 +224,6 @@ class Player
 					if pg.player.nil?
 						game_.st = 2
 						game_.co_d = nowDate
-						#Rails.logger.info("game after status set #{@game.inspect}")
-						game_.update_players_last_refresh_date
 						game_.save
 					else
 						game_, unauthorized = GameService.resign(pg.player, value)
