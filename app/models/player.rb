@@ -214,14 +214,14 @@ class Player
 			game_ = value
 			
 			#load the player game hashes into the array
-			value.player_games.each do |pg|
+			game_.player_games.each do |pg|
 				#while we are in this loop, let's check for expired turns
 				#if the player has not taken her turn within 10 days, concede for that player 
 				
 				if pg.i_t
-					Rails.logger.info("is turn hours ago=#{((nowDate - value.l_t_d) / 3600).round}")
+					Rails.logger.info("is turn hours ago=#{((nowDate - game_.l_t_d) / 3600).round}")
 				end
-				if (pg.i_t && ((nowDate - value.l_t_d) / 3600).round > 240)
+				if (pg.i_t && ((nowDate - game_.l_t_d) / 3600).round > 240)
 					
 					#check to see if the player is nil, if so it's likely an older game with a deleted player
 					#if so, just cancel the game
@@ -230,7 +230,18 @@ class Player
 						game_.co_d = nowDate
 						game_.save
 					else
-						game_, unauthorized = GameService.resign(pg.player, value)
+						#check for auto-decline or auto-resign
+						numActivePlayers = game_.numActivePlayers
+						if ((numActivePlayers == 2 && game_.t <= 2) || #make sure the player declined in his/her first turn
+							(numActivePlayers == 3 && @game.t <= 3) ||
+							(numActivePlayers == 4 && @game.t <= 4))
+							#first turn so auto decline...this logic is not exactly right
+							#it should probably check for specific player's first turn
+							#but this is fine for now
+							game_, unauthorized = GameService.decline(pg.player, game_)
+						else
+							#past first turn, resign
+							game_, unauthorized = GameService.resign(pg.player, game_)
 					end
 					
 					#at this point the game has changed state 
