@@ -233,8 +233,8 @@ class Player
 						#check for auto-decline or auto-resign
 						numActivePlayers = game_.numActivePlayers
 						if ((numActivePlayers == 2 && game_.t <= 2) || #make sure the player declined in his/her first turn
-							(numActivePlayers == 3 && @game.t <= 3) ||
-							(numActivePlayers == 4 && @game.t <= 4))
+							(numActivePlayers == 3 && game_.t <= 3) ||
+							(numActivePlayers == 4 && game_.t <= 4))
 							#first turn so auto decline...this logic is not exactly right
 							#it should probably check for specific player's first turn
 							#but this is fine for now
