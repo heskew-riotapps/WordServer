@@ -242,6 +242,7 @@ class Player
 						else
 							#past first turn, resign
 							game_, unauthorized = GameService.resign(pg.player, game_)
+						end
 					end
 					
 					#at this point the game has changed state 
