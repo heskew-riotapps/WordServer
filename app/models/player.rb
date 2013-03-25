@@ -218,9 +218,9 @@ class Player
 				#while we are in this loop, let's check for expired turns
 				#if the player has not taken her turn within 10 days, concede for that player 
 				
-				if pg.i_t
-					Rails.logger.info("is turn hours ago=#{((nowDate - game_.l_t_d) / 3600).round}")
-				end
+			#	if pg.i_t
+			#		Rails.logger.info("is turn hours ago=#{((nowDate - game_.l_t_d) / 3600).round}")
+			#	end
 				if (pg.i_t && ((nowDate - game_.l_t_d) / 3600).round > 240)
 					
 					#check to see if the player is nil, if so it's likely an older game with a deleted player
